@@ -1,0 +1,132 @@
+/* Shared by several components. Import where needed. */
+
+.primaryButton {
+  min-height: 40px;
+  padding: 0 20px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.secondaryButton {
+  min-height: 40px;
+  padding: 0 20px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.primaryButton {
+  background: var(--orange);
+  color: #fff;
+}
+
+.primaryButton:hover {
+  background: var(--orange-dark);
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  background: #fff;
+  color: #263448;
+  border-color: #d9e2ea;
+}
+
+.iconButton {
+  border: 0;
+  background: transparent;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+}
+
+.iconButton:hover {
+  background: #eef2f5;
+}
+
+.landingActions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 22px;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.aiButton {
+  border: 0;
+  background: #f1f4f7;
+  color: #56657a;
+  border-radius: 7px;
+  padding: 9px 13px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.textButton {
+  border: 0;
+  background: transparent;
+  color: #334155;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .landingActions .primaryButton {
+    display: none;
+  }
+}
+
+.questionSuccessActions {
+  margin-top: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  flex-wrap: wrap;
+}
+
+.questionSuccessActions .primaryButton {
+  min-width: 130px;
+
+  background: #f97316;
+  border-color: #f97316;
+}
+
+.questionSuccessActions .secondaryButton {
+  min-width: 130px;
+
+  background: #e8eef5;
+  border-color: #dbe2ea;
+
+  color: #334155;
+}
+
+@media (max-width: 600px) {
+  .questionSuccessActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .questionSuccessActions a {
+    width: 100%;
+  }
+}

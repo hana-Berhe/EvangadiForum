@@ -1,0 +1,325 @@
+/* Shared by several components. Import where needed. */
+
+.brandMark {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--orange);
+}
+
+.brandMark.inverse {
+  background: #fff;
+  color: var(--orange);
+}
+
+.eyebrow {
+  color: #d74e00;
+  font-weight: 800;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.formField {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+label {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+small {
+  color: #64748b;
+  font-size: 0.76rem;
+}
+
+input {
+  width: 100%;
+  border: 1px solid #d4dde6;
+  border-radius: 8px;
+  background: #fff;
+  padding: 12px 13px;
+  outline: none;
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid #d4dde6;
+  border-radius: 8px;
+  background: #fff;
+  padding: 12px 13px;
+  outline: none;
+}
+
+.replyEdit textarea {
+  width: 100%;
+  border: 1px solid #d4dde6;
+  border-radius: 8px;
+  background: #fff;
+  padding: 12px 13px;
+  outline: none;
+}
+
+input:focus {
+  border-color: #f58a48;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.08);
+}
+
+textarea:focus {
+  border-color: #f58a48;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.08);
+}
+
+.replyEdit textarea:focus {
+  border-color: #f58a48;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.08);
+}
+
+.formError {
+  color: #b42318;
+  background: #fff2f0;
+  border: 1px solid #ffd6d1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.86rem;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #7fe1eb;
+  color: #0f3b45;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
+.avatar.small {
+  width: 31px;
+  height: 31px;
+}
+
+.pageStack {
+  display: grid;
+  gap: 22px;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+}
+
+.screenCenter {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  align-content: center;
+  gap: 10px;
+}
+
+.screenCenter {
+  min-height: 100vh;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 4px solid #e0e6ec;
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+.threadList {
+  display: grid;
+}
+
+.threadRow {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e3e9ee;
+  background: #fff;
+  position: relative;
+}
+
+.threadRow:hover {
+  background: #fafcfd;
+}
+
+.threadRow.yours {
+  background: #eef3f7;
+  border-left: 3px solid var(--orange);
+  padding-left: 17px;
+}
+
+.threadAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #55efd8;
+  color: #073b34;
+  border: 1px solid #31d3bd;
+  font-size: 0.78rem;
+}
+
+.threadRow.yours .threadAvatar {
+  background: #8adddf;
+  border-color: #ff9c5a;
+}
+
+.designForm .formField {
+  margin-bottom: 24px;
+}
+
+.editorShell {
+  border: 1px solid #d4dde6;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.editorShell textarea {
+  border: 0;
+  border-radius: 0;
+  min-height: 220px;
+  resize: vertical;
+}
+
+.replyEdit textarea {
+  margin-top: 10px;
+}
+
+.aiPanel {
+  background: #fff7f0;
+  border-color: #ffd3b5;
+}
+
+.aiPanel.compact {
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 8px;
+}
+
+.pageHeading {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+h1 {
+  margin: 6px 0;
+}
+
+.questionList {
+  display: grid;
+  gap: 0;
+  border: 1px solid #dbe3ea;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.textLink {
+  color: var(--orange);
+  font-weight: 700;
+}
+
+.editorShell textarea {
+  width: 100%;
+  padding: 17px 16px;
+  line-height: 1.65;
+  font-size: 0.86rem;
+  color: #27364a;
+  outline: none;
+}
+
+.proseContent {
+  line-height: 1.7;
+  color: #334155;
+  overflow-wrap: anywhere;
+}
+
+*:first-child {
+  margin-top: 0;
+}
+
+*:last-child {
+  margin-bottom: 0;
+}
+
+p {
+  margin: 0.65em 0;
+}
+
+strong {
+  font-weight: 800;
+  color: #172033;
+}
+
+em {
+  font-style: italic;
+}
+
+ul {
+  padding-left: 1.45rem;
+}
+
+ol {
+  padding-left: 1.45rem;
+}
+
+blockquote {
+  margin: 1rem 0;
+  padding: 0.7rem 1rem;
+  border-left: 3px solid var(--orange);
+  background: #fff7f1;
+  color: #526177;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #edf2f6;
+  border-radius: 4px;
+  padding: 0.12rem 0.3rem;
+  font-size: 0.9em;
+}
+
+pre {
+  background: #172033;
+  color: #edf5ff;
+  border-radius: 8px;
+  padding: 14px;
+  overflow: auto;
+}
+
+pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+a {
+  color: #e65f0e;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.replyEdit .editorShell {
+  margin-top: 12px;
+}

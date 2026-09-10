@@ -22,3 +22,4 @@ authRouter.post("/register", registerValidation, registerController);
  * @access Public
  */
 authRouter.post("/login", loginValidation, loginController);
+export { authRouter };

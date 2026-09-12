@@ -92,5 +92,23 @@ async function storeQuestionVector({
 }
 
 validateEmbedding(embedding);
-
 const embeddingJson = JSON.stringify(embedding);
+
+const sql = `
+  INSERT INTO question_vectors (question_id, source_text, embedding, status)
+  VALUES (?, ?, ?, ?)
+  ON DUPLICATE KEY UPDATE
+    source_text = VALUES(source_text),
+    embedding = VALUES(embedding),
+    status = VALUES(status),
+    updated_at = CURRENT_TIMESTAMP
+`;
+
+try {
+  await safeExecute(sql, [
+    questionId,
+    sourceText,
+    embeddingJson,
+    status,
+  ]);
+}

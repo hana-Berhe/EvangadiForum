@@ -27,3 +27,12 @@ try {
 
   throw error;
 }
+const questionId = questionResult.insertId;
+
+const creationResult = {
+  id: questionId,
+  questionHash,
+  title,
+  content,
+  userId,
+};

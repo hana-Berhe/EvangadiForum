@@ -90,3 +90,7 @@ async function storeQuestionVector({
 
   return;
 }
+
+validateEmbedding(embedding);
+
+const embeddingJson = JSON.stringify(embedding);

@@ -36,3 +36,7 @@ const creationResult = {
   content,
   userId,
 };
+
+const sourceText = normalizeQuestionText({
+  title: payload.title,
+});

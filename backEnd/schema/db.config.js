@@ -1,17 +1,13 @@
-import "dotenv/config";
 import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+dotenv.config();
 
-// Mock connection pool creation if non-null connection parameters are provided
-// and connection configuration should work with the schema we designed
-export const db = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  user: process.env.DB_USER || "admin",
-  password: process.env.DB_PASS || "Addis2026%",
-  database: process.env.DB_NAME || "ai-forum",
-  //   waitForConnections: true,
-  //   connectionLimit: 10,
-  //   queueLimit: 0,
-  //   namedPlaceholders: true,
+const db = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  charset: "utf8mb4",
 });
 
 const ensureParams = (params) => {
@@ -25,7 +21,7 @@ const ensureParams = (params) => {
   }
 };
 
-export const safeExecute = async (sql, params) => {
+const safeExecute = async (sql, params) => {
   if (typeof sql !== "string" || sql.trim().length === 0) {
     throw new Error("SQL query must be a non-empty string");
   }
@@ -33,3 +29,5 @@ export const safeExecute = async (sql, params) => {
   const [result] = await db.execute(sql, params);
   return result;
 };
+
+export { db, safeExecute };

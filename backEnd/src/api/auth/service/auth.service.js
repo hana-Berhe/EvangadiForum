@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { safeExecute } from "../../../../db/config.js";
+import { safeExecute } from "../../../../schema/db.config.js";
 import {
   BadRequestError,
   UnauthenticatedError,
-} from "../../../utils/errors/index.js";
+} from "../../../utility/errors/errors.js";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
@@ -24,7 +24,7 @@ const normalizeEmail = (email) => email.trim().toLowerCase();
 export const checkUserExists = async (email) => {
   const normalizedEmail = normalizeEmail(email);
   const sql = "SELECT user_id FROM users WHERE email = ? ";
-  const rows = await safeExecute(sql, [email]);
+  const rows = await safeExecute(sql, [normalizedEmail]);
   return rows.length > 0;
 };
 

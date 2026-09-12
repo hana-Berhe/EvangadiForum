@@ -4,76 +4,102 @@ import { safeExecute } from "../../../../schema/db.config.js";
 const generateQuestionHash = () => crypto.randomBytes(8).toString("hex");
 
 
+/**
+ * Creates a new question and stores its vector embedding for semantic search.
+ * @param {Object} payload - The question data
+ * @param {string} payload.userId - ID of the user creating the question
+ * @param {string} payload.title - Title of the question
+ * @param {string} payload.content - Content/body of the question
+ * @returns {Promise<Object>} Object containing the created question
+ */
 const createQuestionWithVectorService = async (payload) => {
+  // Extract required fields from the payload
   const { userId, title, content } = payload;
+
+  // Prepare the SQL statement for inserting a new question
   const insertQuestionSql =
-  "INSERT INTO questions (question_hash, user_id, title, content) VALUES (?, ?, ?, ?)";
+    "INSERT INTO questions (question_hash, user_id, title, content) VALUES (?, ?, ?, ?)";
 
-const questionHash = generateQuestionHash();
+  // Generate a unique hash for the question
+  const questionHash = generateQuestionHash();
 
-let questionResult;
+  let questionResult;
 
-try {
-  questionResult = await safeExecute(insertQuestionSql, [
+  try {
+    // Execute the insertion query safely
+    questionResult = await safeExecute(insertQuestionSql, [
+      questionHash,
+      userId,
+      title,
+      content,
+    ]);
+  } catch (error) {
+    // Handle specific foreign key constraint error for non-existent user
+    if (error?.code === "ER_NO_REFERENCED_ROW_2") {
+      throw new BadRequestError("User does not exist.");
+    }
+
+    throw error;
+  }
+
+  // Retrieve the auto-generated ID of the newly inserted question
+  const questionId = questionResult.insertId;
+
+  // Construct the result object representing the created question
+  const creationResult = {
+    id: questionId,
     questionHash,
-    userId,
     title,
     content,
-  ]);
-} catch (error) {
-  if (error?.code === "ER_NO_REFERENCED_ROW_2") {
-    throw new BadRequestError("User does not exist.");
-  }
+    userId,
+  };
 
-  throw error;
-}
-const questionId = questionResult.insertId;
-
-const creationResult = {
-  id: questionId,
-  questionHash,
-  title,
-  content,
-  userId,
-};
-
-const sourceText = normalizeQuestionText({
-  title: payload.title,
-});
-
-try {
-  const embeddingResult = await generateQuestionEmbedding(sourceText, {
-    questionId: creationResult.id,
+  // Normalize the question text (e.g., title) to prepare it for vector embedding
+  const sourceText = normalizeQuestionText({
+    title: payload.title,
   });
 
-  if (
-    !embeddingResult ||
-    !embeddingResult.embedding ||
-    embeddingResult.embedding.length === 0
-  ) {
-    throw new Error("Gemini API returned an empty or invalid embedding");
-  }
+  try {
+    // Generate the vector embedding for the normalized question text
+    const embeddingResult = await generateQuestionEmbedding(sourceText, {
+      questionId: creationResult.id,
+    });
 
-  await storeQuestionVector({
-    questionId: creationResult.id,
-    sourceText,
-    embedding: embeddingResult.embedding,
-    status: "ready",
-  });
+    // Validate that a valid embedding was returned from the API
+    if (
+      !embeddingResult ||
+      !embeddingResult.embedding ||
+      embeddingResult.embedding.length === 0
+    ) {
+      throw new Error("Gemini API returned an empty or invalid embedding");
+    }
+
+    // Store the generated vector embedding in the database with a 'ready' status
+    await storeQuestionVector({
+      questionId: creationResult.id,
+      sourceText,
+      embedding: embeddingResult.embedding,
+      status: "ready",
+    });
   } catch (error) {
-  console.error("=== FAILED TO STORE VECTOR FOR QUESTION ===");
-  console.error("Question ID:", creationResult.id);
-  console.error("Operation: question creation");
-  console.error("Error:", error);
-  console.error("===========================================");
+    // Log detailed error information if vector generation or storage fails
+    console.error("=== FAILED TO STORE VECTOR FOR QUESTION ===");
+    console.error("Question ID:", creationResult.id);
+    console.error("Operation: question creation");
+    console.error("Error:", error);
+    console.error("===========================================");
 
-  await storeQuestionVector({
-    questionId: creationResult.id,
-    sourceText,
-    embedding: [],
-    status: "failed",
-  }).catch((e) => console.error("Failed to save failed status", e));
-}
-return {
-  question: creationResult,
+    // Explicitly record the failure state in the database so it can be retried or tracked later
+    await storeQuestionVector({
+      questionId: creationResult.id,
+      sourceText,
+      embedding: [],
+      status: "failed",
+    }).catch((e) => console.error("Failed to save failed status", e));
+  }
+
+  // Return the created question object
+  return {
+    question: creationResult,
+  };
 };

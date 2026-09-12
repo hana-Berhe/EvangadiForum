@@ -69,3 +69,24 @@ async function storeQuestionVector({
   embedding = [],
   status = "ready",
 }) {
+
+    if (status === "failed" || !embedding || embedding.length === 0) {
+  const sql = `
+    INSERT INTO question_vectors (question_id, source_text, embedding, status)
+    VALUES (?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE
+      source_text = VALUES(source_text),
+      embedding = VALUES(embedding),
+      status = VALUES(status),
+      updated_at = CURRENT_TIMESTAMP
+  `;
+
+  await safeExecute(sql, [
+    questionId,
+    sourceText,
+    JSON.stringify([]),
+    "failed",
+  ]);
+
+  return;
+}

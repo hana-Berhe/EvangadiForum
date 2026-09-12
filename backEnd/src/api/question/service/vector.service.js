@@ -62,3 +62,10 @@ function validateEmbedding(embedding) {
     throw new Error("Embedding must contain only valid numbers");
   }
 }
+
+async function storeQuestionVector({
+  questionId,
+  sourceText,
+  embedding = [],
+  status = "ready",
+}) {

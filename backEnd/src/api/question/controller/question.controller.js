@@ -28,3 +28,7 @@ const createQuestionController = async (req, res, next) => {
     next(error);
   }
 };
+
+export {
+  createQuestionController,
+};

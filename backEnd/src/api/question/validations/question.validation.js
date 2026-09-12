@@ -21,3 +21,7 @@ const createQuestionValidation = [
     .trim(),
   validationErrorHandler,
 ];
+
+export {
+  createQuestionValidation,
+};

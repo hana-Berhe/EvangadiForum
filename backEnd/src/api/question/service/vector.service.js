@@ -50,3 +50,15 @@ try {
   console.error("========================");
   throw error;
 }
+
+function validateEmbedding(embedding) {
+  if (!Array.isArray(embedding)) {
+    throw new Error("Embedding must be an array");
+  }
+  if (embedding.length === 0) {
+    throw new Error("Embedding cannot be empty");
+  }
+  if (!embedding.every((v) => typeof v === "number" && !isNaN(v))) {
+    throw new Error("Embedding must contain only valid numbers");
+  }
+}

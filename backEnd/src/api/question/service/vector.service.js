@@ -12,3 +12,8 @@ const RECOMMEND_K = Number(process.env.RECOMMEND_K) || 5;
 if (!GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY environment variable is required");
 }
+
+function normalizeWhitespace(value) {
+  return value.replace(/\s+/g, " ").trim();
+}
+

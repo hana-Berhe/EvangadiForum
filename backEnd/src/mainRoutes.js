@@ -5,3 +5,5 @@ export const mainRouter = express.Router();
 
 // /api/auth
 mainRouter.use("/auth", authRouter);
+// api answers
+mainRouter.use("/answers", answerRouter);

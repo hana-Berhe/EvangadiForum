@@ -1,6 +1,13 @@
 import { StatusCodes } from "http-status-codes";
 
-
+/**
+ * Handles creating a new question.
+ *
+ * @param {import('express').Request} req - The Express request object.
+ * @param {import('express').Response} res - The Express response object.
+ * @param {import('express').NextFunction} next - The Express next function.
+ * @returns {Promise<void>}
+ */
 const createQuestionController = async (req, res, next) => {
   try {
     const { title, content } = req.body;

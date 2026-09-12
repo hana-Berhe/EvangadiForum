@@ -23,3 +23,5 @@ answerRouter.post(
   createAnswerValidation,
   createAnswerController,
 );
+
+export { answerRouter };

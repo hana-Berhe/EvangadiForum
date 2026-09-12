@@ -40,3 +40,23 @@ const creationResult = {
 const sourceText = normalizeQuestionText({
   title: payload.title,
 });
+
+try {
+  const embeddingResult = await generateQuestionEmbedding(sourceText, {
+    questionId: creationResult.id,
+  });
+
+  if (
+    !embeddingResult ||
+    !embeddingResult.embedding ||
+    embeddingResult.embedding.length === 0
+  ) {
+    throw new Error("Gemini API returned an empty or invalid embedding");
+  }
+
+  await storeQuestionVector({
+    questionId: creationResult.id,
+    sourceText,
+    embedding: embeddingResult.embedding,
+    status: "ready",
+  });

@@ -1,12 +1,18 @@
 # Evangadi Forum
 
-Evangadi Forum is a developer Q&A platform where users can register, log in, ask programming questions, share answers, and learn from the community.
+Evangadi Forum is a developer Q&A platform where users can register, log in, ask programming questions, share answers, search for related discussions, and learn from the community.
 
-## Milestone 1
+The project is organized into milestones so each major stage can be developed, tested, reviewed, and deployed incrementally.
 
-Milestone 1 focuses on authentication and the initial project structure.
+---
 
-### Main Features
+## Project Milestones
+
+### Milestone 1 — Authentication & Project Foundation
+
+Milestone 1 establishes the project foundation and authentication system.
+
+Main features include:
 
 - User registration
 - User login
@@ -19,6 +25,47 @@ Milestone 1 focuses on authentication and the initial project structure.
 - Backend authentication API
 - Error handling and validation
 
+➡️ [View Milestone 1 README](./MILESTONE-1-README.MD)
+
+---
+
+### Milestone 2 — Questions & Answers
+
+Milestone 2 adds the core community forum functionality.
+
+Main features include:
+
+- Create and list questions
+- View a single question
+- Create and list answers
+- AI-assisted question drafting
+- AI-assisted answer assessment
+- Vector embeddings
+- Semantic search
+
+➡️ [View Milestone 2 README](./MILESTONE-2-README.md)
+
+---
+
+### Milestone 3 — AI & RAG
+
+Milestone 3 will extend the platform with advanced AI and Retrieval-Augmented Generation (RAG) functionality.
+
+Planned areas include:
+
+- Document/PDF upload
+- Document text extraction
+- Chunking
+- Embedding generation
+- Vector storage and retrieval
+- Similarity search
+- Retrieval-Augmented Generation
+- AI answers grounded in uploaded content
+
+> The Milestone 3 README can be linked here when the milestone begins.
+
+---
+
 ## Project Structure
 
 ```text
@@ -27,7 +74,9 @@ EvangadiForum/
 │   ├── schema/
 │   ├── src/
 │   │   ├── api/
-│   │   │   └── auth/
+│   │   │   ├── auth/
+│   │   │   ├── question/
+│   │   │   └── answer/
 │   │   ├── middleware/
 │   │   └── utility/
 │   ├── .env.example
@@ -45,8 +94,12 @@ EvangadiForum/
 │   │   └── utils/
 │   └── package.json
 │
+├── MILESTONE-1-README.MD
+├── MILESTONE-2-README.md
 └── README.md
 ```
+
+---
 
 ## Technologies
 
@@ -67,6 +120,15 @@ EvangadiForum/
 - bcrypt
 - dotenv
 - CORS
+
+### AI / Semantic Search
+
+- Google Gemini
+- Embeddings
+- Vector similarity
+- Semantic search
+
+---
 
 ## Getting Started
 
@@ -93,11 +155,9 @@ npm install
 
 ### 4. Configure Environment Variables
 
-Create a `.env` file inside the `backEnd` folder.
+Create a `.env` file inside the `backEnd` folder and use `.env.example` as a reference.
 
-Use `.env.example` as a reference.
-
-> Never commit your real `.env` file to GitHub.
+> Never commit real `.env` files, JWT secrets, database credentials, passwords, or API keys to GitHub.
 
 ### 5. Run the Backend
 
@@ -115,11 +175,80 @@ cd frontEnd
 npm run dev
 ```
 
+---
+
+## API Overview
+
+### Authentication
+
+```text
+/api/auth
+```
+
+Handles:
+
+- Registration
+- Login
+- Authentication
+- Protected user access
+
+### Questions
+
+```text
+/api/questions
+```
+
+Handles:
+
+- Creating questions
+- Listing questions
+- Viewing a single question
+- Semantic search
+- AI drafting assistance
+
+### Answers
+
+```text
+/api/answers
+```
+
+Handles:
+
+- Creating answers
+- Retrieving answers
+- AI-assisted answer assessment
+
+---
+
+## Request Flow
+
+```text
+Frontend
+   ↓
+Route
+   ↓
+Validation
+   ↓
+Authentication Middleware
+   ↓
+Controller
+   ↓
+Service
+   ↓
+MySQL / Gemini / Vector Logic
+   ↓
+Controller Response
+   ↓
+Frontend
+```
+
+---
+
 ## Team Collaboration Workflow
 
-Do not work directly on the `main` branch.
+Do not work directly on `main`.
 
-Before starting a new task:
+Before starting a task:
 
 ```bash
 git checkout main
@@ -131,59 +260,76 @@ After completing the task:
 
 ```bash
 git add .
-git commit -m "Describe completed task"
+git commit -m "describe completed task"
 git push -u origin feature/task-name
 ```
 
-Then create a Pull Request on GitHub.
+Then:
+
+1. Open a Pull Request.
+2. Review the changes.
+3. Resolve conflicts if needed.
+4. Merge into `main`.
+
+---
 
 ## Branch Naming Examples
 
 ```text
 feature/login-page
-feature/register-page
 feature/auth-backend
-feature/auth-context
+feature/question-api
+feature/answer-api
+feature/milestone-2-qa
 fix/login-validation
+fix/import-paths
 ```
+
+---
 
 ## Team Rules
 
-- Pull the latest `main` before starting a task.
-- Work only on your assigned branch.
-- Follow the Trello task description and checklist.
-- Keep each task focused on the assigned files and folders.
-- Avoid editing files assigned to another team member unless coordinated.
+- Pull the latest `main` before starting new work.
+- Work on the assigned branch.
+- Keep changes focused on the assigned task.
+- Avoid editing another team member's files unless coordinated.
 - Use clear and meaningful commit messages.
-- Create a Pull Request for every completed task.
-- Review changes before merging into `main`.
-- Resolve merge conflicts carefully before merging.
-- Never push `.env`, passwords, JWT secrets, database credentials, or API keys.
+- Create a Pull Request for completed work.
+- Review changes before merging.
+- Resolve merge conflicts carefully.
+- Never commit secrets or environment files.
 
-## Git Workflow Summary
+---
+
+## Milestone Workflow
 
 ```text
-main
-  ↓
-pull latest changes
-  ↓
-create task branch
-  ↓
-work on assigned files
-  ↓
-commit changes
-  ↓
-push branch
-  ↓
-open Pull Request
-  ↓
-review
-  ↓
-merge into main
+Milestone 1
+Authentication + Foundation
+        ↓
+Merge to main
+        ↓
+Deploy
+        ↓
+Milestone 2
+Questions + Answers + Semantic Search
+        ↓
+Merge to main
+        ↓
+Update Deployment
+        ↓
+Milestone 3
+AI + RAG
+        ↓
+Merge to main
+        ↓
+Final Deployment
 ```
+
+---
 
 ## Project Goal
 
-The goal of Evangadi Forum is to provide a collaborative developer community where users can ask questions, share knowledge, and learn from each other.
+The goal of Evangadi Forum is to provide a collaborative developer community where users can ask questions, share knowledge, search for relevant discussions, and receive AI-powered assistance.
 
-Future milestones can extend the project with additional forum functionality and AI-powered features.
+The milestone-based structure allows the team to build the application progressively while keeping each stage organized, testable, and deployable.

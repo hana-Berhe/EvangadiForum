@@ -20,3 +20,5 @@ function normalizeWhitespace(value) {
 function normalizeQuestionText({ title }) {
   return normalizeWhitespace(`${title || ""}`.normalize("NFKC").toLowerCase());
 }
+
+const { taskType = "RETRIEVAL_DOCUMENT", questionId = null } = options;

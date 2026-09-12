@@ -1,4 +1,3 @@
-
 // Import React tools (Context, Hooks)
 import {
   createContext, // Creates an authentication Context
@@ -407,4 +406,3 @@ export function useAuth() {
   // Return all authentication data/functions
   return context;
 }
-git

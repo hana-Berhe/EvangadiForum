@@ -60,3 +60,17 @@ try {
     embedding: embeddingResult.embedding,
     status: "ready",
   });
+  } catch (error) {
+  console.error("=== FAILED TO STORE VECTOR FOR QUESTION ===");
+  console.error("Question ID:", creationResult.id);
+  console.error("Operation: question creation");
+  console.error("Error:", error);
+  console.error("===========================================");
+
+  await storeQuestionVector({
+    questionId: creationResult.id,
+    sourceText,
+    embedding: [],
+    status: "failed",
+  }).catch((e) => console.error("Failed to save failed status", e));
+}

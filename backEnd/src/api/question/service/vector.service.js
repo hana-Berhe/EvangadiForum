@@ -112,3 +112,15 @@ try {
     status,
   ]);
 }
+
+catch (error) {
+  console.error("=== MYSQL UPSERT ERROR ===");
+  console.error("Operation: storeQuestionVector");
+  console.error(`Question ID: ${questionId}`);
+  console.error(`Embedding length: ${embedding.length}`);
+  console.error(`Status: ${status}`);
+  console.error("SQL:", sql.trim().replace(/\s+/g, " "));
+  console.error("Error:", error);
+  console.error("==========================");
+  throw error;
+}

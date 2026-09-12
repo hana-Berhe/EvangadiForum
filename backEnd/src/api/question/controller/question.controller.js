@@ -1,5 +1,7 @@
 import { StatusCodes } from "http-status-codes";
-
+import {
+  createQuestionWithVectorService,
+} from "../service/question.service.js";
 /**
  * Handles creating a new question.
  *

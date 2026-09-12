@@ -1,5 +1,11 @@
 import crypto from "crypto";
 import { safeExecute } from "../../../../schema/db.config.js";
+import {
+  generateQuestionEmbedding,
+  getVectorConfig,
+  normalizeQuestionText,
+  storeQuestionVector,
+} from "./vector.service.js";
 
 const generateQuestionHash = () => crypto.randomBytes(8).toString("hex");
 
@@ -102,4 +108,8 @@ const createQuestionWithVectorService = async (payload) => {
   return {
     question: creationResult,
   };
+};
+
+export {
+  createQuestionWithVectorService,
 };

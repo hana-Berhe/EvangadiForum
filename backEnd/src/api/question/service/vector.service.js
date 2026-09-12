@@ -17,3 +17,6 @@ function normalizeWhitespace(value) {
   return value.replace(/\s+/g, " ").trim();
 }
 
+function normalizeQuestionText({ title }) {
+  return normalizeWhitespace(`${title || ""}`.normalize("NFKC").toLowerCase());
+}

@@ -74,3 +74,6 @@ try {
     status: "failed",
   }).catch((e) => console.error("Failed to save failed status", e));
 }
+return {
+  question: creationResult,
+};

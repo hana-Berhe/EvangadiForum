@@ -21,7 +21,6 @@ function normalizeQuestionText({ title }) {
   return normalizeWhitespace(`${title || ""}`.normalize("NFKC").toLowerCase());
 }
 
-
 /**
  * Generate a normalized embedding for the provided question text using the Gemini API.
  *
@@ -34,36 +33,37 @@ function normalizeQuestionText({ title }) {
  *
  */
 
-const { taskType = "RETRIEVAL_DOCUMENT", questionId = null } = options;
+async function generateQuestionEmbedding(sourceText, options = {}) {
+  const { taskType = "RETRIEVAL_DOCUMENT", questionId = null } = options;
 
-const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-try {
-  const result = await ai.models.embedContent({
-    model: process.env.GEMINI_EMBEDDING_MODEL,
-    contents: sourceText,
-    taskType,
-    config: {
-      outputDimensionality: 768,
-    },
-  });
+  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  try {
+    const result = await ai.models.embedContent({
+      model: process.env.GEMINI_EMBEDDING_MODEL,
+      contents: sourceText,
+      taskType,
+      config: {
+        outputDimensionality: 768,
+      },
+    });
 
-  // console.log(result.embeddings[0].values);
+    // console.log(result.embeddings[0].values);
 
-  let values = result?.embeddings[0]?.values;
+    let values = result?.embeddings[0]?.values;
 
-  if (!Array.isArray(values) || values.length === 0) {
-    throw new Error("Gemini embedding response does not contain values");
+    if (!Array.isArray(values) || values.length === 0) {
+      throw new Error("Gemini embedding response does not contain values");
+    }
+
+    return {
+      embedding: values,
+    };
+  } catch (error) {
+    console.error("Error:", error);
+    console.error("========================");
+    throw error;
   }
-
-  return {
-    embedding: values,
-  };
-} catch (error) {
-  console.error("Error:", error);
-  console.error("========================");
-  throw error;
 }
-
 
 /**
  * Validate that an embedding is a valid array of numbers.
@@ -81,7 +81,6 @@ function validateEmbedding(embedding) {
     throw new Error("Embedding must contain only valid numbers");
   }
 }
-
 
 /**
  * Store the question vector in the database.

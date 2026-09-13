@@ -3,6 +3,8 @@ import { validationErrorHandler } from "../../../middleware/validation-handler.j
 
 
 const createQuestionValidation = [
+/** Same body rules as posting a question — AI coach only reads draft text. */
+const generateQuestionDraftCoachValidation = [
   body("title")
     .notEmpty()
     .withMessage("Question title is required")
@@ -25,3 +27,4 @@ const createQuestionValidation = [
 export {
   createQuestionValidation,
 };
+export { generateQuestionDraftCoachValidation };

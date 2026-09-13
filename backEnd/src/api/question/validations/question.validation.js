@@ -1,5 +1,8 @@
 import { body, param, query } from "express-validator";
 import { validationErrorHandler } from "../../../middleware/validation-handler.js";
+
+
+const createQuestionValidation = [
 /** Same body rules as posting a question — AI coach only reads draft text. */
 const generateQuestionDraftCoachValidation = [
   body("title")
@@ -20,4 +23,8 @@ const generateQuestionDraftCoachValidation = [
     .trim(),
   validationErrorHandler,
 ];
+
+export {
+  createQuestionValidation,
+};
 export { generateQuestionDraftCoachValidation };

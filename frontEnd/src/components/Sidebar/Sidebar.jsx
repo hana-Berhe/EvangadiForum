@@ -50,3 +50,14 @@ export default function Sidebar() {
             <MessageSquare size={18} />
             Your Topics
           </NavLink>
+                    <NavLink
+            to="/rag-documents"
+            className={({ isActive }) =>
+              `${styles.sidebarLink}${isActive ? ` ${styles.active}` : ""}`
+            }
+          >
+            <BookOpen size={18} />
+            Knowledge Base
+          </NavLink>
+        </nav>
+      </div>

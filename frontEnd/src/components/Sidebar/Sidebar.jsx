@@ -30,3 +30,14 @@ export default function Sidebar() {
             <small>Learn together. Ask with context.</small>
           </span>
         </NavLink>
+        <div className={styles.sidebarSectionLabel}>Navigate</div>
+        <nav className={styles.sidebarNav}>
+                      <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `${styles.sidebarLink}${isActive ? ` ${styles.active}` : ""}`
+            }
+          >
+            <Home size={18} />
+            Home
+          </NavLink>

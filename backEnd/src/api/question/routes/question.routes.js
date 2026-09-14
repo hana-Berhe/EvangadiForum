@@ -1,7 +1,8 @@
 import express from "express";
 const questionRouter = express.Router();
-import { createQuestionController, searchQuestionsSemanticController } from "../controller/question.controller.js";
-import { createQuestionValidation, searchQuestionsSemanticValidation } from "../validations/question.validation.js";
+import { createQuestionController, searchQuestionsSemanticController,getSingleQuestionController } from "../controller/question.controller.js";
+import { createQuestionValidation, searchQuestionsSemanticValidation,getSingleQuestionValidation } from "../validations/question.validation.js";
+
 import { authenticateUser } from "../../../middleware/authentication.js";
 
 /**
@@ -38,6 +39,19 @@ questionRouter.post(
   generateQuestionDraftCoachValidation,
   generateQuestionDraftCoachController,
 );
+// ---- T-10b ----  keep this LAST: /:questionHash matches any word
+/**
+ * @route GET /api/questions/:questionHash
+ * @desc Get one question with answers
+ * @access Private
+ */
+questionRouter.get(
+  "/:questionHash",
+  authenticateUser,
+  getSingleQuestionValidation,
+  getSingleQuestionController,
+);
+
 
 /**
  * @route GET /api/questions/search
@@ -62,5 +76,16 @@ questionRouter.post(
   createQuestionValidation,
   createQuestionController,
 );
-
+// ---- T-10b ----  keep this LAST: /:questionHash matches any word
+/**
+ * @route GET /api/questions/:questionHash
+ * @desc Get one question with answers
+ * @access Private
+ */
+questionRouter.get(
+  "/:questionHash",
+  authenticateUser,
+  getSingleQuestionValidation,
+  getSingleQuestionController,
+);
 export { questionRouter };

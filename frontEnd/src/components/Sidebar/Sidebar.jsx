@@ -12,3 +12,5 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
 
   const navigate = useNavigate();
+    const initials =
+    `${user?.firstName?.[0] || "U"}${user?.lastName?.[0] || ""}`.toUpperCase();

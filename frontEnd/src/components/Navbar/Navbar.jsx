@@ -57,3 +57,11 @@ export default function Navbar() {
         <strong>{title}</strong>
         <small>{subtitle}</small>
       </div>
+         <form className={styles.navbarSearch} onSubmit={submit}>
+        <Search size={17} />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search questions by keyword..."
+        />
+      </form>   

@@ -1,8 +1,7 @@
 import { body, param, query } from "express-validator";
 import { validationErrorHandler } from "../../../middleware/validation-handler.js";
 
-
-const createQuestionValidation = []// here is unfinished code,
+// here is unfinished code,
 /** Same body rules as posting a question — AI coach only reads draft text. */
 
 // ---- T-10b ----
@@ -56,10 +55,6 @@ export const searchQuestionsSemanticValidation = [
   validationErrorHandler,
 ];
 
-export {
-  createQuestionValidation,
-};
-export { generateQuestionDraftCoachValidation };
 const createQuestionValidation = [
   body("title")
     .notEmpty()

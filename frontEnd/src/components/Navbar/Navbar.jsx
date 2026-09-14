@@ -35,41 +35,48 @@ export default function Navbar() {
     navigate = useNavigate(),
     { user, logout } = useAuth(),
     [search, setSearch] = useState("");
-      const [title, subtitle] =
+  const [title, subtitle] =
     pathname.startsWith("/questions/") && !TITLES[pathname]
       ? [
           "Discussion",
           "Read the thread, review related topics, and reply with markdown if you can help.",
         ]
       : TITLES[pathname] || ["Evangadi Forum", "Technical Q&A for learners."];
-        function submit(e) {
+  function submit(e) {
     e.preventDefault();
     if (search.trim())
       navigate(`/questions?search=${encodeURIComponent(search.trim())}`);
   }
-    function onLogout() {
+  function onLogout() {
     logout();
     navigate("/auth", { replace: true });
   }
-    return (
+  return (
     <header className={styles.navbar}>
       <div className={styles.navbarPageTitle}>
         <strong>{title}</strong>
         <small>{subtitle}</small>
       </div>
-         <form className={styles.navbarSearch} onSubmit={submit}>
+      <form className={styles.navbarSearch} onSubmit={submit}>
         <Search size={17} />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search questions by keyword..."
         />
-      </form>   
-          <div className={styles.navbarUser}>
+      </form>
+      <div className={styles.navbarUser}>
         <strong>
           {user?.firstName || "User"} {user?.lastName || ""}
         </strong>
 
         <span className={`${ui.avatar} ${ui.small}`}>
           {`${user?.firstName?.[0] || "U"}${user?.lastName?.[0] || ""}`.toUpperCase()}
-        </span>  
+        </span>
+        <button className={btn.iconButton} onClick={onLogout}>
+          <LogOut size={18} />
+        </button>
+      </div>
+    </header>
+  );
+}   

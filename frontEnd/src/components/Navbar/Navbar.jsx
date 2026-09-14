@@ -1,7 +1,8 @@
-import React from "react";
+import { LogOut, Search } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
-function Navbar() {
-  return <div></div>;
-}
-
-export default Navbar;
+import { useAuth } from "../../context/AuthContext";
+import btn from "../../styles/buttons.module.css";
+import styles from "./Navbar.module.css";
+import ui from "../../styles/pageStates.module.css";

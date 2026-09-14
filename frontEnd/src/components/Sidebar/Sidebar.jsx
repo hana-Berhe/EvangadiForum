@@ -13,11 +13,11 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const initials =
     `${user?.firstName?.[0] || "U"}${user?.lastName?.[0] || ""}`.toUpperCase();
-    function onLogout() {
+  function onLogout() {
     logout();
     navigate("/auth", { replace: true });
   }
-    return (
+  return (
     <aside className={styles.sidebar}>
       <div>
         <NavLink to="/dashboard" className={styles.sidebarBrand}>
@@ -32,7 +32,7 @@ export default function Sidebar() {
         </NavLink>
         <div className={styles.sidebarSectionLabel}>Navigate</div>
         <nav className={styles.sidebarNav}>
-                      <NavLink
+          <NavLink
             to="/dashboard"
             className={({ isActive }) =>
               `${styles.sidebarLink}${isActive ? ` ${styles.active}` : ""}`
@@ -41,7 +41,7 @@ export default function Sidebar() {
             <Home size={18} />
             Home
           </NavLink>
-                    <NavLink
+          <NavLink
             to="/my-questions"
             className={({ isActive }) =>
               `${styles.sidebarLink}${isActive ? ` ${styles.active}` : ""}`
@@ -50,7 +50,7 @@ export default function Sidebar() {
             <MessageSquare size={18} />
             Your Topics
           </NavLink>
-                    <NavLink
+          <NavLink
             to="/rag-documents"
             className={({ isActive }) =>
               `${styles.sidebarLink}${isActive ? ` ${styles.active}` : ""}`
@@ -75,3 +75,15 @@ export default function Sidebar() {
             <small>Learner</small>
           </span>
         </div>
+        <button
+          type="button"
+          className={styles.sidebarLogout}
+          onClick={onLogout}
+        >
+          <LogOut size={16} />
+          Logout
+        </button>
+      </div>
+    </aside>
+  );
+}

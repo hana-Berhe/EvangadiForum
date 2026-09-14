@@ -65,3 +65,11 @@ export default function Navbar() {
           placeholder="Search questions by keyword..."
         />
       </form>   
+          <div className={styles.navbarUser}>
+        <strong>
+          {user?.firstName || "User"} {user?.lastName || ""}
+        </strong>
+
+        <span className={`${ui.avatar} ${ui.small}`}>
+          {`${user?.firstName?.[0] || "U"}${user?.lastName?.[0] || ""}`.toUpperCase()}
+        </span>  

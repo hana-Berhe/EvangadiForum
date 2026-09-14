@@ -1,7 +1,10 @@
 import { StatusCodes } from "http-status-codes";
 import { createQuestionWithVectorService } from "../service/question.service.js";
 import { getSingleQuestionService } from "../service/question.service.js";
-import { generateQuestionDraftCoachService } from "../service/geminiTextCoach.service.js";
+import {
+  generateQuestionDraftCoachService,
+  assessAnswerAgainstQuestionService,
+} from "../service/geminiTextCoach.service.js";
 /**
  * Handles creating a new question.
  *
@@ -60,7 +63,6 @@ const getSingleQuestionController = async (req, res, next) => {
   }
 };
 
-
 export const searchQuestionsSemanticController = async (req, res, next) => {
   try {
     const result = await searchQuestionsSemanticService({
@@ -95,6 +97,29 @@ const generateQuestionDraftCoachController = async (req, res, next) => {
   }
 };
 
+const assessAnswerAgainstQuestionController = async (req, res, next) => {
+  try {
+    const { questionHash } = req.params;
+    const { answerText } = req.body;
+    const { question } = await getSingleQuestionService({ questionHash });
+    const data = await assessAnswerAgainstQuestionService({
+      questionTitle: question.title,
+      questionContent: question.content,
+      answerText,
+    });
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Answer fit assessed.",
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-export { createQuestionController, getSingleQuestionController, generateQuestionDraftCoachController };
-
+export {
+  createQuestionController,
+  getSingleQuestionController,
+  generateQuestionDraftCoachController,
+  assessAnswerAgainstQuestionController,
+};

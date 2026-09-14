@@ -5,6 +5,7 @@ import {
   searchQuestionsSemanticController,
   getSingleQuestionController,
   generateQuestionDraftCoachController,
+  assessAnswerAgainstQuestionController,
 } from "../controller/question.controller.js";
 
 import {
@@ -12,6 +13,7 @@ import {
   searchQuestionsSemanticValidation,
   getSingleQuestionValidation,
   generateQuestionDraftCoachValidation,
+  assessAnswerAgainstQuestionValidation,
 } from "../validations/question.validation.js";
 
 import { authenticateUser } from "../../../middleware/authentication.js";
@@ -89,4 +91,17 @@ questionRouter.get(
   getSingleQuestionValidation,
   getSingleQuestionController,
 );
+
+/**
+ * @route POST /api/questions/:questionHash/answer-fit
+ * @desc AI relevance check for an answer draft vs the question
+ * @access Private
+ */
+questionRouter.post(
+  "/:questionHash/answer-fit",
+  authenticateUser,
+  assessAnswerAgainstQuestionValidation,
+  assessAnswerAgainstQuestionController,
+);
+
 export { questionRouter };

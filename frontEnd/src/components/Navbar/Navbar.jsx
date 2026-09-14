@@ -29,3 +29,9 @@ const TITLES = {
     "Find questions by meaning, not only exact words.",
   ],
 };
+
+export default function Navbar() {
+  const { pathname } = useLocation(),
+    navigate = useNavigate(),
+    { user, logout } = useAuth(),
+    [search, setSearch] = useState("");

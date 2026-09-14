@@ -17,3 +17,16 @@ export default function Sidebar() {
     logout();
     navigate("/auth", { replace: true });
   }
+    return (
+    <aside className={styles.sidebar}>
+      <div>
+        <NavLink to="/dashboard" className={styles.sidebarBrand}>
+          <span className={ui.brandMark}>
+            <MessageSquare size={19} />
+          </span>
+
+          <span>
+            <strong>Evangadi Forum</strong>
+            <small>Learn together. Ask with context.</small>
+          </span>
+        </NavLink>

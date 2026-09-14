@@ -4,6 +4,16 @@ import { validationErrorHandler } from "../../../middleware/validation-handler.j
 
 const createQuestionValidation = []// here is unfinished code,
 /** Same body rules as posting a question — AI coach only reads draft text. */
+
+// ---- T-10b ----
+const getSingleQuestionValidation = [
+  param("questionHash")
+    .isString()
+    .withMessage("Question hash is required")
+    .matches(/^[a-f0-9]{16}$/)
+    .withMessage("Question hash must be a 16-character lowercase hex string"),
+  validationErrorHandler,
+];
 const generateQuestionDraftCoachValidation = [
   body("title")
     .notEmpty()
@@ -70,4 +80,4 @@ const createQuestionValidation = [
   validationErrorHandler,
 ];
 
-export { createQuestionValidation, generateQuestionDraftCoachValidation };
+export { createQuestionValidation, getSingleQuestionValidation, generateQuestionDraftCoachValidation };

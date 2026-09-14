@@ -42,3 +42,8 @@ export default function Navbar() {
           "Read the thread, review related topics, and reply with markdown if you can help.",
         ]
       : TITLES[pathname] || ["Evangadi Forum", "Technical Q&A for learners."];
+        function submit(e) {
+    e.preventDefault();
+    if (search.trim())
+      navigate(`/questions?search=${encodeURIComponent(search.trim())}`);
+  }

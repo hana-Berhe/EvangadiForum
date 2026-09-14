@@ -51,3 +51,9 @@ export default function Navbar() {
     logout();
     navigate("/auth", { replace: true });
   }
+    return (
+    <header className={styles.navbar}>
+      <div className={styles.navbarPageTitle}>
+        <strong>{title}</strong>
+        <small>{subtitle}</small>
+      </div>

@@ -1,5 +1,6 @@
 import { StatusCodes } from "http-status-codes";
 import { createQuestionWithVectorService } from "../service/question.service.js";
+import { getSingleQuestionService } from "../service/question.service.js";
 import { generateQuestionDraftCoachService } from "../service/geminiTextCoach.service.js";
 /**
  * Handles creating a new question.
@@ -31,6 +32,33 @@ const createQuestionController = async (req, res, next) => {
 /**
  * Handles AI coaching for a question draft (title + body).
  */
+
+// ---- T-10b ----
+/**
+ * Handles fetching a single question with answers. Max 100 answers.
+ *
+ * @param {import('express').Request} req - The Express request object.
+ * @param {import('express').Response} res - The Express response object.
+ * @param {import('express').NextFunction} next - The Express next function.
+ * @returns {Promise<void>}
+ */
+const getSingleQuestionController = async (req, res, next) => {
+  try {
+    const { questionHash } = req.params;
+
+    const result = await getSingleQuestionService({
+      questionHash,
+    });
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Question fetched successfully.",
+      ...result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
 export const searchQuestionsSemanticController = async (req, res, next) => {
@@ -67,9 +95,5 @@ const generateQuestionDraftCoachController = async (req, res, next) => {
   }
 };
 
-export {
-  createQuestionController,
-  generateQuestionDraftCoachController
-};
-export { generateQuestionDraftCoachController };
-export { createQuestionController, generateQuestionDraftCoachController };
+
+export { createQuestionController, getSingleQuestionController, generateQuestionDraftCoachController };

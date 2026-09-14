@@ -9,7 +9,6 @@ import {
 
 const generateQuestionHash = () => crypto.randomBytes(8).toString("hex");
 
-
 /**
  * Creates a new question and stores its vector embedding for semantic search.
  * @param {Object} payload - The question data
@@ -142,3 +141,4 @@ export const searchQuestionsSemanticService = async ({ query, k = 5, threshold }
 export {
   createQuestionWithVectorService,
 };
+export { createQuestionWithVectorService };

@@ -1,6 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import { createQuestionWithVectorService,searchQuestionsSemanticService} from "../service/question.service.js";
-import {generateQuestionDraftCoachService,} from "../service/geminiTextCoach.service.js";// syntax error solved here
+import { createQuestionWithVectorService } from "../service/question.service.js";
+import { generateQuestionDraftCoachService } from "../service/geminiTextCoach.service.js";
 /**
  * Handles creating a new question.
  *
@@ -26,7 +26,8 @@ const createQuestionController = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};// syntax error solved here
+};
+
 /**
  * Handles AI coaching for a question draft (title + body).
  */
@@ -71,3 +72,4 @@ export {
   generateQuestionDraftCoachController
 };
 export { generateQuestionDraftCoachController };
+export { createQuestionController, generateQuestionDraftCoachController };

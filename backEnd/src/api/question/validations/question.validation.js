@@ -80,4 +80,4 @@ const createQuestionValidation = [
   validationErrorHandler,
 ];
 
-export { createQuestionValidation, generateQuestionDraftCoachValidation };
+export { createQuestionValidation, getSingleQuestionValidation, generateQuestionDraftCoachValidation };

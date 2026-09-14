@@ -35,3 +35,10 @@ export default function Navbar() {
     navigate = useNavigate(),
     { user, logout } = useAuth(),
     [search, setSearch] = useState("");
+      const [title, subtitle] =
+    pathname.startsWith("/questions/") && !TITLES[pathname]
+      ? [
+          "Discussion",
+          "Read the thread, review related topics, and reply with markdown if you can help.",
+        ]
+      : TITLES[pathname] || ["Evangadi Forum", "Technical Q&A for learners."];

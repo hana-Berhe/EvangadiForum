@@ -11,15 +11,19 @@ import ui from "../../styles/pageStates.module.css";
 export default function Sidebar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Keep the avatar usable while authentication data is still loading.
   const initials =
     `${user?.firstName?.[0] || "U"}${user?.lastName?.[0] || ""}`.toUpperCase();
   function onLogout() {
     logout();
+    // Replace history so a signed-out user cannot return to a protected view.
     navigate("/auth", { replace: true });
   }
   return (
     <aside className={styles.sidebar}>
       <div>
+        {/* The brand returns users to the dashboard from any authenticated page. */}
         <NavLink to="/dashboard" className={styles.sidebarBrand}>
           <span className={ui.brandMark}>
             <MessageSquare size={19} />
@@ -31,7 +35,9 @@ export default function Sidebar() {
           </span>
         </NavLink>
         <div className={styles.sidebarSectionLabel}>Navigate</div>
+        {/* Keep the main destinations together so the sidebar remains scannable. */}
         <nav className={styles.sidebarNav}>
+          {/* NavLink supplies the active state used to highlight the current view. */}
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
@@ -62,10 +68,12 @@ export default function Sidebar() {
         </nav>
       </div>
       <div className={styles.sidebarBottom}>
+        {/* This action stays separate from browsing links because it starts content creation. */}
         <NavLink to="/questions/ask" className={styles.sidebarNew}>
           <Plus size={17} />
           New Question
         </NavLink>
+        {/* Show the authenticated user's identity without requiring a separate profile page. */}
         <div className={styles.sidebarUser}>
           <span className={ui.avatar}>{initials}</span>
           <span>

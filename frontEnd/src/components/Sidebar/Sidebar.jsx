@@ -41,3 +41,12 @@ export default function Sidebar() {
             <Home size={18} />
             Home
           </NavLink>
+                    <NavLink
+            to="/my-questions"
+            className={({ isActive }) =>
+              `${styles.sidebarLink}${isActive ? ` ${styles.active}` : ""}`
+            }
+          >
+            <MessageSquare size={18} />
+            Your Topics
+          </NavLink>

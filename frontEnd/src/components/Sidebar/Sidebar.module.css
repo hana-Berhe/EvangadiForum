@@ -1,0 +1,146 @@
+/* Styles for Sidebar. Scoped to this component. */
+
+.sidebar {
+  background: #fff;
+  border-right: 1px solid #dde5ec;
+  padding: 18px 14px;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebarBrand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 4px 20px;
+  border-bottom: 1px solid #e6ebf0;
+}
+
+.sidebarBrand > span:last-child {
+  display: grid;
+}
+
+.sidebarBrand strong {
+  font-size: 0.93rem;
+}
+
+.sidebarBrand small {
+  font-size: 0.66rem;
+  color: #64748b;
+  line-height: 1.25;
+}
+
+.sidebarSectionLabel {
+  margin: 20px 7px 9px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.sidebarNav {
+  display: grid;
+  gap: 4px;
+}
+
+.sidebarLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 11px;
+  border-radius: 7px;
+  color: #334155;
+  font-size: 0.87rem;
+  font-weight: 600;
+}
+
+.sidebarLink.active {
+  background: #edf2f6;
+  color: #172033;
+  position: relative;
+}
+
+.sidebarLink.active:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 7px;
+  bottom: 7px;
+  width: 3px;
+  background: var(--orange);
+  border-radius: 3px;
+}
+
+.sidebarLink.active svg {
+  color: var(--orange);
+}
+
+.sidebarBottom {
+  border-top: 1px solid #e6ebf0;
+  padding-top: 14px;
+}
+
+.sidebarNew {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 7px;
+  padding: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-bottom: 14px;
+}
+
+.sidebarUser {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 4px;
+}
+
+.sidebarUser > span:last-child {
+  display: grid;
+}
+
+.sidebarUser strong {
+  font-size: 0.78rem;
+}
+
+.sidebarUser small {
+  font-size: 0.65rem;
+  color: #64748b;
+}
+
+.sidebarLogout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: #ef4444;
+  padding: 8px 5px;
+  font-size: 0.78rem;
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    position: static;
+    height: auto;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .sidebarBottom {
+    display: none;
+  }
+}

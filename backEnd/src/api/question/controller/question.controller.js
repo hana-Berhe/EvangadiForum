@@ -1,7 +1,6 @@
 import { StatusCodes } from "http-status-codes";
-import {
-  createQuestionWithVectorService,
-} from "../service/question.service.js";
+import { createQuestionWithVectorService } from "../service/question.service.js";
+import { generateQuestionDraftCoachService } from "../service/geminiTextCoach.service.js";
 /**
  * Handles creating a new question.
  *
@@ -23,9 +22,12 @@ const createQuestionController = async (req, res, next) => {
       success: true,
       message: "Question posted successfully.",
       data: result.question,
-  generateQuestionDraftCoachService,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-} from "../service/geminiTextCoach.service.js";
 /**
  * Handles AI coaching for a question draft (title + body).
  */
@@ -43,7 +45,4 @@ const generateQuestionDraftCoachController = async (req, res, next) => {
   }
 };
 
-export {
-  createQuestionController,
-};
-export { generateQuestionDraftCoachController };
+export { createQuestionController, generateQuestionDraftCoachController };

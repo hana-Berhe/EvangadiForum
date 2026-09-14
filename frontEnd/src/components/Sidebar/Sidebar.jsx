@@ -61,3 +61,8 @@ export default function Sidebar() {
           </NavLink>
         </nav>
       </div>
+      <div className={styles.sidebarBottom}>
+        <NavLink to="/questions/ask" className={styles.sidebarNew}>
+          <Plus size={17} />
+          New Question
+        </NavLink>

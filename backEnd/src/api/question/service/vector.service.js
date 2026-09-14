@@ -21,6 +21,8 @@ function normalizeQuestionText({ title }) {
   return normalizeWhitespace(`${title || ""}`.normalize("NFKC").toLowerCase());
 }
 
+
+
 /**
  * Generate a normalized embedding for the provided question text using the Gemini API.
  *

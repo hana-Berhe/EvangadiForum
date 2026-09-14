@@ -66,3 +66,12 @@ export default function Sidebar() {
           <Plus size={17} />
           New Question
         </NavLink>
+        <div className={styles.sidebarUser}>
+          <span className={ui.avatar}>{initials}</span>
+          <span>
+            <strong>
+              {user?.firstName || "User"} {user?.lastName || ""}
+            </strong>
+            <small>Learner</small>
+          </span>
+        </div>

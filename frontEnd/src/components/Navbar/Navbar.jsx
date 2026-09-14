@@ -47,3 +47,7 @@ export default function Navbar() {
     if (search.trim())
       navigate(`/questions?search=${encodeURIComponent(search.trim())}`);
   }
+    function onLogout() {
+    logout();
+    navigate("/auth", { replace: true });
+  }

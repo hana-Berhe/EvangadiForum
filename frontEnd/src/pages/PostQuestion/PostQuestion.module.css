@@ -1,0 +1,82 @@
+/* Styles for PostQuestion. Scoped to this component. */
+
+.guidanceCard {
+  background: #fff;
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+}
+
+.askIntro h1 {
+  font-size: 1.8rem;
+  margin: 8px 0;
+}
+
+.askIntro p {
+  color: #56657a;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 760px;
+}
+
+.askPage {
+  max-width: 1120px;
+}
+
+.askIntro {
+  padding: 10px 0 4px;
+}
+
+.guidanceCard {
+  background: #edf3f8;
+  border: 1.5px solid var(--orange);
+  padding: 26px 30px;
+}
+
+.guidanceCard h2 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.guidanceCard p {
+  font-size: 0.82rem;
+  color: #435268;
+  line-height: 1.55;
+}
+
+.guidanceCard li {
+  font-size: 0.82rem;
+  color: #435268;
+  line-height: 1.55;
+}
+
+.guidanceCard h3 {
+  font-size: 0.9rem;
+  margin: 18px 0 6px;
+}
+
+.questionFormCard {
+  padding: 28px;
+}
+
+.aiTipList {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.aiTipList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 0.84rem;
+  color: #435268;
+  line-height: 1.55;
+}
+
+.aiTipList li svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--orange);
+}

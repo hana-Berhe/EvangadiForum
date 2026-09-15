@@ -1,4 +1,8 @@
+// import link from react-router-dom
+import { Link } from "react-router-dom";
+// import styles from "./Footer.module.css";
 import styles from "./Footer.module.css";
+
 export default function Footer() {
   return (
     <footer className={styles.siteFooter}>
@@ -11,12 +15,14 @@ export default function Footer() {
         <small>© 2026 Evangadi Forum. For educational use.</small>
       </div>
 
+      {/* links tag  */}
       <nav className={styles.siteFooterLinks} aria-label="Footer links">
-        <a href="#about">About</a>
-        <a href="#privacy">Privacy</a>
-        <a href="#terms">Terms</a>
-        <a href="#contact">Contact</a>
-      </nav>
+  <Link to="/dashboard">About</Link>
+  <Link to="/dashboard">Privacy</Link>
+  <Link to="/dashboard">Terms</Link>
+  <Link to="/dashboard">Contact</Link>
+</nav>
     </footer>
   );
 }
+

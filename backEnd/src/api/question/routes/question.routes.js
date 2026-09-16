@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   createQuestionController,
+  getSimilarQuestionsController,
   searchQuestionsSemanticController,
   getSingleQuestionController,
   generateQuestionDraftCoachController,
@@ -10,6 +11,7 @@ import {
 
 import {
   createQuestionValidation,
+  getSimilarQuestionsValidation,
   searchQuestionsSemanticValidation,
   getSingleQuestionValidation,
   generateQuestionDraftCoachValidation,
@@ -43,6 +45,19 @@ questionRouter.post(
   generateQuestionDraftCoachValidation,
   generateQuestionDraftCoachController,
 );
+
+/**
+ * @route GET /api/questions/:questionHash/similar
+ * @desc Get similar questions based on vector embeddings
+ * @access Private
+ */
+questionRouter.get(
+  "/:questionHash/similar",
+  authenticateUser,
+  getSimilarQuestionsValidation,
+  getSimilarQuestionsController,
+);
+
 // ---- T-10b ----  keep this LAST: /:questionHash matches any word
 /**
  * @route GET /api/questions/:questionHash

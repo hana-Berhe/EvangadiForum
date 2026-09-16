@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import { safeExecute } from "../../../../schema/db.config.js";
 import {
+  findSimilarQuestionsByQuestionId,
+  findSimilarQuestionsByText,
   generateQuestionEmbedding,
   getVectorConfig,
   normalizeQuestionText,
@@ -275,11 +277,7 @@ const createQuestionWithVectorService = async (payload) => {
  * @param {number} [params.threshold] - Similarity threshold (uses config default if not provided)
  * @returns {Promise<Object>} Object containing similar questions and search metadata
  */
-export const searchQuestionsSemanticService = async ({
-  query,
-  k = 5,
-  threshold,
-}) => {
+const searchQuestionsSemanticService = async ({ query, k = 5, threshold }) => {
   const sourceText = normalizeQuestionText({ title: query });
   const vectorConfig = getVectorConfig();
   const searchThreshold =
@@ -300,4 +298,41 @@ export const searchQuestionsSemanticService = async ({
   };
 };
 
-export { getSingleQuestionService, createQuestionWithVectorService };
+const getSimilarQuestionsService = async ({
+  questionHash,
+  k = 5,
+  threshold,
+}) => {
+  const questionRows = await safeExecute(
+    "SELECT question_id AS id FROM questions WHERE question_hash = ? LIMIT 1",
+    [questionHash],
+  );
+  if (questionRows.length === 0) {
+    throw new NotFoundError("Question not found");
+  }
+  const questionId = questionRows[0].id;
+  const vectorConfig = getVectorConfig();
+  const searchThreshold =
+    threshold !== undefined ? threshold : vectorConfig.recommendThreshold;
+  const similarQuestions = await findSimilarQuestionsByQuestionId({
+    questionId,
+    threshold: searchThreshold,
+    k,
+  });
+  return {
+    data: similarQuestions,
+    meta: {
+      questionHash,
+      k,
+      threshold: searchThreshold,
+      total: similarQuestions.length,
+    },
+  };
+};
+
+export {
+  getSingleQuestionService,
+  createQuestionWithVectorService,
+  getSimilarQuestionsService,
+  searchQuestionsSemanticService,
+};

@@ -277,11 +277,7 @@ const createQuestionWithVectorService = async (payload) => {
  * @param {number} [params.threshold] - Similarity threshold (uses config default if not provided)
  * @returns {Promise<Object>} Object containing similar questions and search metadata
  */
-export const searchQuestionsSemanticService = async ({
-  query,
-  k = 5,
-  threshold,
-}) => {
+const searchQuestionsSemanticService = async ({ query, k = 5, threshold }) => {
   const sourceText = normalizeQuestionText({ title: query });
   const vectorConfig = getVectorConfig();
   const searchThreshold =
@@ -338,4 +334,5 @@ export {
   getSingleQuestionService,
   createQuestionWithVectorService,
   getSimilarQuestionsService,
+  searchQuestionsSemanticService,
 };

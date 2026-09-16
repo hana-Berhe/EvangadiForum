@@ -67,7 +67,7 @@ const generateQuestionDraftCoachValidation = [
   validationErrorHandler,
 ];
 
-export const searchQuestionsSemanticValidation = [
+const searchQuestionsSemanticValidation = [
   query("query")
     .notEmpty()
     .withMessage("query is required")

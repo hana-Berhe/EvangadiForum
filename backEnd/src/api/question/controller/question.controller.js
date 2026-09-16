@@ -1,8 +1,11 @@
 import { StatusCodes } from "http-status-codes";
 import { createQuestionWithVectorService } from "../service/question.service.js";
-import { getSingleQuestionService } from "../service/question.service.js";
 import {
+  getSingleQuestionService,
   getSimilarQuestionsService,
+  searchQuestionsSemanticService,
+} from "../service/question.service.js";
+import {
   generateQuestionDraftCoachService,
   assessAnswerAgainstQuestionService,
 } from "../service/geminiTextCoach.service.js";
@@ -85,7 +88,7 @@ const getSingleQuestionController = async (req, res, next) => {
   }
 };
 
-export const searchQuestionsSemanticController = async (req, res, next) => {
+const searchQuestionsSemanticController = async (req, res, next) => {
   try {
     const result = await searchQuestionsSemanticService({
       query: req.query.query,
@@ -169,4 +172,5 @@ export {
   getSimilarQuestionsController,
   generateQuestionDraftCoachController,
   assessAnswerAgainstQuestionController,
+  searchQuestionsSemanticController,
 };

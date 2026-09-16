@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { safeExecute } from "../../../../schema/db.config.js";
+import { ServiceUnavailableError } from "../../../utility/errors/errors.js";
 
 const GEMINI_EMBEDDING_MODEL =
   process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-001";
@@ -30,7 +31,7 @@ function normalizeQuestionText({ title }) {
  * @returns {number} Similarity score between -1 and 1 (typically 0 to 1 for embeddings)
  * @throws {Error} If vectors have different lengths
  */
-export function calculateCosineSimilarity(vectorA, vectorB) {
+function calculateCosineSimilarity(vectorA, vectorB) {
   // Validate vectors have same length
   if (vectorA.length !== vectorB.length) {
     throw new Error(
@@ -74,7 +75,7 @@ export function calculateCosineSimilarity(vectorA, vectorB) {
  *
  * @returns {Promise<Array<{questionId: number, embedding: number[]}>>} Array of question embeddings
  */
-export async function retrieveReadyEmbeddings() {
+async function retrieveReadyEmbeddings() {
   // Query question_vectors table with status='ready' filter
   const sql = `
     SELECT question_id, embedding
@@ -128,7 +129,7 @@ export async function retrieveReadyEmbeddings() {
  * @param {number} [params.k] - Maximum number of results to return.
  * @returns {Promise<Object>} The generated embedding and similar questions.
  */
-export async function findSimilarQuestionsByText({ sourceText, threshold, k }) {
+async function findSimilarQuestionsByText({ sourceText, threshold, k }) {
   // Normalize parameters
   const normalizedK = k > 0 ? Math.min(k, 20) : RECOMMEND_K;
   const normalizedThreshold =
@@ -604,12 +605,12 @@ async function storeQuestionVector({
   }
 }
 
-function getVectorConfig() {
-  return {
-    recommendThreshold: RECOMMEND_THRESHOLD,
-    recommendK: RECOMMEND_K,
-  };
-}
+// function getVectorConfig() {
+// return {
+// recommendThreshold: RECOMMEND_THRESHOLD,
+// recommendK: RECOMMEND_K,
+// };
+// }
 
 export {
   normalizeQuestionText,

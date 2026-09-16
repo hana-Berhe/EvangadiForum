@@ -32,6 +32,26 @@ const createQuestionController = async (req, res, next) => {
   }
 };
 
+// ---- T-10a ----//
+const getQuestionsController = async (req, res, next) => {
+  try {
+    const filters = {
+      search: req.query.search,
+      mine: req.query.mine,
+      userId: req.user.id, // Pass the authenticated user's ID
+    };
+
+    const result = await getQuestionsService(filters);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Questions fetched successfully.",
+      ...result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 /**
  * Handles AI coaching for a question draft (title + body).
  */

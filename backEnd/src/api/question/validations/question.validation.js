@@ -3,6 +3,20 @@ import { validationErrorHandler } from "../../../middleware/validation-handler.j
 
 // here is unfinished code,
 /** Same body rules as posting a question — AI coach only reads draft text. */
+// ---- T-10a ----
+const getQuestionsValidation = [
+  query("search")
+    .optional()
+    .isString()
+    .withMessage("Search must be a string")
+    .trim(),
+  query("mine")
+    .optional()
+    .isBoolean()
+    .withMessage("Mine must be a boolean")
+    .toBoolean(),
+  validationErrorHandler,
+];
 
 // ---- T-10b ----
 const getSingleQuestionValidation = [

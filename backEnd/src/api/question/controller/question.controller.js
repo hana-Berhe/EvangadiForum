@@ -32,7 +32,7 @@ const createQuestionController = async (req, res, next) => {
   }
 };
 
-// ---- T-10a ----//
+// ---- T-10a --added--//
 const getQuestionsController = async (req, res, next) => {
   try {
     const filters = {

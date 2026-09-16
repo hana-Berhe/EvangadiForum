@@ -58,7 +58,6 @@ questionRouter.get(
   getSimilarQuestionsController,
 );
 
-
 // ---- T-10b ----  keep this LAST: /:questionHash matches any word
 /**
  * @route GET /api/questions/:questionHash

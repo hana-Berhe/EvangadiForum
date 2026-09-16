@@ -1,0 +1,39 @@
+/* Styles for MyQuestions. Scoped to this component. */
+
+.topicsIntro {
+  background: #fff;
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+}
+
+.topicsIntro {
+  padding: 28px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.topicsIntro h1 {
+  font-size: 1.8rem;
+  margin: 8px 0;
+}
+
+.topicsIntro p {
+  color: #56657a;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 760px;
+}
+
+.topicsList {
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+@media (max-width: 700px) {
+  .topicsIntro {
+    flex-direction: column;
+  }
+}

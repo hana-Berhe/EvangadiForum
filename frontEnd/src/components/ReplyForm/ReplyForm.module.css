@@ -1,0 +1,38 @@
+/* Styles for ReplyForm. Scoped to this component. */
+
+.replyFormActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.replyFormDisabled {
+  background: #f8fafb;
+  border: 1px dashed #cbd5df;
+  border-radius: 8px;
+  padding: 18px;
+  color: #64748b;
+  text-align: center;
+}
+
+.answerHelperRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  color: #64748b;
+  font-size: 0.71rem;
+}
+
+.replyFormActions {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e6ebf0;
+}
+
+@media (max-width: 700px) {
+  .answerHelperRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

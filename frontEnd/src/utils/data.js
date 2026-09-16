@@ -68,39 +68,3 @@ export function getErrorMessage(error, fallback = "Something went wrong.") {
   );
 }
 
-export function getRelativeTime(value) {
-  if (!value) return "";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-
-  const diffMs = Date.now() - date.getTime();
-  const diffMinutes = Math.floor(diffMs / 60000);
-
-  if (diffMinutes < 1) return "just now";
-  if (diffMinutes < 60) {
-    return `${diffMinutes} ${diffMinutes === 1 ? "minute" : "minutes"} ago`;
-  }
-
-  const diffHours = Math.floor(diffMinutes / 60);
-
-  if (diffHours < 24) {
-    return `${diffHours} ${diffHours === 1 ? "hour" : "hours"} ago`;
-  }
-
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffDays < 30) {
-    return `${diffDays} ${diffDays === 1 ? "day" : "days"} ago`;
-  }
-
-  const diffMonths = Math.floor(diffDays / 30);
-
-  if (diffMonths < 12) {
-    return `${diffMonths} ${diffMonths === 1 ? "month" : "months"} ago`;
-  }
-
-  const diffYears = Math.floor(diffMonths / 12);
-
-  return `${diffYears} ${diffYears === 1 ? "year" : "years"} ago`;
-}

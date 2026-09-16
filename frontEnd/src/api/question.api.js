@@ -10,6 +10,7 @@ export async function getAllQuestions(params = {}) {
   return response.data;
 }
 
+
 export async function getQuestion(questionHash) {
   const response = await api.get(`/questions/${questionHash}`);
   return response.data;
@@ -38,3 +39,6 @@ export async function checkAnswerFit(questionHash, answerText) {
   });
   return response.data;
 }
+// ---- T-21 ---- optional wrapper, if your lead wants a named function
+// Placing getMyQuestions at the bottom keeps all existing team functions untouched while exporting this helper function at the end.
+export const getMyQuestions = () => getAllQuestions({ mine: true });

@@ -1,0 +1,53 @@
+/* Styles for QuestionCard. Scoped to this component. */
+
+.threadMain {
+  min-width: 0;
+}
+
+.threadTitleRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.threadTitleRow h3 {
+  font-size: 0.84rem;
+  margin: 0 0 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.threadMain p {
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: #556579;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.threadMeta {
+  display: flex;
+  gap: 16px;
+  margin-top: 9px;
+  color: #657489;
+  font-size: 0.64rem;
+}
+
+.threadMeta span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.yoursBadge {
+  background: #fff0e5;
+  color: #d95500;
+  text-transform: uppercase;
+  font-size: 0.56rem;
+  font-weight: 800;
+  padding: 4px 6px;
+  border-radius: 4px;
+}

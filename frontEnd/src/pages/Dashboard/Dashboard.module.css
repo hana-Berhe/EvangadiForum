@@ -1,0 +1,211 @@
+/* Styles for Dashboard. Scoped to this component. */
+
+.welcomeCard {
+  background: #fff;
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+}
+
+.feedCard {
+  background: #fff;
+  border: 1px solid #dbe3ea;
+  border-radius: 12px;
+}
+
+.dashboardPage {
+  display: grid;
+  gap: 22px;
+}
+
+.welcomeCard {
+  padding: 28px;
+}
+
+.welcomeCard h1 {
+  font-size: 1.75rem;
+  margin: 8px 0 6px;
+}
+
+.welcomeCard > p {
+  color: #56657a;
+  font-size: 0.86rem;
+  max-width: 780px;
+  line-height: 1.5;
+}
+
+.quickGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.quickGrid a {
+  background: #f6f8fa;
+  border: 1px solid #dfe6ec;
+  border-radius: 7px;
+  padding: 14px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.quickGrid svg {
+  color: var(--orange);
+  background: #fff1e7;
+  padding: 6px;
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+}
+
+.quickGrid strong {
+  display: block;
+  font-size: 0.8rem;
+}
+
+.quickGrid small {
+  display: block;
+  color: #657489;
+  font-size: 0.68rem;
+  margin-top: 3px;
+}
+
+.welcomeDivider {
+  height: 1px;
+  background: #e5ebf0;
+  margin: 20px 0 14px;
+}
+
+.tinyNote {
+  font-size: 0.67rem !important;
+}
+
+.statsGrid.compact {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.statsGrid.compact > div {
+  background: #edf3f8;
+  border: 1px solid #dce5ec;
+  border-radius: 7px;
+  padding: 13px;
+}
+
+.statsGrid.compact small {
+  display: block;
+  color: #526177;
+  font-size: 0.68rem;
+}
+
+.statsGrid.compact strong {
+  font-size: 1.25rem;
+}
+
+.feedCard {
+  overflow: hidden;
+}
+
+.feedHead {
+  padding: 18px 20px;
+  border-bottom: 1px solid #dfe6ed;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feedHead h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.feedHead p {
+  margin: 3px 0 0;
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.orangePill {
+  background: var(--orange);
+  color: #fff;
+  border-radius: 5px;
+  padding: 6px 10px;
+  text-transform: uppercase;
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+@media (max-width: 980px) {
+  .quickGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 980px) {
+  .statsGrid.compact {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.feedSearch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+.feedSearchInput {
+  flex: 1 1 260px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #fff;
+  border: 1px solid #d4dde6;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: #64748b;
+}
+
+.feedSearchInput input {
+  border: 0;
+  padding: 11px 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.feedSearchInput input:focus {
+  outline: none;
+}
+
+.feedModeToggle {
+  display: inline-flex;
+  background: #f1f4f7;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.feedModeToggle button {
+  border: 0;
+  background: transparent;
+  color: #56657a;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 8px 13px;
+  border-radius: 6px;
+}
+
+.feedModeToggle button.active {
+  background: #fff;
+  color: #1f2937;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+}
+
+.feedSearchNote {
+  width: 100%;
+  margin: 0;
+  font-size: 0.72rem;
+  color: #64748b;
+}

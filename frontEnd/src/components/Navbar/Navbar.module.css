@@ -1,4 +1,4 @@
-Styles for Navbar. Scoped to this component.
+/* Styles for Navbar. Scoped to this component. */
 
 .navbar {
   height: 60px;
@@ -89,4 +89,3 @@ Styles for Navbar. Scoped to this component.
     display: none;
   }
 }
-

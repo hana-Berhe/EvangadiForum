@@ -1,6 +1,6 @@
-/* Styles for LoadingSpinner. Scoped to this component. */
+/* Styles for EmptyState. Scoped to this component. */
 
-.loadingState {
+.emptyState {
   min-height: 180px;
   display: grid;
   place-items: center;

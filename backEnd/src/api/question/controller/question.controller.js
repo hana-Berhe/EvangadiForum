@@ -2,9 +2,11 @@ import { StatusCodes } from "http-status-codes";
 import { createQuestionWithVectorService } from "../service/question.service.js";
 import { getSingleQuestionService } from "../service/question.service.js";
 import {
+  getSimilarQuestionsService,
   generateQuestionDraftCoachService,
   assessAnswerAgainstQuestionService,
 } from "../service/geminiTextCoach.service.js";
+
 /**
  * Handles creating a new question.
  *
@@ -103,6 +105,30 @@ export const searchQuestionsSemanticController = async (req, res, next) => {
   }
 };
 
+const getSimilarQuestionsController = async (req, res, next) => {
+  try {
+    const result = await getSimilarQuestionsService({
+      questionHash: req.params.questionHash,
+      k: req.query.k ? Number(req.query.k) : 5,
+      threshold:
+        req.query.threshold !== undefined
+          ? Number(req.query.threshold)
+          : undefined,
+    });
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Similar questions fetched successfully.",
+      ...result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Handles AI coaching for a question draft (title + body).
+ */
+
 const generateQuestionDraftCoachController = async (req, res, next) => {
   try {
     const { title, content } = req.body;
@@ -140,6 +166,7 @@ const assessAnswerAgainstQuestionController = async (req, res, next) => {
 export {
   createQuestionController,
   getSingleQuestionController,
+  getSimilarQuestionsController,
   generateQuestionDraftCoachController,
   assessAnswerAgainstQuestionController,
 };

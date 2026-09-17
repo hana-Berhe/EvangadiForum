@@ -135,4 +135,5 @@ export {
   assessAnswerAgainstQuestionValidation,
   searchQuestionsSemanticValidation,
   getSimilarQuestionsValidation,
+  getQuestionsValidation,
 };

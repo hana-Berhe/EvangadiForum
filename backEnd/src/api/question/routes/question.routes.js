@@ -7,6 +7,7 @@ import {
   getSingleQuestionController,
   generateQuestionDraftCoachController,
   assessAnswerAgainstQuestionController,
+  getQuestionsController,
 } from "../controller/question.controller.js";
 
 import {
@@ -16,6 +17,7 @@ import {
   getSingleQuestionValidation,
   generateQuestionDraftCoachValidation,
   assessAnswerAgainstQuestionValidation,
+  getQuestionsValidation,
 } from "../validations/question.validation.js";
 
 import { authenticateUser } from "../../../middleware/authentication.js";
@@ -44,6 +46,18 @@ questionRouter.post(
   authenticateUser,
   generateQuestionDraftCoachValidation,
   generateQuestionDraftCoachController,
+);
+
+/**
+ * @route GET /api/questions
+ * @desc Get questions with optional search filtering
+ * @access Private
+ */
+questionRouter.get(
+  "/",
+  authenticateUser,
+  getQuestionsValidation,
+  getQuestionsController,
 );
 
 /**

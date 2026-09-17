@@ -1,0 +1,83 @@
+/* Styles for MarkdownEditor. Scoped to this component. */
+
+.editorToolbar {
+  height: 38px;
+  background: #edf3f8;
+  border-bottom: 1px solid #d4dde6;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 12px;
+  color: #445468;
+}
+
+.editorToolbar span {
+  margin-left: auto;
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.editorToolbar {
+  min-height: 38px;
+  height: auto;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.editorToolsLeft {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.editorTool {
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #34445a;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.editorTool:hover {
+  background: #fff;
+  color: var(--orange);
+  box-shadow: 0 0 0 1px #d9e1e8;
+}
+
+.editorTool.active {
+  background: #fff;
+  color: var(--orange);
+  box-shadow: 0 0 0 1px #d9e1e8;
+}
+
+.editorCharacterCount {
+  margin-left: auto !important;
+  white-space: nowrap;
+}
+
+.markdownPreview {
+  min-height: 220px;
+  padding: 17px 18px;
+  background: #fff;
+  overflow: auto;
+}
+
+@media (max-width: 700px) {
+  .editorToolbar {
+    align-items: flex-start;
+    padding: 6px 8px;
+  }
+}
+
+@media (max-width: 700px) {
+  .editorCharacterCount {
+    padding-top: 6px;
+  }
+}

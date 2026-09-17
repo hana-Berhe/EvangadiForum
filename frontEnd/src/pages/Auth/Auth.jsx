@@ -8,10 +8,14 @@ import {
   Code2,
   AlertCircle,
   CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getErrorMessage } from "../../utils/data";
+import avatar1 from "../../assets/avatar1.png";
+import avatar2 from "../../assets/avatar2.png";
+import avatar3 from "../../assets/avatar3.png";
 import btn from "../../styles/buttons.module.css";
 import styles from "./Auth.module.css";
 import ui from "../../styles/pageStates.module.css";
@@ -222,7 +226,7 @@ export default function Auth() {
         <div className={styles.authBrandInner}>
           <div className={styles.authBrand}>
             <span className={`${ui.brandMark} ${ui.inverse}`}>
-              <MessageSquare size={23} />
+              <MessageSquare size={16} />
             </span>
 
             <div>
@@ -239,7 +243,7 @@ export default function Auth() {
 
           <div className={styles.authBenefit}>
             <span>
-              <Sparkles size={20} />
+              <Sparkles size={14} />
             </span>
 
             <div>
@@ -254,7 +258,7 @@ export default function Auth() {
 
           <div className={styles.authBenefit}>
             <span>
-              <Code2 size={20} />
+              <Code2 size={14} />
             </span>
 
             <div>
@@ -267,8 +271,18 @@ export default function Auth() {
             </div>
           </div>
 
-          <div className={styles.authCohort}>
-            Evangadi cohorts · weekly stand-ups · office-hour style help
+          <div className={styles.authCohortDivider} />
+
+          <div className={styles.authCohortRow}>
+            <div className={styles.avatarGroup}>
+              <img src={avatar1} alt="Evangadi learner" className={styles.avatarImg} />
+              <img src={avatar2} alt="Evangadi learner" className={styles.avatarImg} />
+              <img src={avatar3} alt="Evangadi learner" className={styles.avatarImg} />
+            </div>
+
+            <div className={styles.authCohort}>
+              Evangadi cohorts · weekly stand-ups · office-hour style help
+            </div>
           </div>
         </div>
       </section>
@@ -296,7 +310,7 @@ export default function Auth() {
               <p>
                 {mode === "login"
                   ? "Enter your email address and password to continue."
-                  : "Create your learner account to join the forum."}
+                  : "Complete the form below to create your account."}
               </p>
 
               {/* REGISTER NAME FIELDS */}
@@ -315,7 +329,7 @@ export default function Auth() {
                         name="firstName"
                         value={form.firstName}
                         onChange={update}
-                        placeholder="Enter your first name"
+                        placeholder="First name"
                       />
 
                       {errors.firstName && (
@@ -339,7 +353,7 @@ export default function Auth() {
                         name="lastName"
                         value={form.lastName}
                         onChange={update}
-                        placeholder="Enter your last name"
+                        placeholder="Last name"
                       />
 
                       {errors.lastName && (
@@ -406,7 +420,7 @@ export default function Auth() {
                       showPassword ? "Hide password" : "Show password"
                     }
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                   </button>
                 </div>
               </div>
@@ -414,7 +428,7 @@ export default function Auth() {
               {/* SESSION ENDED WHILE THEY WERE USING THE APP */}
               {sessionExpired && mode === "login" && !error && (
                 <div className={styles.authSessionNotice}>
-                  <AlertCircle size={18} />
+                  <AlertCircle size={15} />
                   <span>
                     Your session ended. Sign in again to pick up where you left
                     off.
@@ -425,7 +439,7 @@ export default function Auth() {
               {/* VALIDATION ERROR */}
               {validationMessage && (
                 <div className={styles.authValidationAlert}>
-                  <AlertCircle size={18} />
+                  <AlertCircle size={15} />
                   <span>{validationMessage}</span>
                 </div>
               )}
@@ -433,7 +447,7 @@ export default function Auth() {
               {/* BACKEND ERROR */}
               {error && (
                 <div className={styles.authValidationAlert}>
-                  <AlertCircle size={18} />
+                  <AlertCircle size={15} />
                   <span>{error}</span>
                 </div>
               )}
@@ -448,7 +462,7 @@ export default function Auth() {
                     exit={{ opacity: 0, height: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <CheckCircle2 size={18} />
+                    <CheckCircle2 size={15} />
                     <span>{success}</span>
                   </Motion.div>
                 )}
@@ -458,15 +472,23 @@ export default function Auth() {
                 className={`${btn.primaryButton} ${styles.authSubmit}`}
                 disabled={submitting || Boolean(success)}
               >
-                {submitting
-                  ? "Please wait..."
-                  : mode === "login"
-                    ? "Sign In  →"
-                    : "Create Account  →"}
+                {submitting ? (
+                  "Please wait..."
+                ) : mode === "login" ? (
+                  <>
+                    <span>Sign In</span>
+                    <ArrowRight size={14} />
+                  </>
+                ) : (
+                  <>
+                    <span>Create Account</span>
+                    <ArrowRight size={14} />
+                  </>
+                )}
               </button>
 
               <div className={styles.authDivider}>
-                <span>Additional options</span>
+                <span>ADDITIONAL OPTIONS</span>
               </div>
 
               <p className={styles.authSwitch}>
@@ -475,7 +497,7 @@ export default function Auth() {
                   : "Already have an account? "}
 
                 <button type="button" onClick={switchMode}>
-                  {mode === "login" ? "Create an account" : "Sign in"}
+                  {mode === "login" ? "Create an account" : "Back to sign in"}
                 </button>
               </p>
             </form>

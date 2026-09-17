@@ -1,11 +1,13 @@
 import express from "express";
 
 import {
-  createAnswerController
+  createAnswerController,
+  getAnswersController,
 } from "../controller/answer.controller.js";
 
 import {
-  createAnswerValidation
+  createAnswerValidation,
+  getAnswersValidation,
 } from "../validations/answer.validation.js";
 
 import { authenticateUser } from "../../../middleware/authentication.js";
@@ -23,5 +25,12 @@ answerRouter.post(
   createAnswerValidation,
   createAnswerController,
 );
+
+/**
+ * @route GET /api/answers
+ * @desc Get answers for a question with pagination
+ * @access Public
+ */
+answerRouter.get("/", getAnswersValidation, getAnswersController);
 
 export { answerRouter };

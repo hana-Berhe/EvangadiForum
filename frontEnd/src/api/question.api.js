@@ -42,3 +42,5 @@ export async function checkAnswerFit(questionHash, answerText) {
 // ---- T-21 ---- optional wrapper, if your lead wants a named function
 // Placing getMyQuestions at the bottom keeps all existing team functions untouched while exporting this helper function at the end.
 export const getMyQuestions = () => getAllQuestions({ mine: true });
+
+// this is a file where functions related to question API calls are defined. 

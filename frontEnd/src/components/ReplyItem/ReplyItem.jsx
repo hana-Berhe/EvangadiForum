@@ -1,3 +1,7 @@
+/**
+ * ReplyItem renders an answer with its author and creation date, and provides
+ * owner-only controls for editing and deleting the answer.
+ */
 import { Check, Pencil, Trash2, UserRound, X } from "lucide-react";
 import { useState } from "react";
 import MarkdownContent from "../MarkdownContent/MarkdownContent";

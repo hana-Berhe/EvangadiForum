@@ -1,3 +1,4 @@
+
 import { Fragment } from "react";
 
 function parseInline(text, keyPrefix = "inline") {
@@ -138,3 +139,4 @@ export default function MarkdownContent({ children = "" }) {
 
   return <>{nodes}</>;
 }
+// this is a React component that renders Markdown content. 

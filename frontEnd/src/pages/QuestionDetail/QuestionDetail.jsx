@@ -37,6 +37,8 @@ import {
   getQuestionId,
   getQuestionOwnerId,
   unwrapArray,
+  getRelativeTime,
+  getAuthorInitials,
 } from "../../utils/data";
 import btn from "../../styles/buttons.module.css";
 import styles from "./QuestionDetail.module.css";
@@ -401,12 +403,13 @@ export default function QuestionDetail() {
           <article className={styles.discussionCard}>
             <div className={styles.questionAuthorLine}>
               <span className={ui.threadAvatar}>
-                {author.slice(0, 2).toUpperCase()}
+                {getAuthorInitials(question)}
               </span>
 
               <div>
                 <strong>{author}</strong>
-                <small>Posted recently</small>
+
+                <small>Posted {getRelativeTime(question.createdAt)}</small>
               </div>
             </div>
 

@@ -7,6 +7,8 @@
   background: #f4f7fa;
 }
 
+/* LEFT PANEL */
+
 .authBrandPanel {
   background: linear-gradient(145deg, #ff6b00, #df4800);
   color: #fff;
@@ -74,14 +76,15 @@
 }
 
 .authCohort {
-  border-top: 1px solid rgba(255, 255, 255, 0.28);
   margin-top: 34px;
-  padding-top: 30px;
+  padding: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
   background: rgba(255, 255, 255, 0.16);
   border-radius: 0 0 8px 8px;
-  padding: 18px;
   font-size: 0.88rem;
 }
+
+/* RIGHT PANEL */
 
 .authFormPanel {
   display: grid;
@@ -105,106 +108,19 @@
 
 .authCard p:first-of-type {
   color: #64748b;
-  margin: 0 0 28px;
+  margin: 0 0 22px;
 }
+
+/* REGISTER NAME FIELDS */
 
 .formRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 14px;
+  margin-bottom: 14px;
 }
 
-.passwordWrap {
-  position: relative;
-}
-
-.passwordWrap input {
-  padding-right: 45px;
-}
-
-.passwordWrap button {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 0;
-  background: transparent;
-  color: #475569;
-}
-
-.authSubmit {
-  width: 100%;
-  margin-top: 4px;
-}
-
-.authDivider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 30px 0;
-  color: #94a3b8;
-  text-transform: uppercase;
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.authDivider:before {
-  content: "";
-  height: 1px;
-  background: #e3e8ed;
-  flex: 1;
-}
-
-.authDivider:after {
-  content: "";
-  height: 1px;
-  background: #e3e8ed;
-  flex: 1;
-}
-
-.authSwitch {
-  text-align: center;
-  color: #475569 !important;
-  font-size: 0.86rem;
-}
-
-.authSwitch button {
-  border: 0;
-  background: transparent;
-  color: var(--orange);
-  padding: 0;
-}
-
-@media (max-width: 700px) {
-  .authPage {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 700px) {
-  .authBrandPanel {
-    display: none;
-  }
-}
-
-@media (max-width: 700px) {
-  .authFormPanel {
-    padding: 20px;
-  }
-}
-
-@media (max-width: 700px) {
-  .authCard {
-    padding: 28px;
-  }
-}
-
-@media (max-width: 700px) {
-  .formRow {
-    grid-template-columns: 1fr;
-  }
-}
+/* INPUT WRAPPERS */
 
 .authInputWrap {
   position: relative;
@@ -227,20 +143,17 @@
 
 .authErrorIcon {
   position: absolute;
-
   right: 12px;
   top: 50%;
-
   transform: translateY(-50%);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   color: #dc2626;
-
   pointer-events: none;
 }
+
+/* PASSWORD */
 
 .passwordWrap {
   position: relative;
@@ -249,12 +162,7 @@
 
 .passwordWrap input {
   width: 100%;
-
   padding-right: 82px;
-}
-
-.passwordWrap.hasError {
-  border-color: #ef4444;
 }
 
 .passwordWrap.hasError input {
@@ -262,43 +170,30 @@
 }
 
 .passwordWrap.hasError:focus-within {
-  border-color: #ef4444;
-
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08);
 }
 
 .passwordErrorIcon {
   position: absolute;
-
   right: 45px;
   top: 50%;
-
   transform: translateY(-50%);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   color: #dc2626;
-
   pointer-events: none;
 }
 
 .passwordToggle {
   position: absolute;
-
   right: 10px;
   top: 50%;
-
   transform: translateY(-50%);
-
   border: none;
   background: transparent;
-
   padding: 4px;
-
   color: #64748b;
-
   display: flex;
   align-items: center;
   justify-content: center;
@@ -308,25 +203,65 @@
   color: #111827;
 }
 
-.authValidationAlert {
-  width: 100%;
+/* SUBMIT */
 
+.authSubmit {
+  width: 100%;
+  margin-top: 14px;
+}
+
+/* DIVIDER */
+
+.authDivider {
   display: flex;
   align-items: center;
+  gap: 12px;
+  margin: 28px 0 24px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
 
+.authDivider::before,
+.authDivider::after {
+  content: "";
+  height: 1px;
+  background: #e3e8ed;
+  flex: 1;
+}
+
+/* SWITCH LOGIN / REGISTER */
+
+.authSwitch {
+  margin: 0;
+  text-align: center;
+  color: #475569 !important;
+  font-size: 0.86rem;
+}
+
+.authSwitch button {
+  border: 0;
+  background: transparent;
+  color: var(--orange);
+  padding: 0;
+  cursor: pointer;
+}
+
+/* VALIDATION */
+
+.authValidationAlert {
+  width: 100%;
+  display: flex;
+  align-items: center;
   gap: 8px;
-
-  margin: 4px 0 18px;
-
+  margin: 14px 0 18px;
   padding: 11px 13px;
-
   border: 1px solid #fecaca;
   border-radius: 8px;
-
   background: #fff5f5;
-
   color: #dc2626;
-
   font-size: 13px;
   line-height: 1.4;
 }
@@ -335,28 +270,21 @@
   flex-shrink: 0;
 }
 
+/* SUCCESS */
+
 .authSuccessAlert {
   width: 100%;
-
   display: flex;
   align-items: center;
-
   gap: 8px;
-
-  margin: 4px 0 18px;
-
+  margin: 14px 0 18px;
   padding: 11px 13px;
-
   border: 1px solid #bbf7d0;
   border-radius: 8px;
-
   background: #f0fdf4;
-
   color: #15803d;
-
   font-size: 13px;
   line-height: 1.4;
-
   overflow: hidden;
 }
 
@@ -364,10 +292,13 @@
   flex-shrink: 0;
 }
 
+/* SESSION MESSAGE */
+
 .authSessionNotice {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-top: 14px;
   background: #eef4fb;
   border: 1px solid #c5d8ec;
   color: #2c4a6b;
@@ -379,4 +310,24 @@
 
 .authSessionNotice svg {
   flex: 0 0 auto;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+  .authPage {
+    grid-template-columns: 1fr;
+  }
+
+  .authBrandPanel {
+    display: none;
+  }
+
+  .authFormPanel {
+    padding: 20px;
+  }
+
+  .authCard {
+    padding: 28px;
+  }
 }

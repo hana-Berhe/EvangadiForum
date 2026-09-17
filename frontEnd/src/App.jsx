@@ -5,6 +5,11 @@ import Layout from "./components/Layout/Layout";
 import Landing from "./pages/Landing/Landing";
 import Auth from "./pages/Auth/Auth";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import Questions from "./pages/Questions/Questions";
+import PostQuestion from "./pages/PostQuestion/PostQuestion";
+import QuestionDetail from "./pages/QuestionDetail/QuestionDetail";
+import MyQuestions from "./pages/MyQuestions/MyQuestions";
+
 import NotFound from "./pages/NotFound/NotFound";
 
 export default function App() {
@@ -16,6 +21,10 @@ export default function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/questions" element={<Questions />} />
+          <Route path="/questions/ask" element={<PostQuestion />} />
+          <Route path="/my-questions" element={<MyQuestions />} />
+          <Route path="/questions/:questionHash" element={<QuestionDetail />} />
         </Route>
       </Route>
 
@@ -24,4 +33,3 @@ export default function App() {
     </Routes>
   );
 }
-/* ---- FE-Landing: public ---- */

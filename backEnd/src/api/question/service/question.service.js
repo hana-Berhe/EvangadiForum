@@ -335,4 +335,5 @@ export {
   createQuestionWithVectorService,
   getSimilarQuestionsService,
   searchQuestionsSemanticService,
+  getQuestionsService,
 };

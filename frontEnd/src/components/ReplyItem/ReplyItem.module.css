@@ -1,0 +1,45 @@
+/* Styles for ReplyItem. Scoped to this component. */
+
+.replyItem {
+  background: #fff;
+  border: 1px solid #dbe3ea;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.replyHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.replyAuthor {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.replyAuthor > div {
+  display: grid;
+}
+
+.replyAuthor small {
+  color: #64748b;
+  font-size: 0.65rem;
+}
+
+.replyContent {
+  font-size: 0.86rem;
+  color: #334155;
+  line-height: 1.65;
+}
+
+.replyEditActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.replyActions {
+  display: flex;
+  gap: 4px;
+}

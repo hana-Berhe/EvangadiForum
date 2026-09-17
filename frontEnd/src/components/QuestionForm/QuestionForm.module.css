@@ -1,0 +1,18 @@
+/* Styles for QuestionForm. Scoped to this component. */
+
+.aiSuggestionRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #64748b;
+  font-size: 0.72rem;
+}
+
+.formBottomActions {
+  margin-top: 34px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8ee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}

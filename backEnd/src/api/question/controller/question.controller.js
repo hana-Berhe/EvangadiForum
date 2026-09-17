@@ -4,6 +4,7 @@ import {
   getSingleQuestionService,
   getSimilarQuestionsService,
   searchQuestionsSemanticService,
+  getQuestionsService,
 } from "../service/question.service.js";
 import {
   generateQuestionDraftCoachService,
@@ -173,4 +174,5 @@ export {
   generateQuestionDraftCoachController,
   assessAnswerAgainstQuestionController,
   searchQuestionsSemanticController,
+  getQuestionsController,
 };

@@ -1,6 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import {
-  createAnswerService
+  createAnswerService,
+  getAnswersService,
 } from "../service/answer.service.js";
 
 /**
@@ -29,6 +30,27 @@ const createAnswerController = async (req, res, next) => {
   }
 };
 
-export {
-  createAnswerController
+/**
+ * Handles listing answers by question with sorting. Max 100 records.
+ *
+ * @param {import('express').Request} req - The Express request object.
+ * @param {import('express').Response} res - The Express response object.
+ * @param {import('express').NextFunction} next - The Express next function.
+ * @returns {Promise<void>}
+ */
+const getAnswersController = async (req, res, next) => {
+  try {
+    const result = await getAnswersService({
+      questionId: Number(req.query.questionId),
+      sortBy: req.query.sortBy || "newest",
+    });
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Answers fetched successfully.",
+      ...result,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
+export { createAnswerController, getAnswersController };

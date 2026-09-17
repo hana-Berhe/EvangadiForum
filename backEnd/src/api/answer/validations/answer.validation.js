@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param, query } from "express-validator";
 import { validationErrorHandler } from "../../../middleware/validation-handler.js";
 
 const createAnswerValidation = [
@@ -19,6 +19,18 @@ const createAnswerValidation = [
   validationErrorHandler,
 ];
 
-export {
-  createAnswerValidation
-};
+const getAnswersValidation = [
+  query("questionId")
+    .notEmpty()
+    .withMessage("questionId is required")
+    .isInt({ min: 1 })
+    .withMessage("questionId must be a positive integer")
+    .toInt(),
+  query("sortBy")
+    .optional()
+    .isIn(["newest", "oldest"])
+    .withMessage("sortBy must be one of newest, oldest"),
+  validationErrorHandler,
+];
+
+export { createAnswerValidation, getAnswersValidation };

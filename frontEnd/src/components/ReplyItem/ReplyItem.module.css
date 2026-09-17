@@ -1,5 +1,6 @@
 /* Styles for ReplyItem. Scoped to this component. */
 
+/* styles related to the reply item container */
 .replyItem {
   background: #fff;
   border: 1px solid #dbe3ea;

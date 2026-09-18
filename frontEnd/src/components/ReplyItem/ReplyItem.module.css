@@ -33,6 +33,7 @@
 }
 
 .replyContent {
+  margin-top: 12px;
   font-size: 0.86rem;
   color: #334155;
   line-height: 1.65;

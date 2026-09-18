@@ -19,10 +19,7 @@ export default function PostQuestion() {
     try {
       const response = await createQuestion(payload);
       // POST /api/questions responds with { success, message, data: { questionHash, ... } }
-      const created = response?.data ?? response?.question ?? response;
-      const questionHash =
-        created?.questionHash ?? created?.question_hash ?? created?.hash;
-      nav(questionHash ? `/questions/${questionHash}` : "/dashboard");
+      nav(`/questions/${response.data.questionHash}`);
     } catch (e) {
       setError(getErrorMessage(e, "Could not post the question."));
     } finally {
@@ -35,7 +32,7 @@ export default function PostQuestion() {
     try {
       const response = await runDraftCoach(payload);
       // POST /api/questions/draft-coach responds with { success, message, data: { tips: [] } }
-      setCoachTips(response?.data?.tips ?? response?.tips ?? []);
+      setCoachTips(response.data.tips);
     } catch (e) {
       setError(getErrorMessage(e, "AI draft coach is unavailable."));
     } finally {

@@ -9,8 +9,7 @@ export default function Sidebar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const initials =
-    `${user?.firstName?.[0] || "U"}${user?.lastName?.[0] || ""}`.toUpperCase();
+  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 
   function onLogout() {
     logout();
@@ -78,7 +77,7 @@ export default function Sidebar() {
 
             <span className={styles.userText}>
               <strong>
-                {user?.firstName || "User"} {user?.lastName || ""}
+                {user.firstName} {user.lastName}
               </strong>
 
               <small>Learner</small>

@@ -6,7 +6,7 @@ import QuestionCard from "../../components/QuestionCard/QuestionCard";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import EmptyState from "../../components/EmptyState/EmptyState";
-import { getErrorMessage, unwrapArray } from "../../utils/data";
+import { getErrorMessage } from "../../utils/data";
 import btn from "../../styles/buttons.module.css";
 import styles from "./MyQuestions.module.css";
 import ui from "../../styles/pageStates.module.css";
@@ -18,7 +18,7 @@ export default function MyQuestions() {
     (async () => {
       try {
         const d = await getAllQuestions({ mine: true });
-        setQuestions(unwrapArray(d, ["questions", "results"]));
+        setQuestions(d.data);
       } catch (e) {
         setError(getErrorMessage(e, "Could not load your questions."));
       } finally {
@@ -51,8 +51,8 @@ export default function MyQuestions() {
         />
       )}
       <div className={`${ui.threadList} ${styles.topicsList}`}>
-        {questions.map((q, i) => (
-          <QuestionCard key={q.question_hash || q.id || i} question={q} yours />
+        {questions.map((q) => (
+          <QuestionCard key={q.questionHash} question={q} yours />
         ))}
       </div>
     </div>

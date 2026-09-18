@@ -10,7 +10,6 @@ export async function getAllQuestions(params = {}) {
   return response.data;
 }
 
-
 export async function getQuestion(questionHash) {
   const response = await api.get(`/questions/${questionHash}`);
   return response.data;
@@ -39,8 +38,15 @@ export async function checkAnswerFit(questionHash, answerText) {
   });
   return response.data;
 }
-// ---- T-21 ---- optional wrapper, if your lead wants a named function
-// Placing getMyQuestions at the bottom keeps all existing team functions untouched while exporting this helper function at the end.
-export const getMyQuestions = () => getAllQuestions({ mine: true });
+
+export async function updateQuestion(questionHash, payload) {
+  const response = await api.patch(`/questions/${questionHash}`, payload);
+  return response.data;
+}
+
+export async function deleteQuestion(questionHash) {
+  const response = await api.delete(`/questions/${questionHash}`);
+  return response.data;
+}
 
 // this is a file where functions related to question API calls are defined. 

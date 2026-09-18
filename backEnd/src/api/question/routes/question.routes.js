@@ -8,6 +8,8 @@ import {
   generateQuestionDraftCoachController,
   assessAnswerAgainstQuestionController,
   getQuestionsController,
+  updateQuestionController,
+  deleteQuestionController,
 } from "../controller/question.controller.js";
 
 import {
@@ -72,19 +74,6 @@ questionRouter.get(
   getSimilarQuestionsController,
 );
 
-// ---- T-10b ----  keep this LAST: /:questionHash matches any word
-/**
- * @route GET /api/questions/:questionHash
- * @desc Get one question with answers
- * @access Private
- */
-questionRouter.get(
-  "/:questionHash",
-  authenticateUser,
-  getSingleQuestionValidation,
-  getSingleQuestionController,
-);
-
 /**
  * @route GET /api/questions/search
  * @desc Semantic search for questions using vector embeddings based on a text query
@@ -95,18 +84,6 @@ questionRouter.get(
   authenticateUser,
   searchQuestionsSemanticValidation,
   searchQuestionsSemanticController,
-);
-/**
- export { questionRouter };
- * @route POST /api/questions
- * @desc Post a new question
- * @access Protected
- */
-questionRouter.post(
-  "/",
-  authenticateUser,
-  createQuestionValidation,
-  createQuestionController,
 );
 // ---- T-10b ----  keep this LAST: /:questionHash matches any word
 /**
@@ -131,6 +108,31 @@ questionRouter.post(
   authenticateUser,
   assessAnswerAgainstQuestionValidation,
   assessAnswerAgainstQuestionController,
+);
+
+/**
+ * @route PATCH /api/questions/:questionHash
+ * @desc Update a question (author only)
+ * @access Protected
+ */
+questionRouter.patch(
+  "/:questionHash",
+  authenticateUser,
+  getSingleQuestionValidation,
+  createQuestionValidation,
+  updateQuestionController,
+);
+
+/**
+ * @route DELETE /api/questions/:questionHash
+ * @desc Delete a question (author only)
+ * @access Protected
+ */
+questionRouter.delete(
+  "/:questionHash",
+  authenticateUser,
+  getSingleQuestionValidation,
+  deleteQuestionController,
 );
 
 export { questionRouter };

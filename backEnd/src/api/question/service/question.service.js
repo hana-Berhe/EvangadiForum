@@ -8,6 +8,10 @@ import {
   normalizeQuestionText,
   storeQuestionVector,
 } from "./vector.service.js";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../utility/errors/errors.js";
 
 const generateQuestionHash = () => crypto.randomBytes(8).toString("hex");
 // ---- T-10a ---added---
@@ -330,10 +334,74 @@ const getSimilarQuestionsService = async ({
   };
 };
 
+// A question that does not exist and a question that belongs to someone else
+// both report "not found".
+const updateQuestionService = async ({
+  questionHash,
+  userId,
+  title,
+  content,
+}) => {
+  const rows = await safeExecute(
+    "SELECT question_id AS id, user_id, title FROM questions WHERE question_hash = ?",
+    [questionHash],
+  );
+  if (rows.length === 0 || rows[0].user_id !== userId) {
+    throw new NotFoundError("Question not found");
+  }
+  const question = rows[0];
+
+  await safeExecute(
+    "UPDATE questions SET title = ?, content = ? WHERE question_id = ?",
+    [title, content, question.id],
+  );
+
+  // The embedding is built from the title only, so refresh it only when the
+  // title changed. If Gemini fails, the edit is kept and the vector is marked
+  // failed, the same as on create.
+  if (title !== question.title) {
+    const sourceText = normalizeQuestionText({ title });
+    try {
+      const { embedding } = await generateQuestionEmbedding(sourceText, {
+        questionId: question.id,
+      });
+      await storeQuestionVector({
+        questionId: question.id,
+        sourceText,
+        embedding,
+        status: "ready",
+      });
+    } catch (error) {
+      console.error("Failed to refresh question vector", question.id, error);
+      await storeQuestionVector({
+        questionId: question.id,
+        sourceText,
+        embedding: [],
+        status: "failed",
+      }).catch((e) => console.error("Failed to save failed status", e));
+    }
+  }
+
+  return { questionHash, title, content };
+};
+
+// Its answers and its stored vector are removed by ON DELETE CASCADE.
+const deleteQuestionService = async ({ questionHash, userId }) => {
+  const result = await safeExecute(
+    "DELETE FROM questions WHERE question_hash = ? AND user_id = ?",
+    [questionHash, userId],
+  );
+  if (result.affectedRows === 0) {
+    throw new NotFoundError("Question not found");
+  }
+};
+
 export {
   getSingleQuestionService,
   createQuestionWithVectorService,
   getSimilarQuestionsService,
   searchQuestionsSemanticService,
   getQuestionsService,
+  updateQuestionService,
+  deleteQuestionService,
 };

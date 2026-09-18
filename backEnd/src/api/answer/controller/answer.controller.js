@@ -2,6 +2,8 @@ import { StatusCodes } from "http-status-codes";
 import {
   createAnswerService,
   getAnswersService,
+  updateAnswerService,
+  deleteAnswerService,
 } from "../service/answer.service.js";
 
 /**
@@ -53,4 +55,48 @@ const getAnswersController = async (req, res, next) => {
     next(error);
   }
 };
-export { createAnswerController, getAnswersController };
+
+/**
+ * Handles updating an answer. Only its author can update it.
+ */
+const updateAnswerController = async (req, res, next) => {
+  try {
+    const answer = await updateAnswerService({
+      answerId: Number(req.params.answerId),
+      userId: req.user.id,
+      content: req.body.content,
+    });
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Answer updated successfully.",
+      data: answer,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Handles deleting an answer. Only its author can delete it.
+ */
+const deleteAnswerController = async (req, res, next) => {
+  try {
+    await deleteAnswerService({
+      answerId: Number(req.params.answerId),
+      userId: req.user.id,
+    });
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Answer deleted successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {
+  createAnswerController,
+  getAnswersController,
+  updateAnswerController,
+  deleteAnswerController,
+};

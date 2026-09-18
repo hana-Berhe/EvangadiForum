@@ -5,6 +5,8 @@ import {
   getSimilarQuestionsService,
   searchQuestionsSemanticService,
   getQuestionsService,
+  updateQuestionService,
+  deleteQuestionService,
 } from "../service/question.service.js";
 import {
   generateQuestionDraftCoachService,
@@ -167,6 +169,46 @@ const assessAnswerAgainstQuestionController = async (req, res, next) => {
   }
 };
 
+/**
+ * Handles updating a question. Only its author can update it.
+ */
+const updateQuestionController = async (req, res, next) => {
+  try {
+    const { title, content } = req.body;
+    const data = await updateQuestionService({
+      questionHash: req.params.questionHash,
+      userId: req.user.id,
+      title,
+      content,
+    });
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Question updated successfully.",
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Handles deleting a question. Only its author can delete it.
+ */
+const deleteQuestionController = async (req, res, next) => {
+  try {
+    await deleteQuestionService({
+      questionHash: req.params.questionHash,
+      userId: req.user.id,
+    });
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Question deleted successfully.",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   createQuestionController,
   getSingleQuestionController,
@@ -175,4 +217,6 @@ export {
   assessAnswerAgainstQuestionController,
   searchQuestionsSemanticController,
   getQuestionsController,
+  updateQuestionController,
+  deleteQuestionController,
 };

@@ -3,11 +3,15 @@ import express from "express";
 import {
   createAnswerController,
   getAnswersController,
+  updateAnswerController,
+  deleteAnswerController,
 } from "../controller/answer.controller.js";
 
 import {
   createAnswerValidation,
   getAnswersValidation,
+  answerIdValidation,
+  updateAnswerValidation,
 } from "../validations/answer.validation.js";
 
 import { authenticateUser } from "../../../middleware/authentication.js";
@@ -32,5 +36,30 @@ answerRouter.post(
  * @access Public
  */
 answerRouter.get("/", getAnswersValidation, getAnswersController);
+
+/**
+ * @route PATCH /api/answers/:answerId
+ * @desc Update an answer (author only)
+ * @access Protected
+ */
+answerRouter.patch(
+  "/:answerId",
+  authenticateUser,
+  answerIdValidation,
+  updateAnswerValidation,
+  updateAnswerController,
+);
+
+/**
+ * @route DELETE /api/answers/:answerId
+ * @desc Delete an answer (author only)
+ * @access Protected
+ */
+answerRouter.delete(
+  "/:answerId",
+  authenticateUser,
+  answerIdValidation,
+  deleteAnswerController,
+);
 
 export { answerRouter };

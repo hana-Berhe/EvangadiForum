@@ -6,7 +6,7 @@ import express from "express";
 import cors from "cors";
 import { db } from "./schema/db.config.js";
 import { mainRouter } from "./src/mainRoutes.js";
-import { errorHandler } from "./src/middleware/error-handler.js";
+import { errorHandler, notFound } from "./src/middleware/error-handler.js";
 
 const app = express();
 
@@ -19,6 +19,7 @@ app.use(cors());
 app.use("/api", mainRouter);
 
 //  your error handler middleware should be after all api calls
+app.use(notFound);
 app.use(errorHandler);
 
 // connection and server configuration

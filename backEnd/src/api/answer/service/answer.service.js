@@ -1,5 +1,8 @@
 import { safeExecute } from "../../../../schema/db.config.js";
-import { BadRequestError } from "../../../utility/errors/errors.js";
+import {
+  BadRequestError,
+  NotFoundError,
+} from "../../../utility/errors/errors.js";
 
 const getQuestionOwner = async (questionId) => {
   const rows = await safeExecute(
@@ -114,4 +117,32 @@ const getAnswersService = async ({ questionId, sortBy = "newest" }) => {
   };
 };
 
-export { createAnswerService, getAnswersService };
+// The author check lives in the WHERE clause, so an answer that does not
+// exist and an answer that belongs to someone else both report "not found".
+const updateAnswerService = async ({ answerId, userId, content }) => {
+  const result = await safeExecute(
+    "UPDATE answers SET content = ? WHERE answer_id = ? AND user_id = ?",
+    [content, answerId, userId],
+  );
+  if (result.affectedRows === 0) {
+    throw new NotFoundError("Answer not found");
+  }
+  return { id: answerId, content };
+};
+
+const deleteAnswerService = async ({ answerId, userId }) => {
+  const result = await safeExecute(
+    "DELETE FROM answers WHERE answer_id = ? AND user_id = ?",
+    [answerId, userId],
+  );
+  if (result.affectedRows === 0) {
+    throw new NotFoundError("Answer not found");
+  }
+};
+
+export {
+  createAnswerService,
+  getAnswersService,
+  updateAnswerService,
+  deleteAnswerService,
+};

@@ -31,6 +31,10 @@ export default function Auth() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Where to go after signing in: the protected page the visitor was sent
+  // here from, or the dashboard.
+  const redirectTo = location.state?.from?.pathname || "/dashboard";
+
   const [mode, setMode] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -53,7 +57,7 @@ export default function Auth() {
   useEffect(() => () => clearTimeout(switchTimer.current), []);
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={redirectTo} replace />;
   }
 
   function update(e) {
@@ -183,9 +187,7 @@ export default function Auth() {
           password: form.password,
         });
 
-        navigate(location.state?.from?.pathname || "/dashboard", {
-          replace: true,
-        });
+        navigate(redirectTo, { replace: true });
       }
     } catch (err) {
       setError(

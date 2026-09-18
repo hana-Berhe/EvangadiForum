@@ -64,10 +64,10 @@ export default function Navbar() {
       </form>
       <div className={styles.navbarUser}>
         <strong>
-          {user?.firstName || "User"} {user?.lastName || ""}
+          {user.firstName} {user.lastName}
         </strong>
         <span className={`${ui.avatar} ${ui.small}`}>
-          {`${user?.firstName?.[0] || "U"}${user?.lastName?.[0] || ""}`.toUpperCase()}
+          {`${user.firstName[0]}${user.lastName[0]}`.toUpperCase()}
         </span>
         <button className={btn.iconButton} onClick={onLogout}>
           <LogOut size={18} />

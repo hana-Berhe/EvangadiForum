@@ -5,7 +5,7 @@
   background: #fff;
   border: 1px solid #dbe3ea;
   border-radius: 10px;
-  padding: 20px;
+  padding: 28px;
 }
 
 .replyHeader {
@@ -23,12 +23,17 @@
   display: grid;
 }
 
+.replyAuthor strong {
+  font-size: 0.8rem;
+}
+
 .replyAuthor small {
-  color: #64748b;
+  color: #475569;
   font-size: 0.65rem;
 }
 
 .replyContent {
+  margin-top: 12px;
   font-size: 0.86rem;
   color: #334155;
   line-height: 1.65;

@@ -6,7 +6,7 @@ import QuestionCard from "../../components/QuestionCard/QuestionCard";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import EmptyState from "../../components/EmptyState/EmptyState";
-import { getErrorMessage, unwrapArray } from "../../utils/data";
+import { getErrorMessage } from "../../utils/data";
 import btn from "../../styles/buttons.module.css";
 import ui from "../../styles/pageStates.module.css";
 
@@ -29,7 +29,7 @@ export default function Questions() {
 
       try {
         const data = await getAllQuestions(search ? { search } : {});
-        setQuestions(unwrapArray(data, ["questions", "results"]));
+        setQuestions(data.data);
       } catch (err) {
         setError(getErrorMessage(err, "Could not load questions."));
       } finally {
@@ -70,16 +70,8 @@ export default function Questions() {
       )}
 
       <div className={ui.questionList}>
-        {questions.map((question, index) => (
-          <QuestionCard
-            key={
-              question.question_hash ||
-              question.questionHash ||
-              question.id ||
-              index
-            }
-            question={question}
-          />
+        {questions.map((question) => (
+          <QuestionCard key={question.questionHash} question={question} />
         ))}
       </div>
     </div>

@@ -153,7 +153,7 @@ export default function Dashboard() {
     ).length;
 
     const yours = questions.filter(
-      (question) => String(question.author.id) === String(user?.id),
+      (question) => String(question.author.id) === String(user.id),
     ).length;
 
     return {
@@ -162,14 +162,14 @@ export default function Dashboard() {
       unanswered,
       yours,
     };
-  }, [questions, user?.id]);
+  }, [questions, user.id]);
 
   return (
     <div className={styles.dashboardPage}>
       <section className={styles.welcomeCard}>
         <span className={ui.eyebrow}>Forum home</span>
 
-        <h1>Good to see you, {user?.firstName || "Learner"}</h1>
+        <h1>Good to see you, {user.firstName}</h1>
 
         <p>
           Start a topic, revisit your own threads, or skim the live feed. Search
@@ -341,7 +341,7 @@ export default function Dashboard() {
             <QuestionCard
               key={question.questionHash}
               question={question}
-              yours={String(question.author.id) === String(user?.id)}
+              yours={String(question.author.id) === String(user.id)}
             />
           ))}
         </div>

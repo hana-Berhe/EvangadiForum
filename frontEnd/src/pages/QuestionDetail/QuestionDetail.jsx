@@ -1,18 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
   Check,
   MessageSquare,
+  Pencil,
   Share2,
   Sparkles,
+  Trash2,
+  X,
 } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import {
   checkAnswerFit,
+  deleteQuestion,
   getAllQuestions,
   getQuestion,
   getSimilarQuestions,
+  updateQuestion,
 } from "../../api/question.api";
 
 import {
@@ -28,15 +33,13 @@ import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import EmptyState from "../../components/EmptyState/EmptyState";
 import MarkdownContent from "../../components/MarkdownContent/MarkdownContent";
+import MarkdownEditor from "../../components/MarkdownEditor/MarkdownEditor";
 
 import { useAuth } from "../../context/AuthContext";
 
 import {
   getAuthorName,
   getErrorMessage,
-  getQuestionId,
-  getQuestionOwnerId,
-  unwrapArray,
   getRelativeTime,
   getAuthorInitials,
 } from "../../utils/data";
@@ -51,23 +54,22 @@ const FIT_LEVELS = {
   weak: { label: "Weak fit", className: "weak" },
 };
 
-function getQuestionHash(question) {
-  return (
-    question?.questionHash ?? question?.question_hash ?? question?.hash ?? null
-  );
-}
-
 function normalizeRelated(items, currentHash) {
   const seen = new Set();
 
   return items.filter((item) => {
-    const hash = getQuestionHash(item);
+    const title = item.title.trim().toLowerCase();
 
-    if (!hash || hash === currentHash || seen.has(hash)) {
+    if (
+      item.questionHash === currentHash ||
+      seen.has(item.questionHash) ||
+      seen.has(title)
+    ) {
       return false;
     }
 
-    seen.add(hash);
+    seen.add(item.questionHash);
+    seen.add(title);
     return true;
   });
 }
@@ -109,6 +111,7 @@ function makeFallbackTerms(title = "") {
 
 export default function QuestionDetail() {
   const { questionHash } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [question, setQuestion] = useState(null);
@@ -130,18 +133,20 @@ export default function QuestionDetail() {
   const [fitResult, setFitResult] = useState(null);
   const [shareStatus, setShareStatus] = useState("");
 
+  const [editing, setEditing] = useState(false);
+  const [draftTitle, setDraftTitle] = useState("");
+  const [draftContent, setDraftContent] = useState("");
+
   const loadQuestion = useCallback(async () => {
     const data = await getQuestion(questionHash);
 
-    return data?.question ?? data?.data?.question ?? data?.data ?? data;
+    return data.question;
   }, [questionHash]);
 
   const loadAnswers = useCallback(async (questionId) => {
-    if (!questionId) return [];
-
     const data = await getAnswers(questionId);
 
-    return unwrapArray(data, ["answers", "results"]);
+    return data.data;
   }, []);
 
   const loadRelatedQuestions = useCallback(
@@ -155,7 +160,7 @@ export default function QuestionDetail() {
         });
 
         const semanticMatches = normalizeRelated(
-          unwrapArray(semanticData, ["questions", "results", "similar"]),
+          semanticData.data,
           questionHash,
         );
 
@@ -164,7 +169,7 @@ export default function QuestionDetail() {
           return;
         }
 
-        const terms = makeFallbackTerms(currentQuestion?.title);
+        const terms = makeFallbackTerms(currentQuestion.title);
         const collected = [];
 
         for (const term of terms) {
@@ -173,9 +178,7 @@ export default function QuestionDetail() {
               search: term,
             });
 
-            collected.push(
-              ...unwrapArray(keywordData, ["questions", "results"]),
-            );
+            collected.push(...keywordData.data);
           } catch {
             // Continue trying the remaining fallback keywords.
           }
@@ -188,7 +191,7 @@ export default function QuestionDetail() {
         setSimilar(normalizeRelated(collected, questionHash).slice(0, 5));
       } catch {
         try {
-          const terms = makeFallbackTerms(currentQuestion?.title);
+          const terms = makeFallbackTerms(currentQuestion.title);
           const collected = [];
 
           for (const term of terms) {
@@ -196,9 +199,7 @@ export default function QuestionDetail() {
               search: term,
             });
 
-            collected.push(
-              ...unwrapArray(keywordData, ["questions", "results"]),
-            );
+            collected.push(...keywordData.data);
 
             if (normalizeRelated(collected, questionHash).length >= 5) {
               break;
@@ -226,9 +227,7 @@ export default function QuestionDetail() {
         const questionData = await loadQuestion();
         setQuestion(questionData);
 
-        const questionId = getQuestionId(questionData);
-
-        setAnswers(await loadAnswers(questionId));
+        setAnswers(await loadAnswers(questionData.id));
 
         await loadRelatedQuestions(questionData);
       } catch (err) {
@@ -241,20 +240,13 @@ export default function QuestionDetail() {
     loadPage();
   }, [questionHash, loadQuestion, loadAnswers, loadRelatedQuestions]);
 
-  const currentUserId = user?.id ?? user?.user_id ?? user?.userId;
+  const currentUserId = user.id;
 
-  const ownerId = getQuestionOwnerId(question);
-
-  const isOwnQuestion = useMemo(
-    () =>
-      ownerId != null &&
-      currentUserId != null &&
-      String(ownerId) === String(currentUserId),
-    [ownerId, currentUserId],
-  );
+  // `question` is still null while the page loads, hence the one `?.` here.
+  const isOwnQuestion = String(question?.author.id) === String(currentUserId);
 
   async function refreshAnswers() {
-    setAnswers(await loadAnswers(getQuestionId(question)));
+    setAnswers(await loadAnswers(question.id));
   }
 
   async function add({ content }) {
@@ -263,7 +255,7 @@ export default function QuestionDetail() {
 
     try {
       await postAnswer({
-        questionId: getQuestionId(question),
+        questionId: question.id,
         content,
       });
 
@@ -310,6 +302,51 @@ export default function QuestionDetail() {
     }
   }
 
+  function startEditing() {
+    setDraftTitle(question.title);
+    setDraftContent(question.content);
+    setEditing(true);
+  }
+
+  async function saveQuestion() {
+    setBusy(true);
+    setError("");
+
+    try {
+      await updateQuestion(questionHash, {
+        title: draftTitle.trim(),
+        content: draftContent.trim(),
+      });
+
+      setQuestion(await loadQuestion());
+      setEditing(false);
+    } catch (err) {
+      setError(getErrorMessage(err, "Could not update the question."));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeQuestion() {
+    const warning =
+      answers.length === 0
+        ? "Delete this question?"
+        : `Delete this question? This also deletes its ${answers.length} answer${answers.length === 1 ? "" : "s"}.`;
+
+    if (!window.confirm(warning)) return;
+
+    setBusy(true);
+    setError("");
+
+    try {
+      await deleteQuestion(questionHash);
+      navigate("/my-questions", { replace: true });
+    } catch (err) {
+      setError(getErrorMessage(err, "Could not delete the question."));
+      setBusy(false);
+    }
+  }
+
   async function fit(answerText) {
     setCheckingFit(true);
     setActionError("");
@@ -318,7 +355,7 @@ export default function QuestionDetail() {
       const response = await checkAnswerFit(questionHash, answerText);
       // POST /api/questions/:questionHash/answer-fit responds with
       // { success, message, data: { level, note } }
-      setFitResult(response?.data ?? response ?? null);
+      setFitResult(response.data);
     } catch (err) {
       setActionError(getErrorMessage(err, "Could not check answer fit."));
     } finally {
@@ -330,8 +367,8 @@ export default function QuestionDetail() {
     const shareUrl = window.location.href;
 
     const shareData = {
-      title: question?.title || "Evangadi Forum question",
-      text: question?.title || "Take a look at this Evangadi Forum question.",
+      title: question.title,
+      text: question.title,
       url: shareUrl,
     };
 
@@ -413,13 +450,55 @@ export default function QuestionDetail() {
               </div>
             </div>
 
-            <h1>{question?.title}</h1>
+            {editing ? (
+              <div className={`${ui.replyEdit} ${styles.questionEdit}`}>
+                <input
+                  value={draftTitle}
+                  onChange={(event) => setDraftTitle(event.target.value)}
+                  aria-label="Question title"
+                  maxLength={255}
+                />
+                <MarkdownEditor
+                  value={draftContent}
+                  onChange={setDraftContent}
+                  rows={10}
+                  minLength={10}
+                  ariaLabel="Question details"
+                />
+                <div className={styles.questionEditActions}>
+                  <button
+                    type="button"
+                    className={btn.secondaryButton}
+                    onClick={() => setEditing(false)}
+                    disabled={busy}
+                  >
+                    <X size={16} /> Cancel
+                  </button>
+                  <button
+                    type="button"
+                    className={btn.primaryButton}
+                    onClick={saveQuestion}
+                    disabled={
+                      busy ||
+                      draftTitle.trim().length < 5 ||
+                      draftContent.trim().length < 10
+                    }
+                  >
+                    <Check size={16} /> Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <h1>{question.title}</h1>
 
-            <div className={`${styles.discussionContent} ${ui.proseContent}`}>
-              <MarkdownContent>
-                {question?.content || question?.description || ""}
-              </MarkdownContent>
-            </div>
+                <div
+                  className={`${styles.discussionContent} ${ui.proseContent}`}
+                >
+                  <MarkdownContent>{question.content}</MarkdownContent>
+                </div>
+              </>
+            )}
 
             <div className={styles.discussionActions}>
               <button
@@ -447,6 +526,29 @@ export default function QuestionDetail() {
                 {answers.length} Answer
                 {answers.length === 1 ? "" : "s"}
               </button>
+
+              {isOwnQuestion && !editing && (
+                <>
+                  <button
+                    type="button"
+                    className={btn.iconButton}
+                    onClick={startEditing}
+                    disabled={busy}
+                    aria-label="Edit question"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    className={btn.iconButton}
+                    onClick={removeQuestion}
+                    disabled={busy}
+                    aria-label="Delete question"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </>
+              )}
             </div>
           </article>
 
@@ -455,16 +557,15 @@ export default function QuestionDetail() {
 
             {answers.length === 0 ? (
               <EmptyState
-                title="No answers yet"
-                message="Be the first person to help with this question."
+                icon={<MessageSquare size={32} />}
+                title="Be the first to help!"
+                message="This question is waiting for someone like you. Share what you know."
               />
             ) : (
               <div className={styles.replyList}>
-                {answers.map((answer, index) => (
+                {answers.map((answer) => (
                   <ReplyItem
-                    key={
-                      answer.answer_id || answer.answerId || answer.id || index
-                    }
+                    key={answer.id}
                     answer={answer}
                     currentUserId={currentUserId}
                     onUpdate={update}
@@ -477,7 +578,7 @@ export default function QuestionDetail() {
           </section>
 
           <section className={`${ui.panel} ${styles.answerFormPanel}`}>
-            <h2>Add your answer</h2>
+            <h2>Contribute an answer</h2>
 
             {/* Shown here, not at the top of the thread, so the reason a click
                 failed is visible without scrolling away from the button. */}
@@ -498,12 +599,12 @@ export default function QuestionDetail() {
                   <Sparkles size={15} />
                   <strong>Answer fit</strong>
                   <span
-                    className={`${styles.fitBadge} ${FIT_LEVELS[fitResult.level]?.className ?? `${styles.unknown}`}`}
+                    className={`${styles.fitBadge} ${styles[FIT_LEVELS[fitResult.level].className]}`}
                   >
-                    {FIT_LEVELS[fitResult.level]?.label ?? "Not rated"}
+                    {FIT_LEVELS[fitResult.level].label}
                   </span>
                 </div>
-                <p>{fitResult.note || "No explanation was returned."}</p>
+                <p>{fitResult.note}</p>
               </div>
             )}
           </section>
@@ -517,12 +618,12 @@ export default function QuestionDetail() {
           ) : similar.length === 0 ? (
             <p className={ui.muted}>No related questions found.</p>
           ) : (
-            similar.map((item, index) => {
-              const hash = getQuestionHash(item);
+            similar.map((item) => {
+              const hash = item.questionHash;
 
               return (
                 <Link
-                  key={hash || index}
+                  key={hash}
                   to={`/questions/${hash}`}
                   className={styles.relatedCard}
                 >
@@ -535,9 +636,7 @@ export default function QuestionDetail() {
                   )}
 
                   <small>{getAuthorName(item)}</small>
-                  {item.createdAt && (
-                    <small>{getRelativeTime(item.createdAt)}</small>
-                  )}
+                  <small>{getRelativeTime(item.createdAt)}</small>
                 </Link>
               );
             })

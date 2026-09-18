@@ -104,7 +104,10 @@ export default function QuestionForm({
         <button type="button" className={btn.textButton} onClick={onCancel}>
           Cancel
         </button>
-        <button className={btn.primaryButton} disabled={submitting || coaching}>
+        <button
+          className={btn.primaryButton}
+          disabled={submitting || coaching || !title.trim() || !content.trim()}
+        >
           {submitting ? (
             "Posting..."
           ) : (

@@ -1,4 +1,3 @@
-
 import { Fragment } from "react";
 
 function parseInline(text, keyPrefix = "inline") {
@@ -20,7 +19,7 @@ function parseInline(text, keyPrefix = "inline") {
       return <code key={key}>{part.slice(1, -1)}</code>;
     }
 
-    const link = part.match(/^\[([^\]]+)\]\(([^\s)]+)\)$/);
+    const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/i);
     if (link) {
       return (
         <a key={key} href={link[2]} target="_blank" rel="noreferrer">
@@ -139,4 +138,4 @@ export default function MarkdownContent({ children = "" }) {
 
   return <>{nodes}</>;
 }
-// this is a React component that renders Markdown content. 
+// this is a React component that renders Markdown content.

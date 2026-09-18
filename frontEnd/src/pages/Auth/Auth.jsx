@@ -212,7 +212,7 @@ export default function Auth() {
     setForm({
       firstName: "",
       lastName: "",
-      email: "",
+      email: form.email,
       password: "",
     });
   }
@@ -325,6 +325,7 @@ export default function Auth() {
                       <input
                         id="firstName"
                         name="firstName"
+                        autoComplete="given-name"
                         value={form.firstName}
                         onChange={update}
                         placeholder="Enter your first name"
@@ -349,6 +350,7 @@ export default function Auth() {
                       <input
                         id="lastName"
                         name="lastName"
+                        autoComplete="family-name"
                         value={form.lastName}
                         onChange={update}
                         placeholder="Enter your last name"
@@ -375,6 +377,7 @@ export default function Auth() {
                     id="email"
                     type="email"
                     name="email"
+                    autoComplete="email"
                     value={form.email}
                     onChange={update}
                     placeholder="Enter your email address"
@@ -399,6 +402,9 @@ export default function Auth() {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     name="password"
+                    autoComplete={
+                      mode === "login" ? "current-password" : "new-password"
+                    }
                     value={form.password}
                     onChange={update}
                     placeholder="••••••••"
@@ -436,7 +442,7 @@ export default function Auth() {
 
               {/* VALIDATION ERROR */}
               {validationMessage && (
-                <div className={styles.authValidationAlert}>
+                <div className={styles.authValidationAlert} role="alert">
                   <AlertCircle size={18} />
                   <span>{validationMessage}</span>
                 </div>
@@ -444,7 +450,7 @@ export default function Auth() {
 
               {/* BACKEND ERROR */}
               {error && (
-                <div className={styles.authValidationAlert}>
+                <div className={styles.authValidationAlert} role="alert">
                   <AlertCircle size={18} />
                   <span>{error}</span>
                 </div>
@@ -455,6 +461,7 @@ export default function Auth() {
                 {success && (
                   <Motion.div
                     className={styles.authSuccessAlert}
+                    role="status"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}

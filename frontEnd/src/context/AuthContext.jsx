@@ -32,17 +32,21 @@ function clearStoredSession() {
 // ======================================================
 // readStoredUser()
 // ======================================================
-// Reads the user object saved in localStorage.
+// Builds the user object from the JWT token saved in localStorage.
+//
+// The backend signs { id, firstName, lastName } into the token,
+// so the browser does not need to keep a second copy of the user.
 function readStoredUser() {
-  // try is used because JSON.parse() can throw an error
+  // try is used because a missing or damaged token cannot be decoded
   try {
-    // Get the "user" string from localStorage
-    // JSON.parse() converts the string into a JavaScript object
-    //
-    // If no user exists, return null
-    return JSON.parse(localStorage.getItem("user")) || null;
+    // Read the payload part of the saved token
+    const { id, firstName, lastName } = decodeTokenPayload(
+      localStorage.getItem("token"),
+    );
+
+    return { id, firstName, lastName };
   } catch {
-    // If the stored JSON is invalid,
+    // If there is no token, or it cannot be decoded,
     // return null instead of crashing the application
     return null;
   }
@@ -171,10 +175,6 @@ export function AuthProvider({ children }) {
     !isTokenExpired(storedToken) ? readStoredUser() : null,
   );
 
-  // Authentication loading state.
-  // Currently it starts as false.
-  const [loading] = useState(false);
-
   // Tracks whether the current session has expired.
   //
   // false = session is active
@@ -214,25 +214,18 @@ export function AuthProvider({ children }) {
     // await waits until the API responds.
     const data = await loginUser(credentials);
 
-    // Check whether the backend returned a token
-    if (data?.token) {
-      // Save JWT token in localStorage
-      localStorage.setItem("token", data.token);
-    }
+    // The backend responds with
+    // { success, message, data: { user, token } }
+    //
+    // Save JWT token in localStorage
+    localStorage.setItem("token", data.data.token);
 
-    // Check whether the backend returned user data
-    if (data?.user) {
-      // Convert user object to JSON string
-      // and save it in localStorage.
-      localStorage.setItem("user", JSON.stringify(data.user));
+    // Build the user from the token and update React user state
+    setUser(readStoredUser());
 
-      // Update React user state
-      setUser(data.user);
-
-      // Login was successful,
-      // so sessionExpired should be false.
-      setSessionExpired(false);
-    }
+    // Login was successful,
+    // so sessionExpired should be false.
+    setSessionExpired(false);
 
     // Return the API response
     return data;
@@ -343,9 +336,6 @@ export function AuthProvider({ children }) {
       // Current logged-in user
       user,
 
-      // Loading status
-      loading,
-
       // true or false authentication status
       isAuthenticated,
 
@@ -366,7 +356,7 @@ export function AuthProvider({ children }) {
     }),
 
     // Re-create the value when these values change
-    [user, loading, isAuthenticated, sessionExpired],
+    [user, isAuthenticated, sessionExpired],
   );
 
   // ====================================================

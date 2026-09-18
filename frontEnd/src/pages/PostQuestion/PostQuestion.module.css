@@ -12,14 +12,14 @@
 }
 
 .askIntro p {
-  color: #56657a;
+  color: #334155;
   line-height: 1.55;
   margin: 0;
   max-width: 760px;
 }
 
 .askPage {
-  max-width: 1120px;
+  max-width: none;
 }
 
 .askIntro {
@@ -27,8 +27,9 @@
 }
 
 .guidanceCard {
-  background: #edf3f8;
+  background: #f1f5f9;
   border: 1.5px solid var(--orange);
+  border-left-width: 4px;
   padding: 26px 30px;
 }
 
@@ -39,13 +40,13 @@
 
 .guidanceCard p {
   font-size: 0.82rem;
-  color: #435268;
+  color: #334155;
   line-height: 1.55;
 }
 
 .guidanceCard li {
   font-size: 0.82rem;
-  color: #435268;
+  color: #334155;
   line-height: 1.55;
 }
 
@@ -55,7 +56,7 @@
 }
 
 .questionFormCard {
-  padding: 28px;
+  padding: clamp(18px, 3.5vw, 48px);
 }
 
 .aiTipList {

@@ -14,7 +14,11 @@ import { useAuth } from "../../context/AuthContext";
 import { getErrorMessage } from "../../utils/data";
 import btn from "../../styles/buttons.module.css";
 import styles from "./Auth.module.css";
+
 import ui from "../../styles/pageStates.module.css";
+import avatar1 from "../../assets/avatar1.png";
+import avatar2 from "../../assets/avatar2.png";
+import avatar3 from "../../assets/avatar3.png";
 
 // How long the "Registration successful" banner stays up before the card
 // switches itself to the sign-in form. The task file asks for a short pause so
@@ -267,8 +271,16 @@ export default function Auth() {
             </div>
           </div>
 
-          <div className={styles.authCohort}>
-            Evangadi cohorts · weekly stand-ups · office-hour style help
+          <div className={styles.authCohortRow}>
+            <div className={styles.authAvatars}>
+              <img src={avatar1} alt="" />
+              <img src={avatar2} alt="" />
+              <img src={avatar3} alt="" />
+            </div>
+
+            <div className={styles.authCohort}>
+              Evangadi cohorts · weekly stand-ups · office-hour style help
+            </div>
           </div>
         </div>
       </section>

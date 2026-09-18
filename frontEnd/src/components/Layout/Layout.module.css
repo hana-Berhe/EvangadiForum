@@ -4,7 +4,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 240px 1fr;
-  background: #f4f7fa;
+  background: #f8fafc;
 }
 
 .appMain {
@@ -13,7 +13,7 @@
 
 .pageContent {
   padding: 28px;
-  max-width: 1320px;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
 }

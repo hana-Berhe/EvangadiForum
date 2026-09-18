@@ -3,8 +3,9 @@
 .aiSuggestionRow {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 14px;
-  color: #64748b;
+  color: #475569;
   font-size: 0.72rem;
 }
 

@@ -535,6 +535,9 @@ export default function QuestionDetail() {
                   )}
 
                   <small>{getAuthorName(item)}</small>
+                  {item.createdAt && (
+                    <small>{getRelativeTime(item.createdAt)}</small>
+                  )}
                 </Link>
               );
             })

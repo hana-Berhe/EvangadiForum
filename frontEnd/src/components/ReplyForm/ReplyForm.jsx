@@ -57,7 +57,7 @@ export default function ReplyForm({
         rows={8}
         minLength={20}
         ariaLabel="Your answer"
-        placeholder="Write a clear answer. You can format code, bold important words, add links, lists, and quotes."
+        placeholder="Type your answer here... You can use Markdown to format your code!"
       />
 
       {error && <p className={ui.formError}>{error}</p>}
@@ -67,19 +67,22 @@ export default function ReplyForm({
           type="button"
           className={btn.aiButton}
           onClick={handleCheckFit}
-          disabled={checkingFit || submitting}
+          disabled={checkingFit || submitting || !content.trim()}
         >
           <Sparkles size={16} />
-          {checkingFit ? "Checking..." : "Check answer fit"}
+          {checkingFit ? "Checking..." : "Check draft fit"}
         </button>
-        <span>AI suggestions are optional; you decide what to submit.</span>
+        <span>
+          Relevance only. Not grading correctness. You need at least 20
+          characters.
+        </span>
       </div>
 
       <div className={styles.replyFormActions}>
         <button
           type="submit"
           className={btn.primaryButton}
-          disabled={submitting || checkingFit}
+          disabled={submitting || checkingFit || !content.trim()}
         >
           {submitting ? "Posting..." : "Post Your Answer"}
           {!submitting && <Send size={16} />}

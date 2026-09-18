@@ -20,7 +20,7 @@ export default function Sidebar() {
   return (
     <aside className={styles.sidebar}>
       <div>
-        <NavLink to="/dashboard" className={styles.sidebarBrand}>
+        <NavLink to="/" className={styles.sidebarBrand}>
           <span className={ui.brandMark}>
             <MessageSquare size={19} />
           </span>

@@ -4,30 +4,33 @@
   background: #fff;
   border: 1px solid #dbe3ea;
   border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 
 .feedCard {
   background: #fff;
   border: 1px solid #dbe3ea;
   border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 
 .dashboardPage {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
 }
 
 .welcomeCard {
-  padding: 28px;
+  padding: clamp(18px, 4vw, 28px);
 }
 
 .welcomeCard h1 {
-  font-size: 1.75rem;
+  font-size: clamp(1.4rem, 1rem + 2vw, 1.75rem);
   margin: 8px 0 6px;
 }
 
 .welcomeCard > p {
-  color: #56657a;
+  color: #334155;
   font-size: 0.86rem;
   max-width: 780px;
   line-height: 1.5;
@@ -41,7 +44,7 @@
 }
 
 .quickGrid a {
-  background: #f6f8fa;
+  background: #f8fafc;
   border: 1px solid #dfe6ec;
   border-radius: 7px;
   padding: 14px;
@@ -52,11 +55,12 @@
 
 .quickGrid svg {
   color: var(--orange);
-  background: #fff1e7;
+  background: #f1f5f9;
   padding: 6px;
   width: 34px;
   height: 34px;
   border-radius: 6px;
+  flex: 0 0 auto;
 }
 
 .quickGrid strong {
@@ -66,7 +70,7 @@
 
 .quickGrid small {
   display: block;
-  color: #657489;
+  color: #334155;
   font-size: 0.68rem;
   margin-top: 3px;
 }
@@ -88,7 +92,7 @@
 }
 
 .statsGrid.compact > div {
-  background: #edf3f8;
+  background: #f1f5f9;
   border: 1px solid #dce5ec;
   border-radius: 7px;
   padding: 13px;
@@ -96,7 +100,7 @@
 
 .statsGrid.compact small {
   display: block;
-  color: #526177;
+  color: #475569;
   font-size: 0.68rem;
 }
 
@@ -111,7 +115,10 @@
 .feedHead {
   padding: 18px 20px;
   border-bottom: 1px solid #dfe6ed;
+  background: linear-gradient(#f1f5f9, #fff);
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: space-between;
   align-items: center;
 }
@@ -124,7 +131,7 @@
 .feedHead p {
   margin: 3px 0 0;
   font-size: 0.68rem;
-  color: #64748b;
+  color: #475569;
 }
 
 .orangePill {
@@ -135,6 +142,7 @@
   text-transform: uppercase;
   font-size: 0.6rem;
   font-weight: 800;
+  white-space: nowrap;
 }
 
 @media (max-width: 980px) {
@@ -154,7 +162,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  margin: 0 0 18px;
+  margin: 16px 20px 18px;
 }
 
 .feedSearchInput {

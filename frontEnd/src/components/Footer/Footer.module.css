@@ -6,11 +6,11 @@
 
 .siteFooter {
   width: 100%;
-  background: #fff;
+  background: linear-gradient(#f1f5f9, #fff 42px);
   border-top: 1px solid #e1e7ed;
   padding: 30px 48px 28px;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 40px;
   margin-top: 38px;

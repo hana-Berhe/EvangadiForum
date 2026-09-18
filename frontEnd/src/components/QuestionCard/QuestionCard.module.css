@@ -21,7 +21,7 @@
 .threadMain p {
   font-size: 0.74rem;
   line-height: 1.4;
-  color: #556579;
+  color: #334155;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -32,7 +32,7 @@
   display: flex;
   gap: 16px;
   margin-top: 9px;
-  color: #657489;
+  color: #475569;
   font-size: 0.64rem;
 }
 

@@ -9,6 +9,7 @@ import Questions from "./pages/Questions/Questions";
 import PostQuestion from "./pages/PostQuestion/PostQuestion";
 import QuestionDetail from "./pages/QuestionDetail/QuestionDetail";
 import MyQuestions from "./pages/MyQuestions/MyQuestions";
+import RagDocuments from "./pages/RagDocuments/RagDocuments";
 
 import NotFound from "./pages/NotFound/NotFound";
 
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/questions/ask" element={<PostQuestion />} />
           <Route path="/my-questions" element={<MyQuestions />} />
           <Route path="/questions/:questionHash" element={<QuestionDetail />} />
+          <Route path="/rag-documents" element={<RagDocuments />} />
         </Route>
       </Route>
 

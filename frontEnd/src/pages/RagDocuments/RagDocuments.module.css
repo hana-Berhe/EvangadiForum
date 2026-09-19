@@ -1,0 +1,5 @@
+/* Styles for RagDocuments. Scoped to this component. */
+
+.knowledgePage {
+  max-width: none;
+}

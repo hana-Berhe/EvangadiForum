@@ -172,13 +172,66 @@
 }
 
 @media (max-width: 700px) {
+  /* Phone: the sidebar becomes a bottom tab bar. */
   .sidebar {
-    position: static;
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
     height: auto;
     min-height: 0;
+    padding: 6px 8px;
+    border-right: 0;
+    border-top: 1px solid #dde5ec;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 4px;
+  }
+
+  /* The Navbar already shows the page title, the user and logout. */
+  .sidebarBrand,
+  .sidebarSectionLabel,
+  .sidebarUser {
+    display: none;
+  }
+
+  /* Three links take three parts, New Question takes one. */
+  .sidebar > div:first-child {
+    flex: 3;
+    min-width: 0;
+  }
+
+  .sidebarNav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .sidebarLink,
+  .sidebarNew {
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 2px;
+    font-size: 0.65rem;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .sidebarLink.active::before {
+    display: none;
   }
 
   .sidebarBottom {
-    display: none;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .sidebarNew {
+    width: 100%;
+    margin-bottom: 0;
   }
 }

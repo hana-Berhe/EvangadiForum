@@ -151,6 +151,13 @@
   }
 }
 
+@media (max-width: 700px) {
+  /* Phone: the bottom tab bar already has these three links. */
+  .quickGrid {
+    display: none;
+  }
+}
+
 @media (max-width: 980px) {
   .statsGrid.compact {
     grid-template-columns: 1fr 1fr;

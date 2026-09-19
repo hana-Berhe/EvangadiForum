@@ -159,14 +159,25 @@ Create a `.env` file inside the `backEnd` folder and use `.env.example` as a ref
 
 > Never commit real `.env` files, JWT secrets, database credentials, passwords, or API keys to GitHub.
 
-### 5. Run the Backend
+The frontend reads one variable, `VITE_API_BASE_URL`. See `frontEnd/.env.example`.
+
+### 5. Add Sample Data (optional)
+
+```bash
+cd backEnd
+npm run seed
+```
+
+Adds 3 users, 10 questions and 12 answers through the same services the API uses. It only adds rows, and it stops if the sample users already exist. Log in with `sara.seed@example.com` and the password `Evangadi123`.
+
+### 6. Run the Backend
 
 ```bash
 cd backEnd
 npm run dev
 ```
 
-### 6. Run the Frontend
+### 7. Run the Frontend
 
 Open another terminal:
 

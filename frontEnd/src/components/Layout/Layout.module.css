@@ -34,6 +34,11 @@
   .pageContent {
     padding: 18px;
   }
+
+  /* Room for the bottom tab bar (Sidebar on phones). */
+  .appMain {
+    padding-bottom: 72px;
+  }
 }
 
 .appMain {

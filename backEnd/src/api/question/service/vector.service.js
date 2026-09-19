@@ -507,7 +507,12 @@ function getVectorConfig() {
 async function generateQuestionEmbedding(sourceText, options = {}) {
   const { taskType = "RETRIEVAL_DOCUMENT", questionId = null } = options;
 
-  const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+  // 10 second time limit, and the SDK's own retry when Gemini is busy
+  // (429, 5xx). The SDK does not really retry after a timeout.
+  const ai = new GoogleGenAI({
+    apiKey: GEMINI_API_KEY,
+    httpOptions: { timeout: 10000, retryOptions: { attempts: 3 } },
+  });
   try {
     const result = await ai.models.embedContent({
       model: GEMINI_EMBEDDING_MODEL,

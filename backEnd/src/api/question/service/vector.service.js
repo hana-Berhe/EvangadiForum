@@ -7,7 +7,10 @@ const GEMINI_EMBEDDING_MODEL =
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-const RECOMMEND_THRESHOLD = Number(process.env.RECOMMEND_THRESHOLD) || 0.75;
+// Both defaults come from real scores (npm run measure). A search is asked for,
+// so it can be looser. Related questions show up unasked, so they are stricter.
+const RECOMMEND_THRESHOLD = Number(process.env.RECOMMEND_THRESHOLD) || 0.62;
+const RELATED_THRESHOLD = Number(process.env.RELATED_THRESHOLD) || 0.75;
 const RECOMMEND_K = Number(process.env.RECOMMEND_K) || 5;
 
 if (!GEMINI_API_KEY) {
@@ -18,8 +21,20 @@ function normalizeWhitespace(value) {
   return value.replace(/\s+/g, " ").trim();
 }
 
-function normalizeQuestionText({ title }) {
-  return normalizeWhitespace(`${title || ""}`.normalize("NFKC").toLowerCase());
+// Long pasted code adds noise, and the key part of a question is at the top.
+const MAX_EMBEDDING_CONTENT_CHARS = 2000;
+
+// Builds the text that is sent to the embedding model.
+// A question uses its title and content. A search query passes only `title`
+// and is returned as plain text. Case is kept: "useEffect" is a better signal
+// than "useeffect".
+function normalizeQuestionText({ title, content }) {
+  const cleanTitle = normalizeWhitespace(`${title || ""}`.normalize("NFKC"));
+  const cleanContent = normalizeWhitespace(
+    `${content || ""}`.normalize("NFKC"),
+  ).slice(0, MAX_EMBEDDING_CONTENT_CHARS);
+  if (!cleanContent) return cleanTitle;
+  return `Question title: ${cleanTitle}\n\nQuestion details: ${cleanContent}`;
 }
 
 /**
@@ -473,6 +488,7 @@ async function findSimilarQuestionsByQuestionId({ questionId, threshold, k }) {
 function getVectorConfig() {
   return {
     recommendThreshold: RECOMMEND_THRESHOLD,
+    relatedThreshold: RELATED_THRESHOLD,
     recommendK: RECOMMEND_K,
   };
 }
@@ -496,8 +512,9 @@ async function generateQuestionEmbedding(sourceText, options = {}) {
     const result = await ai.models.embedContent({
       model: GEMINI_EMBEDDING_MODEL,
       contents: sourceText,
-      taskType,
+      // taskType must be inside config. Outside it, the SDK drops it silently.
       config: {
+        taskType,
         outputDimensionality: 768,
       },
     });

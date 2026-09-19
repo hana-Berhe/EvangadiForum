@@ -158,7 +158,6 @@ export default function QuestionDetail() {
         // search below runs instead.
         const semanticData = await getSimilarQuestions(questionHash, {
           k: 5,
-          threshold: 0.35,
         }).catch(() => ({ data: [] }));
 
         const semanticMatches = normalizeRelated(

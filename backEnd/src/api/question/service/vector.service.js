@@ -494,7 +494,7 @@ async function generateQuestionEmbedding(sourceText, options = {}) {
   const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
   try {
     const result = await ai.models.embedContent({
-      model: process.env.GEMINI_EMBEDDING_MODEL,
+      model: GEMINI_EMBEDDING_MODEL,
       contents: sourceText,
       taskType,
       config: {

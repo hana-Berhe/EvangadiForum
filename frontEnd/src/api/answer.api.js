@@ -12,10 +12,6 @@ export async function getAnswers(questionId, sortBy = "newest") {
   return response.data;
 }
 
-export async function getSingleAnswer(answerId) {
-  const response = await api.get(`/answers/${answerId}`);
-  return response.data;
-}
 // update the answer using patch method
 export async function updateAnswer(answerId, payload) {
   const response = await api.patch(`/answers/${answerId}`, payload);

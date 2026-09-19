@@ -154,10 +154,12 @@ export default function QuestionDetail() {
       setRelatedLoading(true);
 
       try {
+        // If the AI search fails, treat it as zero results so the keyword
+        // search below runs instead.
         const semanticData = await getSimilarQuestions(questionHash, {
           k: 5,
           threshold: 0.35,
-        });
+        }).catch(() => ({ data: [] }));
 
         const semanticMatches = normalizeRelated(
           semanticData.data,
@@ -190,26 +192,7 @@ export default function QuestionDetail() {
 
         setSimilar(normalizeRelated(collected, questionHash).slice(0, 5));
       } catch {
-        try {
-          const terms = makeFallbackTerms(currentQuestion.title);
-          const collected = [];
-
-          for (const term of terms) {
-            const keywordData = await getAllQuestions({
-              search: term,
-            });
-
-            collected.push(...keywordData.data);
-
-            if (normalizeRelated(collected, questionHash).length >= 5) {
-              break;
-            }
-          }
-
-          setSimilar(normalizeRelated(collected, questionHash).slice(0, 5));
-        } catch {
-          setSimilar([]);
-        }
+        setSimilar([]);
       } finally {
         setRelatedLoading(false);
       }

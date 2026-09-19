@@ -22,10 +22,6 @@ const TITLES = {
     "Knowledge Base",
     "Course files, retrieval, and grounded references.",
   ],
-  "/search": [
-    "Semantic search",
-    "Find questions by meaning, not only exact words.",
-  ],
 };
 export default function Navbar() {
   const { pathname } = useLocation(),

@@ -296,36 +296,6 @@ export function AuthProvider({ children }) {
   }, []); // [] means the effect is set up once
 
   // ====================================================
-  // refreshUser()
-  // ====================================================
-  // Re-checks the stored authentication session.
-  // ====================================================
-  function refreshUser() {
-    // Read the latest token from localStorage
-    const token = localStorage.getItem("token");
-
-    // If there is no token
-    // OR the token has expired...
-    if (!token || isTokenExpired(token)) {
-      // Log the user out
-      logout();
-
-      // Tell the caller that refresh failed
-      return false;
-    }
-
-    // Read the stored user from localStorage
-    const storedUser = readStoredUser();
-
-    // Update React user state
-    setUser(storedUser);
-
-    // Return true if user exists,
-    // otherwise return false.
-    return Boolean(storedUser);
-  }
-
-  // ====================================================
   // Context Value
   // ====================================================
   // This object contains everything that other
@@ -350,9 +320,6 @@ export function AuthProvider({ children }) {
 
       // Logout function
       logout,
-
-      // Refresh user/session
-      refreshUser,
     }),
 
     // Re-create the value when these values change

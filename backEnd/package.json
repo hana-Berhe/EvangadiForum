@@ -7,6 +7,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "seed": "node schema/seed.js",
+    "measure": "node schema/measure-related.js",
+    "reembed": "node schema/reembed.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

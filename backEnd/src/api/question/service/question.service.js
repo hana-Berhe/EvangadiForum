@@ -223,9 +223,10 @@ const createQuestionWithVectorService = async (payload) => {
     userId,
   };
 
-  // Normalize the question text (e.g., title) to prepare it for vector embedding
+  // Normalize the question text (title and content) to prepare it for vector embedding
   const sourceText = normalizeQuestionText({
     title: payload.title,
+    content: payload.content,
   });
 
   try {
@@ -317,7 +318,7 @@ const getSimilarQuestionsService = async ({
   const questionId = questionRows[0].id;
   const vectorConfig = getVectorConfig();
   const searchThreshold =
-    threshold !== undefined ? threshold : vectorConfig.recommendThreshold;
+    threshold !== undefined ? threshold : vectorConfig.relatedThreshold;
   const similarQuestions = await findSimilarQuestionsByQuestionId({
     questionId,
     threshold: searchThreshold,
@@ -343,7 +344,7 @@ const updateQuestionService = async ({
   content,
 }) => {
   const rows = await safeExecute(
-    "SELECT question_id AS id, user_id, title FROM questions WHERE question_hash = ?",
+    "SELECT question_id AS id, user_id, title, content FROM questions WHERE question_hash = ?",
     [questionHash],
   );
   if (rows.length === 0 || rows[0].user_id !== userId) {
@@ -356,11 +357,11 @@ const updateQuestionService = async ({
     [title, content, question.id],
   );
 
-  // The embedding is built from the title only, so refresh it only when the
-  // title changed. If Gemini fails, the edit is kept and the vector is marked
-  // failed, the same as on create.
-  if (title !== question.title) {
-    const sourceText = normalizeQuestionText({ title });
+  // The embedding is built from the title and the content, so refresh it only
+  // when one of them changed. If Gemini fails, the edit is kept and the vector
+  // is marked failed, the same as on create.
+  if (title !== question.title || content !== question.content) {
+    const sourceText = normalizeQuestionText({ title, content });
     try {
       const { embedding } = await generateQuestionEmbedding(sourceText, {
         questionId: question.id,

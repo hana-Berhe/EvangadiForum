@@ -9,8 +9,16 @@ if (!GEMINI_API_KEY) {
   throw new Error("GEMINI_API_KEY environment variable is required");
 }
 
+// One try may take 20 seconds. A busy or slow Gemini gets a second try.
+const GEMINI_TEXT_TIMEOUT_MS = 20000;
+const GEMINI_TEXT_ATTEMPTS = 2;
+const RETRYABLE_STATUS = [429, 500, 502, 503, 504];
+
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const textModel = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
+const textModel = genAI.getGenerativeModel(
+  { model: GEMINI_TEXT_MODEL },
+  { timeout: GEMINI_TEXT_TIMEOUT_MS },
+);
 
 /**
  * Strip optional markdown fence and parse JSON object from model text.
@@ -42,6 +50,23 @@ async function fetchGeminiJsonTextResponse(userPrompt) {
   return typeof text === "string" ? text : "";
 }
 
+// Try again when Gemini is busy (429, 5xx) or gives no reply (timeout,
+// network). A wrong key or a bad request (400, 401, 403) is not retried,
+// because a retry cannot fix it.
+async function fetchGeminiJsonTextWithRetry(userPrompt) {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await fetchGeminiJsonTextResponse(userPrompt);
+    } catch (error) {
+      // No status means a timeout or a network problem.
+      const canRetry =
+        error?.status === undefined || RETRYABLE_STATUS.includes(error.status);
+      if (!canRetry || attempt >= GEMINI_TEXT_ATTEMPTS) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+}
+
 /**
  * Short coaching tips for a question draft (forum / coursework context).
  * @param {{ title: string; content: string }} param
@@ -65,7 +90,7 @@ Rules:
 - Do not claim the question is "correct" or grade homework; give constructive checklist-style tips only.`;
 
   try {
-    const raw = await fetchGeminiJsonTextResponse(userPrompt);
+    const raw = await fetchGeminiJsonTextWithRetry(userPrompt);
     const parsed = parseJsonObjectFromGeminiText(raw);
     // An empty list is a real answer ("the draft is clear"). A reply without
     // a tips list is a broken reply, so report it and do not invent tips.
@@ -108,7 +133,7 @@ Rules:
 - note: one sentence, plain language, no markdown, under 200 characters. Frame as fit/relevance, not grading.`;
 
   try {
-    const raw = await fetchGeminiJsonTextResponse(userPrompt);
+    const raw = await fetchGeminiJsonTextWithRetry(userPrompt);
     const parsed = parseJsonObjectFromGeminiText(raw);
     // "level":"strong"|"partial"|"weak"
     const levelRaw = parsed?.level;

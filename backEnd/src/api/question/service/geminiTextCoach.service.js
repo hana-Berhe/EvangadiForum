@@ -32,7 +32,12 @@ function parseJsonObjectFromGeminiText(raw) {
 }
 
 async function fetchGeminiJsonTextResponse(userPrompt) {
-  const result = await textModel.generateContent(userPrompt);
+  // JSON mode: Gemini must reply with JSON, not with text around it.
+  // Temperature stays at the default: Google advises this for Gemini 3 models.
+  const result = await textModel.generateContent({
+    contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+    generationConfig: { responseMimeType: "application/json" },
+  });
   const text = result?.response?.text?.();
   return typeof text === "string" ? text : "";
 }
@@ -53,27 +58,24 @@ ${content}
 Reply with ONLY valid JSON (no markdown fences), exactly this shape:
 {"tips":["...","..."]}
 Rules:
-- tips: array of 3 to 5 short strings (each under 120 characters).
+- tips: array of 0 to 5 short strings (each under 120 characters).
+- Every tip must point at something that is missing or unclear in THIS draft. Do not give general advice.
+- If the draft is already clear and complete, return an empty array. Do not invent problems.
 - Focus on: missing context (error message, expected vs actual), reproducibility, a sharper title idea if needed, tone for peers.
 - Do not claim the question is "correct" or grade homework; give constructive checklist-style tips only.`;
 
   try {
     const raw = await fetchGeminiJsonTextResponse(userPrompt);
-    console.log("generateQuestionDraftCoachService raw:", raw);
     const parsed = parseJsonObjectFromGeminiText(raw);
-    console.log("generateQuestionDraftCoachService parsed:", parsed);
-    let tips = Array.isArray(parsed?.tips)
-      ? parsed.tips
-          .filter((t) => typeof t === "string" && t.trim())
-          .map((t) => t.trim())
-      : [];
-    tips = tips.slice(0, 5);
-    if (tips.length === 0) {
-      tips = [
-        "Add any error messages or exact behavior you see.",
-        "Say what you already tried and what you expected instead.",
-      ];
+    // An empty list is a real answer ("the draft is clear"). A reply without
+    // a tips list is a broken reply, so report it and do not invent tips.
+    if (!Array.isArray(parsed?.tips)) {
+      throw new Error("Gemini reply has no tips array");
     }
+    let tips = parsed.tips
+      .filter((t) => typeof t === "string" && t.trim())
+      .map((t) => t.trim());
+    tips = tips.slice(0, 5);
     return { tips };
   } catch (error) {
     console.error("generateQuestionDraftCoachService:", error);
@@ -112,16 +114,19 @@ Rules:
     const levelRaw = parsed?.level;
     //- note: one sentence, plain language, no markdown, under 200 characters. Frame as fit/relevance, not grading.`;
     const noteRaw = parsed?.note;
-    //default to "partial" if level is missing or invalid, and provide a fallback note if missing
+    // A missing or invalid level is a broken reply. Report it; do not invent a level.
     const level =
       levelRaw === "strong" || levelRaw === "partial" || levelRaw === "weak"
         ? levelRaw
-        : "partial";
+        : null;
+    if (!level) {
+      throw new Error("Gemini reply has no valid level");
+    }
     //default to a fallback note if missing or empty
     const note =
       typeof noteRaw === "string" && noteRaw.trim()
         ? noteRaw.trim().slice(0, 280)
-        : "Could not summarize fit; treat this as a partial match.";
+        : "No short explanation was returned.";
     return { level, note };
   } catch (error) {
     console.error("assessAnswerAgainstQuestionService:", error);

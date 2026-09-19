@@ -97,10 +97,10 @@ export default function PostQuestion() {
         />
       </section>
       {coachTips && (
-        <section className={`${ui.panel} ${ui.aiPanel}`}>
+        <section className={`${ui.panel} ${ui.aiPanel} ${styles.aiTipsPanel}`}>
           <h2>AI suggestions</h2>
           {coachTips.length === 0 ? (
-            <p>The coach did not return any tips for this draft.</p>
+            <p>No tips this time. Your draft already looks clear.</p>
           ) : (
             <ul className={styles.aiTipList}>
               {coachTips.map((tip, index) => (

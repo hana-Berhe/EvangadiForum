@@ -272,6 +272,9 @@ export const listDocumentsForUserService = async (userId) => {
 // ---- end T-24a ----
 
 // ---- T-24c (Wonde): resolveDocumentAbsolutePath (reused by T-24d) ----
+export const resolveDocumentAbsolutePath = (storagePath) =>
+  path.resolve(process.env.RAG_UPLOAD_DIR || "uploads/rag", storagePath);
+
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): embedQueryText, rankChunksByCosine, searchInDocumentService ----

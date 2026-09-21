@@ -82,6 +82,20 @@ export const getDocumentFileController = async (req, res, next) => {
         "The stored PDF file is missing from the server.",
       );
     }
+    
+    res.type("application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${encodeURIComponent(document.title)}"`,
+    );
+    res.sendFile(absolutePath, (error) => {
+      if (error) next(error);
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): searchInDocumentController ----

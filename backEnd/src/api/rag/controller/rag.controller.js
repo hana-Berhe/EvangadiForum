@@ -68,12 +68,21 @@ export const listDocumentsController = async (req, res, next) => {
 // ---- T-23a (Abel): searchInDocumentController ----
 export const searchInDocumentController = async (req, res, next) => {
   try {
-   const data = await searchInDocumentService({
-     documentId: req.params.documentId,
-     userId: req.user.id,
-     query: req.query.query,
-     k: req.query.k ? Number(req.query.k) : 5,
-   });
+    const data = await searchInDocumentService({
+      documentId: req.params.documentId,
+      userId: req.user.id,
+      query: req.query.query,
+      k: req.query.k ? Number(req.query.k) : 5,
+    });
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Ranked chunk excerpts",
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 // ---- end T-23a ----
 

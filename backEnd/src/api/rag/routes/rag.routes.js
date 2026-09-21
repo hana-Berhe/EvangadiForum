@@ -1,6 +1,8 @@
 import express from "express";
 import { authenticateUser } from "../../../middleware/authentication.js";
-
+import { createDocumentController } from "../controller/rag.controller.js";
+import { createDocumentMulterErrorHandler } from "../config/rag.upload.config.js";
+import { ragUpload } from "../config/rag.upload.config.js";
 // Imports for your task: add them here, one per line.
 // On a merge conflict in the imports, keep BOTH lines.
 
@@ -12,6 +14,17 @@ ragRouter.use(authenticateUser);
 // Register each route between its own markers. Keep this order.
 
 // ---- T-22 (Yabets): POST /documents ----
+/**
+ * @route POST /api/rag/documents
+ * @desc Upload a PDF, chunk it, and embed every chunk
+ * @access Protected
+ */
+ragRouter.post(
+  "/documents",
+  ragUpload.single("file"),
+  createDocumentMulterErrorHandler,
+  createDocumentController,
+);
 // ---- end T-22 ----
 
 // ---- T-24a (Natinael): GET /documents ----

@@ -292,6 +292,8 @@ export const searchInDocumentService = async ({
        `This document is '${document.status}', so it cannot be searched yet.`,
      );
    }
+
+    const queryVector = await embedQueryText(query);
 };
 // ---- end T-23a ----
 

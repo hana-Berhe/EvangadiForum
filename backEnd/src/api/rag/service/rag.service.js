@@ -278,6 +278,46 @@ export const resolveDocumentAbsolutePath = (storagePath) =>
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): embedQueryText, rankChunksByCosine, searchInDocumentService ----
+
+/** Turn the search text into a vector. A query uses RETRIEVAL_QUERY. */
+export const embedQueryText = async (query) => {
+  const { embedding } = await generateQuestionEmbedding(query, {
+    taskType: "RETRIEVAL_QUERY",
+  });
+  return embedding;
+};
+
+/**
+ * Rank this document's chunks against a query. Same maths as forum semantic
+ * search, scoped to one document's vectors.
+ */
+export const searchInDocumentService = async ({
+  documentId,
+  userId,
+  query,
+  k = 5,
+}) => {
+   const document = await assertOwnedDocument(documentId, userId);
+
+   if (document.status !== "ready") {
+     throw new BadRequestError(
+       `This document is '${document.status}', so it cannot be searched yet.`,
+     );
+   }
+
+    const queryVector = await embedQueryText(query);
+
+    const rows = await safeExecute(
+      `SELECT c.chunk_id, c.chunk_index, c.content, c.page_start, c.page_end,
+            v.embedding
+       FROM document_chunks c
+       JOIN document_chunk_vectors v ON v.chunk_id = c.chunk_id
+      WHERE c.document_id = ? AND v.status = 'ready'`,
+      [documentId],
+    );
+
+     return { query, results: rankChunksByCosine(queryVector, rows, k) };
+};
 // ---- end T-23a ----
 
 // ---- T-23b (Desalew): queryDocumentService ----

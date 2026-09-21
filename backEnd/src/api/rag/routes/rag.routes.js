@@ -37,6 +37,16 @@ ragRouter.get("/documents", listDocumentsController);
 // ---- end T-24a ----
 
 // ---- T-23a (Abel): GET /documents/:documentId/search ----
+/**
+ * @route GET /api/rag/documents/:documentId/search
+ * @desc Rank this document's chunks against a query
+ * @access Protected
+ */
+ragRouter.get(
+  "/documents/:documentId/search",
+  searchInDocumentValidation,
+  searchInDocumentController,
+);
 // ---- end T-23a ----
 
 // ---- T-24c (Wonde): GET /documents/:documentId/file ----

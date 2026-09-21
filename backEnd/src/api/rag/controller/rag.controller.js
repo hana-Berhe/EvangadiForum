@@ -66,6 +66,9 @@ export const listDocumentsController = async (req, res, next) => {
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): searchInDocumentController ----
+export const searchInDocumentController = async (req, res, next) => {
+  
+};
 // ---- end T-23a ----
 
 // ---- T-23b (Desalew): queryDocumentController ----

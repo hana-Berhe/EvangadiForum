@@ -294,6 +294,15 @@ export const searchInDocumentService = async ({
    }
 
     const queryVector = await embedQueryText(query);
+
+    const rows = await safeExecute(
+      `SELECT c.chunk_id, c.chunk_index, c.content, c.page_start, c.page_end,
+            v.embedding
+       FROM document_chunks c
+       JOIN document_chunk_vectors v ON v.chunk_id = c.chunk_id
+      WHERE c.document_id = ? AND v.status = 'ready'`,
+      [documentId],
+    );
 };
 // ---- end T-23a ----
 

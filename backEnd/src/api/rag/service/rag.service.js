@@ -303,6 +303,8 @@ export const searchInDocumentService = async ({
       WHERE c.document_id = ? AND v.status = 'ready'`,
       [documentId],
     );
+
+     return { query, results: rankChunksByCosine(queryVector, rows, k) };
 };
 // ---- end T-23a ----
 

@@ -40,6 +40,17 @@ ragRouter.get("/documents", listDocumentsController);
 // ---- end T-23a ----
 
 // ---- T-24c (Wonde): GET /documents/:documentId/file ----
+
+/**
+ * @route GET /api/rag/documents/:documentId/file
+ * @desc Stream the stored PDF for inline preview
+ * @access Protected
+ */
+ragRouter.get(
+  "/documents/:documentId/file",
+  documentIdParamValidation,
+  getDocumentFileController,
+);
 // ---- end T-24c ----
 
 // ---- T-23b (Desalew): POST /documents/:documentId/query ----

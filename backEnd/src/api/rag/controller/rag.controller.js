@@ -63,6 +63,39 @@ export const listDocumentsController = async (req, res, next) => {
 // ---- end T-24b ----
 
 // ---- T-24c (Wonde): getDocumentFileController ----
+/**
+ * Streams the stored PDF back so the browser can preview it inline.
+ */
+export const getDocumentFileController = async (req, res, next) => {
+  try {
+    // 404 when the document does not exist or belongs to someone else.
+    const document = await assertOwnedDocument(
+      req.params.documentId,
+      req.user.id,
+    );
+    const absolutePath = resolveDocumentAbsolutePath(document.storage_path);
+
+    try {
+      await fs.access(absolutePath);
+    } catch {
+      throw new NotFoundError(
+        "The stored PDF file is missing from the server.",
+      );
+    }
+    
+    res.type("application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${encodeURIComponent(document.title)}"`,
+    );
+    res.sendFile(absolutePath, (error) => {
+      if (error) next(error);
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): searchInDocumentController ----

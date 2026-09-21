@@ -275,6 +275,15 @@ export const listDocumentsForUserService = async (userId) => {
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): embedQueryText, rankChunksByCosine, searchInDocumentService ----
+
+/** Turn the search text into a vector. A query uses RETRIEVAL_QUERY. */
+export const embedQueryText = async (query) => {
+  const { embedding } = await generateQuestionEmbedding(query, {
+    taskType: "RETRIEVAL_QUERY",
+  });
+  return embedding;
+};
+
 /**
  * Rank this document's chunks against a query. Same maths as forum semantic
  * search, scoped to one document's vectors.

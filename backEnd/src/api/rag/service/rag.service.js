@@ -255,6 +255,20 @@ export const createDocumentFromUploadService = async ({ userId, file }) => {
 // ---- end T-22 ----
 
 // ---- T-24a (Natinael): listDocumentsForUserService ----
+export const listDocumentsForUserService = async (userId) => {
+  // No user_id and no storage_path here: the list does not need them.
+  const rows = await safeExecute(
+    `SELECT document_id, title, mime_type, byte_size, status, error_message,
+            created_at, updated_at
+       FROM documents
+      WHERE user_id = ?
+      ORDER BY created_at DESC`,
+    [userId],
+  );
+
+  // byte_size is BIGINT in MySQL, so make sure the JSON holds a number.
+  return rows.map((row) => ({ ...row, byte_size: Number(row.byte_size) }));
+};
 // ---- end T-24a ----
 
 // ---- T-24c (Wonde): resolveDocumentAbsolutePath (reused by T-24d) ----

@@ -275,6 +275,18 @@ export const listDocumentsForUserService = async (userId) => {
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): embedQueryText, rankChunksByCosine, searchInDocumentService ----
+/**
+ * Rank this document's chunks against a query. Same maths as forum semantic
+ * search, scoped to one document's vectors.
+ */
+export const searchInDocumentService = async ({
+  documentId,
+  userId,
+  query,
+  k = 5,
+}) => {
+  
+};
 // ---- end T-23a ----
 
 // ---- T-23b (Desalew): queryDocumentService ----

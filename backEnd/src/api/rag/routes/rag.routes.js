@@ -15,6 +15,12 @@ ragRouter.use(authenticateUser);
 // ---- end T-22 ----
 
 // ---- T-24a (Natinael): GET /documents ----
+/**
+ * @route GET /api/rag/documents
+ * @desc List the authenticated user's documents, newest first
+ * @access Protected
+ */
+ragRouter.get("/documents", listDocumentsController);
 // ---- end T-24a ----
 
 // ---- T-23a (Abel): GET /documents/:documentId/search ----

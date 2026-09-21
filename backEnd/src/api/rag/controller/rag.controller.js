@@ -5,10 +5,38 @@
 // Imports: add them below, one per line. On a merge conflict in the imports,
 // keep BOTH lines.
 
+import fs from "node:fs/promises";
+import { StatusCodes } from "http-status-codes";
+import { NotFoundError } from "../../../utility/errors/errors.js";
+import { assertOwnedDocument } from "../service/rag.service.js";
+import { createDocumentFromUploadService } from "../service/rag.service.js";
+import { deleteDocumentService } from "../service/rag.service.js";
+import { getDocumentMetaService } from "../service/rag.service.js";
+import { listDocumentsForUserService } from "../service/rag.service.js";
+import { queryDocumentService } from "../service/rag.service.js";
+import { resolveDocumentAbsolutePath } from "../service/rag.service.js";
+import { searchInDocumentService } from "../service/rag.service.js";
+
 // ---- T-22 (Yabets): createDocumentController ----
 // ---- end T-22 ----
 
 // ---- T-24a (Natinael): listDocumentsController ----
+/**
+ * Handles listing the authenticated user's documents, newest first.
+ */
+export const listDocumentsController = async (req, res, next) => {
+  try {
+    const data = await listDocumentsForUserService(req.user.id);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Documents fetched successfully.",
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 // ---- end T-24a ----
 
 // ---- T-24b (Haymanot Y.): getDocumentMetaController ----

@@ -286,6 +286,12 @@ export const searchInDocumentService = async ({
   k = 5,
 }) => {
    const document = await assertOwnedDocument(documentId, userId);
+
+   if (document.status !== "ready") {
+     throw new BadRequestError(
+       `This document is '${document.status}', so it cannot be searched yet.`,
+     );
+   }
 };
 // ---- end T-23a ----
 

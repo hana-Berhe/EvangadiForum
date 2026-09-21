@@ -1,15 +1,14 @@
-// RAG request validation (express-validator). Every list ends with
-// validationErrorHandler from middleware/validation-handler.js.
-//
-// Write your validation between your own markers and use "export const".
-// Imports: add them below, one per line. On a merge conflict in the imports,
-// keep BOTH lines.
+import { body } from "express-validator";
+import { param } from "express-validator";
+import { query } from "express-validator";
+import { validationErrorHandler } from "../../../middleware/validation-handler.js";
 
 // ---- T-24b (Haymanot Y.): documentIdParamValidation (shared by 4 tasks) ----
-// ---- end T-24b ----
-
-// ---- T-23a (Abel): searchInDocumentValidation ----
-// ---- end T-23a ----
-
-// ---- T-23b (Desalew): queryDocumentValidation ----
-// ---- end T-23b ----
+// Shared by T-24b, T-24c and T-24d: the routes that only take :documentId.
+export const documentIdParamValidation = [
+  param("documentId")
+    .isInt({ min: 1 })
+    .withMessage("Document id must be a positive integer")
+    .toInt(),
+  validationErrorHandler,
+];

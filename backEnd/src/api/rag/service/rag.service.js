@@ -285,7 +285,7 @@ export const searchInDocumentService = async ({
   query,
   k = 5,
 }) => {
-  
+   const document = await assertOwnedDocument(documentId, userId);
 };
 // ---- end T-23a ----
 

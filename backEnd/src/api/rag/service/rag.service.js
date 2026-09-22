@@ -9,16 +9,26 @@
 // - Embeddings: always use generateQuestionEmbedding from
 //   question/service/vector.service.js. Do not call Gemini directly.
 // - Another user's document is reported as 404, never 403.
+
 import fs from "node:fs/promises";
 import path from "node:path";
 import { PDFParse } from "pdf-parse";
 import { safeExecute } from "../../../../schema/db.config.js";
-import { ServiceUnavailableError } from "../../../utility/errors/errors.js";
 import { BadRequestError } from "../../../utility/errors/errors.js";
+import { NotFoundError } from "../../../utility/errors/errors.js";
+import { ServiceUnavailableError } from "../../../utility/errors/errors.js";
+import { calculateCosineSimilarity } from "../../question/service/vector.service.js";
 import { generateEmbeddingsBatch } from "../../question/service/vector.service.js";
+import { generateQuestionEmbedding } from "../../question/service/vector.service.js";
+import { answerFromRagChunksService } from "../../question/service/geminiTextCoach.service.js";
 import { RAG_UPLOAD_DIR } from "../config/rag.upload.config.js";
 
 // ---- T-24b (Haymanot Y.): assertOwnedDocument (shared by 5 tasks), getDocumentMetaService ----
+/**
+ * Fetch a document and prove the caller owns it. A document that belongs to
+ * someone else is reported as 404, not 403: the caller should not learn that
+ * the id exists at all. Shared by T-24c, T-24d, T-23a and T-23b.
+ */
 export const assertOwnedDocument = async (documentId, userId) => {
   const rows = await safeExecute(
     `SELECT document_id, title, mime_type, byte_size, status, error_message,
@@ -39,7 +49,6 @@ export const getDocumentMetaService = async ({ documentId, userId }) => {
   // byte_size is BIGINT in MySQL, so make sure the JSON holds a number.
   return { ...row, byte_size: Number(row.byte_size) };
 };
-
 // ---- end T-24b ----
 
 // ---- T-22 (Yabets): extractPdfText, chunkTextWithOverlap, embedChunks, createDocumentFromUploadService ----
@@ -103,6 +112,7 @@ const pageAt = (pageIndex, offset) => {
   const hit = pageIndex.find((p) => offset >= p.start && offset <= p.end);
   return hit ? hit.num : null;
 };
+
 /**
  * Slice text into overlapping windows. The overlap matters: without it a
  * sentence that sits on a boundary is in neither chunk cleanly and stops
@@ -293,12 +303,20 @@ export const listDocumentsForUserService = async (userId) => {
 // ---- end T-24a ----
 
 // ---- T-24c (Wonde): resolveDocumentAbsolutePath (reused by T-24d) ----
+/**
+ * Absolute path on disk for a storage_path stored in the documents table.
+ * Reused by T-24d to delete the file.
+ */
 export const resolveDocumentAbsolutePath = (storagePath) =>
   path.resolve(process.env.RAG_UPLOAD_DIR || "uploads/rag", storagePath);
-
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): embedQueryText, rankChunksByCosine, searchInDocumentService ----
+// Measured with the real Gemini on a real PDF: a phrase that matches scores
+// 0.64 to 0.70. Off-topic queries score 0.53 ("pasta recipe") and up to 0.61
+// when they sound technical ("how to use bootstrap").
+const SEARCH_THRESHOLD = Number(process.env.RAG_SEARCH_THRESHOLD) || 0.62;
+const SEARCH_K = Number(process.env.RAG_SEARCH_K) || 10;
 
 /** Turn the search text into a vector. A query uses RETRIEVAL_QUERY. */
 export const embedQueryText = async (query) => {
@@ -306,6 +324,40 @@ export const embedQueryText = async (query) => {
     taskType: "RETRIEVAL_QUERY",
   });
   return embedding;
+};
+
+/**
+ * Score every chunk row against the query vector with cosine similarity, keep
+ * the ones above the threshold, best first, at most k.
+ */
+export const rankChunksByCosine = (queryVector, rows, k) => {
+  const scored = [];
+
+  for (const row of rows) {
+    const stored =
+      typeof row.embedding === "string"
+        ? JSON.parse(row.embedding)
+        : row.embedding;
+
+    if (!Array.isArray(stored) || stored.length !== queryVector.length)
+      continue;
+
+    const score = calculateCosineSimilarity(queryVector, stored);
+    if (score >= SEARCH_THRESHOLD) {
+      scored.push({
+        chunkId: row.chunk_id,
+        chunkIndex: row.chunk_index,
+        pageStart: row.page_start,
+        pageEnd: row.page_end,
+        score: Number(score.toFixed(6)),
+        excerpt: row.content,
+      });
+    }
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+
+  return scored.slice(0, Math.min(k, SEARCH_K));
 };
 
 /**
@@ -342,6 +394,11 @@ export const searchInDocumentService = async ({
 // ---- end T-23a ----
 
 // ---- T-23b (Desalew): queryDocumentService ----
+/**
+ * Retrieval-augmented answer: find the best chunks, then let Gemini answer
+ * using only those. The cited chunks come back as citations so the answer can
+ * be checked against the source.
+ */
 export const queryDocumentService = async ({ documentId, userId, query }) => {
   const { results } = await searchInDocumentService({
     documentId,
@@ -359,14 +416,6 @@ export const queryDocumentService = async ({ documentId, userId, query }) => {
       chunksUsed: [],
     };
   }
-
-  const { answer } = await answerFromRagChunksService({
-    query,
-    chunks: results.map((hit, index) => ({
-      ref: index + 1,
-      text: hit.excerpt,
-    })),
-  });
 
   // Honest sources: list only the chunks the answer really cites as [n].
   const citedRefs = new Set(
@@ -386,8 +435,32 @@ export const queryDocumentService = async ({ documentId, userId, query }) => {
     chunksUsed: cited.map(({ hit }) => hit.chunkId),
   };
 };
-
 // ---- end T-23b ----
 
 // ---- T-24d (Haymanot B.): removeDocumentFileFromDisk, deleteDocumentService ----
+/** Remove the PDF from disk. A file that is already gone is not an error. */
+export const removeDocumentFileFromDisk = async (storagePath) => {
+  try {
+    await fs.unlink(resolveDocumentAbsolutePath(storagePath));
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      console.error("removeDocumentFileFromDisk: could not remove file", error);
+    }
+  }
+};
+
+export const deleteDocumentService = async ({ documentId, userId }) => {
+  const document = await assertOwnedDocument(documentId, userId);
+
+  // Remove the file first; a missing file should not block the row deletion.
+  await removeDocumentFileFromDisk(document.storage_path);
+
+  // document_chunks and document_chunk_vectors cascade from the foreign keys.
+  await safeExecute(
+    "DELETE FROM documents WHERE document_id = ? AND user_id = ?",
+    [documentId, userId],
+  );
+
+  return { id: documentId };
+};
 // ---- end T-24d ----

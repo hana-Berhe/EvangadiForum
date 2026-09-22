@@ -4,7 +4,6 @@
 // Write your controller between your own markers and use "export const".
 // Imports: add them below, one per line. On a merge conflict in the imports,
 // keep BOTH lines.
-import { createDocumentFromUploadService } from "../service/rag.service.js";
 
 import fs from "node:fs/promises";
 import { StatusCodes } from "http-status-codes";
@@ -114,10 +113,12 @@ export const getDocumentFileController = async (req, res, next) => {
     next(error);
   }
 };
-
 // ---- end T-24c ----
 
 // ---- T-23a (Abel): searchInDocumentController ----
+/**
+ * Handles ranking a document's chunks against a search phrase.
+ */
 export const searchInDocumentController = async (req, res, next) => {
   try {
     const data = await searchInDocumentService({
@@ -139,6 +140,9 @@ export const searchInDocumentController = async (req, res, next) => {
 // ---- end T-23a ----
 
 // ---- T-23b (Desalew): queryDocumentController ----
+/**
+ * Handles answering a question grounded in the document's own text.
+ */
 export const queryDocumentController = async (req, res, next) => {
   try {
     const data = await queryDocumentService({
@@ -156,9 +160,26 @@ export const queryDocumentController = async (req, res, next) => {
     next(error);
   }
 };
-
 // ---- end T-23b ----
 
-// ---- T-24d (Haymanot B.)
-// : deleteDocumentController ----
+// ---- T-24d (Haymanot B.): deleteDocumentController ----
+/**
+ * Handles removing a document, its file on disk, and its chunks.
+ */
+export const deleteDocumentController = async (req, res, next) => {
+  try {
+    const data = await deleteDocumentService({
+      documentId: req.params.documentId,
+      userId: req.user.id,
+    });
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Document deleted successfully.",
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 // ---- end T-24d ----

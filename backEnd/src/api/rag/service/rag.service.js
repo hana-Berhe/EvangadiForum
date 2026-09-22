@@ -297,30 +297,75 @@ export const searchInDocumentService = async ({
   query,
   k = 5,
 }) => {
-   const document = await assertOwnedDocument(documentId, userId);
+  const document = await assertOwnedDocument(documentId, userId);
 
-   if (document.status !== "ready") {
-     throw new BadRequestError(
-       `This document is '${document.status}', so it cannot be searched yet.`,
-     );
-   }
+  if (document.status !== "ready") {
+    throw new BadRequestError(
+      `This document is '${document.status}', so it cannot be searched yet.`,
+    );
+  }
 
-    const queryVector = await embedQueryText(query);
+  const queryVector = await embedQueryText(query);
 
-    const rows = await safeExecute(
-      `SELECT c.chunk_id, c.chunk_index, c.content, c.page_start, c.page_end,
+  const rows = await safeExecute(
+    `SELECT c.chunk_id, c.chunk_index, c.content, c.page_start, c.page_end,
             v.embedding
        FROM document_chunks c
        JOIN document_chunk_vectors v ON v.chunk_id = c.chunk_id
       WHERE c.document_id = ? AND v.status = 'ready'`,
-      [documentId],
-    );
+    [documentId],
+  );
 
-     return { query, results: rankChunksByCosine(queryVector, rows, k) };
+  return { query, results: rankChunksByCosine(queryVector, rows, k) };
 };
 // ---- end T-23a ----
 
 // ---- T-23b (Desalew): queryDocumentService ----
+export const queryDocumentService = async ({ documentId, userId, query }) => {
+  const { results } = await searchInDocumentService({
+    documentId,
+    userId,
+    query,
+    k: 5,
+  });
+
+  // Nothing close enough: say so, and do not spend a Gemini call.
+  if (results.length === 0) {
+    return {
+      answer:
+        "I could not find anything in this document that answers that question.",
+      citations: [],
+      chunksUsed: [],
+    };
+  }
+
+  const { answer } = await answerFromRagChunksService({
+    query,
+    chunks: results.map((hit, index) => ({
+      ref: index + 1,
+      text: hit.excerpt,
+    })),
+  });
+
+  // Honest sources: list only the chunks the answer really cites as [n].
+  const citedRefs = new Set(
+    [...answer.matchAll(/\[(\d+)\]/g)].map((match) => Number(match[1])),
+  );
+  const cited = results
+    .map((hit, index) => ({ ref: index + 1, hit }))
+    .filter(({ ref }) => citedRefs.has(ref));
+
+  return {
+    answer,
+    citations: cited.map(({ ref, hit }) => ({
+      ref,
+      chunkIndex: hit.chunkIndex,
+      pageStart: hit.pageStart,
+    })),
+    chunksUsed: cited.map(({ hit }) => hit.chunkId),
+  };
+};
+
 // ---- end T-23b ----
 
 // ---- T-24d (Haymanot B.): removeDocumentFileFromDisk, deleteDocumentService ----

@@ -627,12 +627,44 @@ async function storeQuestionVector({
   }
 }
 
-// function getVectorConfig() {
-// return {
-// recommendThreshold: RECOMMEND_THRESHOLD,
-// recommendK: RECOMMEND_K,
-// };
-// }
+/**
+ * Embed many texts in ONE Gemini call (used for PDF chunks).
+ * One call per chunk is slow and hits the free rate limit on a big PDF.
+ *
+ * @param {string[]} texts - The texts to embed, in order.
+ * @param {Object} [options]
+ * @param {string} [options.taskType='RETRIEVAL_DOCUMENT']
+ * @returns {Promise<Array<Array<number>>>} One vector per text, same order.
+ * @throws {Error} If Gemini does not return one vector for every text.
+ */
+async function generateEmbeddingsBatch(texts, options = {}) {
+  const { taskType = "RETRIEVAL_DOCUMENT" } = options;
+
+  // Same settings as generateQuestionEmbedding, with a longer time limit
+  // because one call carries many texts.
+  const ai = new GoogleGenAI({
+    apiKey: GEMINI_API_KEY,
+    httpOptions: { timeout: 30000, retryOptions: { attempts: 3 } },
+  });
+  const result = await ai.models.embedContent({
+    model: GEMINI_EMBEDDING_MODEL,
+    contents: texts,
+    config: {
+      taskType,
+      outputDimensionality: 768,
+    },
+  });
+
+  const vectors = (result?.embeddings ?? []).map((item) => item?.values);
+  const allValid =
+    vectors.length === texts.length &&
+    vectors.every((values) => Array.isArray(values) && values.length > 0);
+  if (!allValid) {
+    throw new Error("Gemini did not return one embedding for every text");
+  }
+
+  return vectors;
+}
 
 export {
   normalizeQuestionText,
@@ -642,4 +674,5 @@ export {
   findSimilarQuestionsByText,
   findSimilarQuestionsByQuestionId,
   getVectorConfig,
+  generateEmbeddingsBatch,
 };

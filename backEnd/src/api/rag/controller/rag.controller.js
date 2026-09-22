@@ -82,7 +82,7 @@ export const getDocumentFileController = async (req, res, next) => {
         "The stored PDF file is missing from the server.",
       );
     }
-    
+
     res.type("application/pdf");
     res.setHeader(
       "Content-Disposition",
@@ -120,6 +120,24 @@ export const searchInDocumentController = async (req, res, next) => {
 // ---- end T-23a ----
 
 // ---- T-23b (Desalew): queryDocumentController ----
+export const queryDocumentController = async (req, res, next) => {
+  try {
+    const data = await queryDocumentService({
+      documentId: req.params.documentId,
+      userId: req.user.id,
+      query: req.body.query,
+    });
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Answer and citations",
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ---- end T-23b ----
 
 // ---- T-24d (Haymanot B.): deleteDocumentController ----

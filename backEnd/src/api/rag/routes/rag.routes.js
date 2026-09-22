@@ -88,6 +88,17 @@ ragRouter.post(
 // ---- end T-23b ----
 
 // ---- T-24b (Haymanot Y.): GET /documents/:documentId ----
+/**
+ * @route GET /api/rag/documents/:documentId
+ * @desc Processing status and metadata for one document
+ * @access Protected
+ */
+ragRouter.get(
+  "/documents/:documentId",
+  documentIdParamValidation,
+  getDocumentMetaController,
+);
+
 // ---- end T-24b ----
 
 // ---- T-24d (Haymanot B.): DELETE /documents/:documentId ----

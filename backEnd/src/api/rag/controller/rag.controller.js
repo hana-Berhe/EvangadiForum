@@ -60,6 +60,25 @@ export const listDocumentsController = async (req, res, next) => {
 // ---- end T-24a ----
 
 // ---- T-24b (Haymanot Y.): getDocumentMetaController ----
+/**
+ * Handles fetching one document's processing status and metadata.
+ */
+export const getDocumentMetaController = async (req, res, next) => {
+  try {
+    const data = await getDocumentMetaService({
+      documentId: req.params.documentId,
+      userId: req.user.id,
+    });
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Document fetched successfully.",
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 // ---- end T-24b ----
 
 // ---- T-24c (Wonde): getDocumentFileController ----
@@ -140,5 +159,6 @@ export const queryDocumentController = async (req, res, next) => {
 
 // ---- end T-23b ----
 
-// ---- T-24d (Haymanot B.): deleteDocumentController ----
+// ---- T-24d (Haymanot B.)
+// : deleteDocumentController ----
 // ---- end T-24d ----

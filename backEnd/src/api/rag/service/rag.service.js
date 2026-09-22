@@ -19,6 +19,27 @@ import { generateEmbeddingsBatch } from "../../question/service/vector.service.j
 import { RAG_UPLOAD_DIR } from "../config/rag.upload.config.js";
 
 // ---- T-24b (Haymanot Y.): assertOwnedDocument (shared by 5 tasks), getDocumentMetaService ----
+export const assertOwnedDocument = async (documentId, userId) => {
+  const rows = await safeExecute(
+    `SELECT document_id, title, mime_type, byte_size, status, error_message,
+            created_at, updated_at, user_id, storage_path
+       FROM documents
+      WHERE document_id = ? AND user_id = ?
+      LIMIT 1`,
+    [documentId, userId],
+  );
+
+  if (rows.length === 0) throw new NotFoundError("Document not found");
+
+  return rows[0];
+};
+
+export const getDocumentMetaService = async ({ documentId, userId }) => {
+  const row = await assertOwnedDocument(documentId, userId);
+  // byte_size is BIGINT in MySQL, so make sure the JSON holds a number.
+  return { ...row, byte_size: Number(row.byte_size) };
+};
+
 // ---- end T-24b ----
 
 // ---- T-22 (Yabets): extractPdfText, chunkTextWithOverlap, embedChunks, createDocumentFromUploadService ----

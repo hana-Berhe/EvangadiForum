@@ -2,6 +2,15 @@ import express from "express";
 import { authenticateUser } from "../../../middleware/authentication.js";
 import { createDocumentController } from "../controller/rag.controller.js";
 import { createDocumentMulterErrorHandler } from "../config/rag.upload.config.js";
+import { deleteDocumentController } from "../controller/rag.controller.js";
+import { getDocumentFileController } from "../controller/rag.controller.js";
+import { getDocumentMetaController } from "../controller/rag.controller.js";
+import { listDocumentsController } from "../controller/rag.controller.js";
+import { searchInDocumentController } from "../controller/rag.controller.js";
+import { documentIdParamValidation } from "../validations/rag.validation.js";
+import { searchInDocumentValidation } from "../validations/rag.validation.js";
+import { queryDocumentValidation } from "../validations/rag.validation.js";
+import { queryDocumentController } from "../controller/rag.controller.js";
 import { ragUpload } from "../config/rag.upload.config.js";
 // Imports for your task: add them here, one per line.
 // On a merge conflict in the imports, keep BOTH lines.
@@ -64,6 +73,18 @@ ragRouter.get(
 // ---- end T-24c ----
 
 // ---- T-23b (Desalew): POST /documents/:documentId/query ----
+
+/**
+ * @route POST /api/rag/documents/:documentId/query
+ * @desc Answer a question using only this document's text
+ * @access Protected
+ */
+ragRouter.post(
+  "/documents/:documentId/query",
+  queryDocumentValidation,
+  queryDocumentController,
+);
+
 // ---- end T-23b ----
 
 // ---- T-24b (Haymanot Y.): GET /documents/:documentId ----

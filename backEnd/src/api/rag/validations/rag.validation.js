@@ -34,3 +34,18 @@ export const searchInDocumentValidation = [
     .toInt(),
   validationErrorHandler,
 ];
+export const queryDocumentValidation = [
+  param("documentId")
+    .isInt({ min: 1 })
+    .withMessage("Document id must be a positive integer")
+    .toInt(),
+  body("query")
+    .trim()
+    .notEmpty()
+    .withMessage("query is required")
+    .isString()
+    .withMessage("query must be a string")
+    .isLength({ min: 3 })
+    .withMessage("query must be at least 3 characters"),
+  validationErrorHandler,
+];

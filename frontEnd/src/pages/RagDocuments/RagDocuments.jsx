@@ -271,7 +271,11 @@ export default function RagDocuments() {
         <aside className={styles.knowledgeLibraryCard}>
           <div className={styles.knowledgeSectionTitle}>
             <h2>Library</h2>
-            <p>Add PDFs here. Processing runs once per upload.</p>
+            <p>
+              Supported Format: PDF
+              <br />
+              File Size Limit: 10 MB max
+            </p>
           </div>
 
           <div className={styles.knowledgeUploadBox}>

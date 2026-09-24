@@ -20,3 +20,24 @@ export const adminListRoomsController = async (req, res, next) => {
     next(error);
   }
 };
+
+
+/**
+ * Closes a room. PATCH, because one part of the room changes (its status).
+ */
+export const closeRoomController = async (req, res, next) => {
+  try {
+    const room = await closeRoomService({
+      roomId: req.room.id,
+      adminId: req.user.id,
+    });
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Room closed",
+      data: room,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

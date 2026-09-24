@@ -21,7 +21,7 @@
   /* Same 72px as .navbar, bleeding over the sidebar's side padding, so this
      border and the navbar border form one continuous line. */
   margin: 0 -14px;
-  height: 72px;
+  height: 79px;
   padding: 0 18px;
   border-bottom: 1px solid var(--border, #e6ebf0);
 }

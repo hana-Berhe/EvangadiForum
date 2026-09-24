@@ -1,9 +1,9 @@
 /* Styles for Sidebar. Scoped to this component. */
 
 .sidebar {
-  background: #fff;
-  border-right: 1px solid #dde5ec;
-  padding: 18px 14px;
+  background: var(--surface, #fff);
+  border-right: 1px solid var(--border, #dde5ec);
+  padding: 0 14px 18px;
   min-height: 100vh;
   position: sticky;
   top: 0;
@@ -18,8 +18,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 2px 4px 20px;
-  border-bottom: 1px solid #e6ebf0;
+  /* Same 72px as .navbar, bleeding over the sidebar's side padding, so this
+     border and the navbar border form one continuous line. */
+  margin: 0 -14px;
+  height: 72px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--border, #e6ebf0);
 }
 
 .sidebarBrand > span:last-child {
@@ -27,18 +31,35 @@
 }
 
 .sidebarBrand strong {
-  font-size: 0.93rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* The second word of the name, in the brand orange. */
+.brandAccent {
+  color: var(--orange);
 }
 
 .sidebarBrand small {
-  font-size: 0.66rem;
-  color: #64748b;
-  line-height: 1.25;
+  font-size: 0.72rem;
+  color: var(--text-secondary, #526077);
+  line-height: 1.35;
+  margin-top: 2px;
+}
+
+/* A bigger, softer tile for the logo in the sidebar only. */
+.sidebarBrand .brandTile {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #ff8a2b, var(--orange));
+  box-shadow: 0 6px 14px rgba(255, 107, 0, 0.28);
 }
 
 .sidebarSectionLabel {
   margin: 20px 7px 9px;
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
   text-transform: uppercase;
   font-size: 0.65rem;
   font-weight: 800;
@@ -55,15 +76,27 @@
   align-items: center;
   gap: 10px;
   padding: 10px 11px;
-  border-radius: 7px;
-  color: #334155;
+  border-radius: 8px;
+  color: var(--text-secondary, #334155);
   font-size: 0.87rem;
   font-weight: 600;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
 }
 
+/* Mouse over a link: light orange. */
+.sidebarLink:hover {
+  background: var(--tint-orange, #fff1e6);
+  color: var(--accent-text, #b84a00);
+}
+
+/* The page you are on: a little stronger, with the orange bar on the left.
+   The text is dark orange, not white: white on light orange is hard to read. */
 .sidebarLink.active {
-  background: #edf2f6;
-  color: #172033;
+  background: var(--tint-orange, #ffe3cc);
+  color: var(--accent-text, #b84a00);
+  font-weight: 700;
   position: relative;
 }
 
@@ -83,7 +116,7 @@
 }
 
 .sidebarBottom {
-  border-top: 1px solid #e6ebf0;
+  border-top: 1px solid var(--border, #e6ebf0);
   padding-top: 14px;
 }
 
@@ -136,7 +169,7 @@
 
 .userText small {
   font-size: 0.65rem;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
 }
 
 .sidebarLogout {
@@ -152,7 +185,7 @@
   border-radius: 7px;
 
   background: transparent;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
 
   cursor: pointer;
 
@@ -162,7 +195,7 @@
 }
 
 .sidebarLogout:hover {
-  background: #f1f5f9;
+  background: var(--surface-soft, #f1f5f9);
   color: #ef4444;
 }
 
@@ -184,7 +217,7 @@
     min-height: 0;
     padding: 6px 8px;
     border-right: 0;
-    border-top: 1px solid #dde5ec;
+    border-top: 1px solid var(--border, #dde5ec);
     flex-direction: row;
     align-items: stretch;
     gap: 4px;
@@ -193,18 +226,19 @@
   /* The Navbar already shows the page title, the user and logout. */
   .sidebarBrand,
   .sidebarSectionLabel,
+  .sidebarAdmin,
   .sidebarUser {
     display: none;
   }
 
-  /* Three links take three parts, New Question takes one. */
+  /* Four links take four parts, New Question takes one. */
   .sidebar > div:first-child {
-    flex: 3;
+    flex: 4;
     min-width: 0;
   }
 
   .sidebarNav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .sidebarLink,

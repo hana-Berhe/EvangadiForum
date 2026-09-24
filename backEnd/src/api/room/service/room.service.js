@@ -87,3 +87,55 @@ export {
   getRoomService,
 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+// [Rooms B - Haymanot Y.] createRoomService.
+/**
+ * Creates a room and makes the creator its first member, in ONE transaction:
+ * a room without its creator as a member must never exist.
+ *
+ * The name check is left to the database (UNIQUE key). "Check first, then
+ * insert" has a gap where two people can create the same name at the same
+ * moment. The UNIQUE key has no gap.
+ *
+ * @param {{ userId: number, name: string, description?: string }} param
+ * @returns {Promise<Object>} The new room.
+ * @throws {ConflictError} If the name is already taken.
+ */
+const createRoomService = async ({ userId, name, description }) => {
+  const cleanDescription = `${description ?? ""}`.trim() || null;
+
+  let roomId;
+  try {
+    roomId = await withTransaction(async (execute) => {
+      const room = await execute(
+        "INSERT INTO rooms (name, description, created_by) VALUES (?, ?, ?)",
+        [name, cleanDescription, userId],
+      );
+      await execute(
+        "INSERT INTO room_members (room_id, user_id) VALUES (?, ?)",
+        [room.insertId, userId],
+      );
+      return room.insertId;
+    });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      throw new ConflictError(
+        "A room with this name already exists. Choose another name.",
+      );
+    }
+    throw error;
+  }
+
+  return getRoomService({ roomId, userId });
+};

@@ -1,16 +1,12 @@
 import { MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
-import {
-  getAuthorInitials,
-  getAuthorName,
-  getRelativeTime,
-} from "../../utils/data";
+import { getAuthorName, getRelativeTime } from "../../utils/data";
+import UserAvatar from "../UserAvatar/UserAvatar";
 import styles from "./QuestionCard.module.css";
 import ui from "../../styles/pageStates.module.css";
 
 export default function QuestionCard({ question, yours = false }) {
   const author = getAuthorName(question);
-  const initials = getAuthorInitials(question);
   const relativeTime = getRelativeTime(question.createdAt);
 
   return (
@@ -18,7 +14,7 @@ export default function QuestionCard({ question, yours = false }) {
       to={`/questions/${question.questionHash}`}
       className={`${ui.threadRow}${yours ? ` ${ui.yours}` : ""}`}
     >
-      <span className={ui.threadAvatar}>{initials}</span>
+      <UserAvatar person={question.author} size="thread" />
 
       <div className={styles.threadMain}>
         <div className={styles.threadTitleRow}>

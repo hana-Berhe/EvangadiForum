@@ -326,6 +326,44 @@ export function AuthProvider({ children }) {
       window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
   }, []); // [] means the effect is set up once
 
+
+  
+  // ====================================================
+  // useEffect()
+  // ====================================================
+  // [Rooms E - Wonde] Loads the admin role from the backend.
+  // Loads the role whenever the logged-in user changes:
+  //
+  // Login or page refresh
+  //     ↓
+  // GET /api/auth/me
+  //     ↓
+  // setRoleInfo({ userId, role })
+  // ====================================================
+  useEffect(() => {
+    // Nobody is logged in, so there is no role to load
+    if (!user) return undefined;
+
+    // "active" becomes false when this effect is cleaned up
+    // (logout, or another user logged in). A late answer
+    // is then ignored.
+    let active = true;
+
+    getCurrentUser()
+      .then((data) => {
+        if (active) setRoleInfo({ userId: user.id, role: data.data.role });
+      })
+      .catch(() => {
+        // If the role cannot be loaded, stay a normal member.
+        // (A 401 is already handled by the Axios interceptor.)
+        if (active) setRoleInfo({ userId: user.id, role: "member" });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user]); // Runs again when the user changes
+
   // ====================================================
   // Context Value
   // ====================================================

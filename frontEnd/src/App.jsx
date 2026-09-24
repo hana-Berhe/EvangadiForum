@@ -29,6 +29,11 @@ export default function App() {
           <Route path="/my-questions" element={<MyQuestions />} />
           <Route path="/questions/:questionHash" element={<QuestionDetail />} />
           <Route path="/rag-documents" element={<RagDocuments />} />
+          
+          {/* [Rooms E ] Admin-only room management route. */}
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/rooms" element={<AdminRooms />} />
+          </Route>
         </Route>
       </Route>
 

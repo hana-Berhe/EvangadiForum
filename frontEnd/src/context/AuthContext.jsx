@@ -184,6 +184,34 @@ export function AuthProvider({ children }) {
   // true  = session expired
   const [sessionExpired, setSessionExpired] = useState(false);
 
+
+  // ====================================================
+  // Role State
+  // ====================================================
+  // [Rooms E -] Admin role state (role, isAdmin, roleReady).
+  // The role ("member" or "admin") is NOT inside the JWT.
+  // It is read from the backend (GET /api/auth/me), so a
+  // role change works at once.
+  //
+  // userId remembers WHICH user this role belongs to.
+  // If another user logs in, the old role is ignored until
+  // the new one arrives.
+  const [roleInfo, setRoleInfo] = useState({ userId: null, role: "member" });
+
+  // true  = the role of the current user has arrived
+  // false = still loading (or nobody is logged in)
+  const roleReady = Boolean(user) && roleInfo.userId === user.id;
+
+  // Until the role arrives, treat the user as a normal member.
+  const role = roleReady ? roleInfo.role : "member";
+
+  // The role only decides what the front end SHOWS.
+  // The backend checks every admin action again.
+  const isAdmin = role === "admin";
+
+
+
+
   // ====================================================
   // isAuthenticated
   // ====================================================

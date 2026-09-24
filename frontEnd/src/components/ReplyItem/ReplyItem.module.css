@@ -2,8 +2,8 @@
 
 /* styles related to the reply item container */
 .replyItem {
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 10px;
   padding: 28px;
 }
@@ -28,14 +28,14 @@
 }
 
 .replyAuthor small {
-  color: #475569;
+  color: var(--text-secondary, #475569);
   font-size: 0.65rem;
 }
 
 .replyContent {
   margin-top: 12px;
   font-size: 0.86rem;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   line-height: 1.65;
 }
 

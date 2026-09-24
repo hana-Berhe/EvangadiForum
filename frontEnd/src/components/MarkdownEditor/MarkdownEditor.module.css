@@ -2,19 +2,19 @@
 
 .editorToolbar {
   height: 38px;
-  background: #edf3f8;
-  border-bottom: 1px solid #d4dde6;
+  background: var(--surface-muted, #edf3f8);
+  border-bottom: 1px solid var(--border, #d4dde6);
   display: flex;
   align-items: center;
   gap: 15px;
   padding: 0 12px;
-  color: #445468;
+  color: var(--text-secondary, #445468);
 }
 
 .editorToolbar span {
   margin-left: auto;
   font-size: 0.68rem;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
 }
 
 .editorToolbar {
@@ -39,22 +39,22 @@
   border: 0;
   border-radius: 5px;
   background: transparent;
-  color: #34445a;
+  color: var(--text-secondary, #34445a);
   transition:
     background 0.15s ease,
     color 0.15s ease;
 }
 
 .editorTool:hover {
-  background: #fff;
+  background: var(--surface, #fff);
   color: var(--orange);
-  box-shadow: 0 0 0 1px #d9e1e8;
+  box-shadow: 0 0 0 1px var(--border, #d9e1e8);
 }
 
 .editorTool.active {
-  background: #fff;
+  background: var(--surface, #fff);
   color: var(--orange);
-  box-shadow: 0 0 0 1px #d9e1e8;
+  box-shadow: 0 0 0 1px var(--border, #d9e1e8);
 }
 
 .editorCharacterCount {
@@ -65,7 +65,7 @@
 .markdownPreview {
   min-height: 220px;
   padding: 17px 18px;
-  background: #fff;
+  background: var(--surface, #fff);
   overflow: auto;
 }
 

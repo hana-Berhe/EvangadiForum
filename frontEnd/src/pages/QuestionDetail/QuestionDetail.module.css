@@ -2,8 +2,8 @@
 
 /* styles for related question cards */
 .discussionCard {
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 12px;
 }
 
@@ -42,7 +42,7 @@
 
 .questionAuthorLine small {
   font-size: 0.66rem;
-  color: #475569;
+  color: var(--text-secondary, #475569);
 }
 
 .discussionCard h1 {
@@ -53,7 +53,7 @@
 
 .discussionContent {
   font-size: 0.92rem;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   line-height: 1.65;
 }
 
@@ -61,7 +61,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  border-top: 1px solid #e4eaef;
+  border-top: 1px solid var(--border, #e4eaef);
   margin-top: 26px;
   padding-top: 16px;
 }
@@ -87,19 +87,19 @@
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   gap: 8px;
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 8px;
   padding: 20px 18px;
   margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 1px 2px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.05 * var(--shadow-boost, 1)));
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .relatedCard:hover,
 .relatedCard:focus-visible {
   border-color: var(--orange);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 8px 18px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.12 * var(--shadow-boost, 1)));
   transform: translateY(-2px);
 }
 
@@ -117,13 +117,13 @@
 
 .relatedCard span {
   font-size: 0.7rem;
-  color: #475569;
+  color: var(--text-secondary, #475569);
 }
 
 .relatedCard small {
   grid-column: 2;
   text-align: right;
-  color: #475569;
+  color: var(--text-secondary, #475569);
   font-size: 0.62rem;
 }
 
@@ -179,7 +179,7 @@
   align-items: center;
   gap: 8px;
   font-size: 0.82rem;
-  color: #334155;
+  color: var(--text-secondary, #334155);
 }
 
 .fitHead svg {
@@ -198,32 +198,32 @@
 }
 
 .fitBadge.strong {
-  background: #e7f6ec;
-  color: #1b7a3d;
-  border-color: #b7e3c6;
+  background: var(--tint-green, #e7f6ec);
+  color: var(--success-text, #1b7a3d);
+  border-color: var(--tint-green-border, #b7e3c6);
 }
 
 .fitBadge.partial {
-  background: #fff4e0;
-  color: #9a5b00;
-  border-color: #f5d199;
+  background: var(--tint-orange, #fff4e0);
+  color: var(--accent-text, #9a5b00);
+  border-color: var(--tint-orange-border, #f5d199);
 }
 
 .fitBadge.weak {
-  background: #fdeaea;
-  color: #a52424;
-  border-color: #f3c0c0;
+  background: var(--tint-red, #fdeaea);
+  color: var(--danger-text, #a52424);
+  border-color: var(--tint-red-border, #f3c0c0);
 }
 
 .fitBadge.unknown {
-  background: #eef2f6;
-  color: #56657a;
-  border-color: #d7dfe7;
+  background: var(--surface-muted, #eef2f6);
+  color: var(--text-secondary, #56657a);
+  border-color: var(--border, #d7dfe7);
 }
 
 .fitPanel p {
   margin: 0;
   font-size: 0.84rem;
-  color: #435268;
+  color: var(--text-secondary, #435268);
   line-height: 1.55;
 }

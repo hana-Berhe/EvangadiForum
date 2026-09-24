@@ -4,8 +4,8 @@
   display: grid;
   gap: 14px;
   margin-top: 14px;
-  background: #fff7f0;
-  border: 1px solid #ffd3b5;
+  background: var(--tint-orange, #fff7f0);
+  border: 1px solid var(--tint-orange-border, #ffd3b5);
   border-radius: 10px;
   padding: 18px 20px;
 }
@@ -15,7 +15,7 @@
   white-space: pre-line;
   font-size: 0.9rem;
   line-height: 1.65;
-  color: #334155;
+  color: var(--text-secondary, #334155);
 }
 
 .citation {
@@ -38,7 +38,7 @@
 .sources {
   display: grid;
   gap: 8px;
-  border-top: 1px solid #ffd3b5;
+  border-top: 1px solid var(--tint-orange-border, #ffd3b5);
   padding-top: 12px;
 }
 
@@ -47,7 +47,7 @@
   font-weight: 700;
   letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: #9a5b00;
+  color: var(--accent-text, #9a5b00);
 }
 
 .sourceList {
@@ -63,7 +63,7 @@
   align-items: center;
   gap: 9px;
   font-size: 0.78rem;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
 }
 
 .sourceRef {
@@ -73,8 +73,8 @@
   width: 18px;
   height: 18px;
   border-radius: 5px;
-  background: #ffe6d2;
-  color: #9a5b00;
+  background: var(--tint-orange, #ffe6d2);
+  color: var(--accent-text, #9a5b00);
   font-size: 0.66rem;
   font-weight: 700;
   flex: 0 0 auto;

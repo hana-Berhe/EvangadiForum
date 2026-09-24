@@ -39,9 +39,9 @@
 }
 
 .secondaryButton {
-  background: #fff;
-  color: #263448;
-  border-color: #d9e2ea;
+  background: var(--surface, #fff);
+  color: var(--text-secondary, #263448);
+  border-color: var(--border, #d9e2ea);
 }
 
 .iconButton {
@@ -55,7 +55,7 @@
 }
 
 .iconButton:hover {
-  background: #eef2f5;
+  background: var(--surface-muted, #eef2f5);
 }
 
 .landingActions {
@@ -69,8 +69,8 @@
 
 .aiButton {
   border: 0;
-  background: #f1f4f7;
-  color: #56657a;
+  background: var(--surface-soft, #f1f4f7);
+  color: var(--text-secondary, #56657a);
   border-radius: 7px;
   padding: 9px 13px;
   display: flex;
@@ -81,7 +81,7 @@
 .textButton {
   border: 0;
   background: transparent;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   font-weight: 600;
 }
 
@@ -119,10 +119,10 @@
 .questionSuccessActions .secondaryButton {
   min-width: 130px;
 
-  background: #e8eef5;
-  border-color: #dbe2ea;
+  background: var(--surface-muted, #e8eef5);
+  border-color: var(--border, #dbe2ea);
 
-  color: #334155;
+  color: var(--text-secondary, #334155);
 }
 
 @media (max-width: 600px) {

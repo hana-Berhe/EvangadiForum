@@ -4,7 +4,7 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 240px 1fr;
-  background: #f8fafc;
+  background: var(--page, #f8fafc);
 }
 
 .appMain {

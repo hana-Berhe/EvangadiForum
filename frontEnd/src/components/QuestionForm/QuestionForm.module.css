@@ -5,14 +5,14 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 14px;
-  color: #475569;
+  color: var(--text-secondary, #475569);
   font-size: 0.72rem;
 }
 
 .formBottomActions {
   margin-top: 34px;
   padding-top: 24px;
-  border-top: 1px solid #e2e8ee;
+  border-top: 1px solid var(--border, #e2e8ee);
   display: flex;
   justify-content: flex-end;
   gap: 14px;

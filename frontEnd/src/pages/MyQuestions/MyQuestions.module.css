@@ -1,8 +1,8 @@
 /* Styles for MyQuestions. Scoped to this component. */
 
 .topicsIntro {
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 12px;
 }
 
@@ -20,14 +20,14 @@
 }
 
 .topicsIntro p {
-  color: #56657a;
+  color: var(--text-secondary, #56657a);
   line-height: 1.55;
   margin: 0;
   max-width: 760px;
 }
 
 .topicsList {
-  border: 1px solid #dbe3ea;
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 12px;
   overflow: hidden;
 }

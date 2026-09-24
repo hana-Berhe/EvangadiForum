@@ -21,7 +21,7 @@
 .threadMain p {
   font-size: 0.74rem;
   line-height: 1.4;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -32,7 +32,7 @@
   display: flex;
   gap: 16px;
   margin-top: 9px;
-  color: #475569;
+  color: var(--text-secondary, #475569);
   font-size: 0.64rem;
 }
 
@@ -43,8 +43,8 @@
 }
 
 .yoursBadge {
-  background: #fff0e5;
-  color: #d95500;
+  background: var(--tint-orange, #fff0e5);
+  color: var(--accent-text, #d95500);
   text-transform: uppercase;
   font-size: 0.56rem;
   font-weight: 800;

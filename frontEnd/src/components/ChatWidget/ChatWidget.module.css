@@ -26,7 +26,10 @@
 
 .bubble:focus-visible,
 .iconBtn:focus-visible,
-.sendBtn:focus-visible {
+.askBtn:focus-visible,
+.suggestion:focus-visible,
+.sendBtn:focus-visible,
+.chip:focus-visible {
   outline: 2px solid var(--orange, #ff6b00);
   outline-offset: 2px;
 }
@@ -155,7 +158,9 @@
   overflow-wrap: anywhere;
 }
 
-.msg p + p {
+.msg p + p,
+.msg p + .code,
+.msg .code + p {
   margin-top: 8px;
 }
 
@@ -174,6 +179,111 @@
 .msgError {
   background: var(--tint-red, #fdecea);
   color: var(--danger-text, #9b2c2c);
+}
+
+.citation {
+  display: inline-block;
+  min-width: 15px;
+  margin: 0 1px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--orange, #ff6b00);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+}
+
+.code {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--ink, #111827);
+  color: #e5e7eb;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  overflow-x: auto;
+}
+
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  text-decoration: none;
+}
+
+.chip svg {
+  flex: none;
+}
+
+.chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Orange = forum thread, blue = your own PDF. */
+.chipThread {
+  background: var(--tint-orange, #fff1e6);
+  color: var(--accent-text, #b34700);
+}
+
+.chipDoc {
+  background: var(--tint-blue, #e6f0ff);
+  color: var(--info-text, #1d4ed8);
+}
+
+.chip:hover {
+  filter: brightness(0.95);
+}
+
+.askBtn {
+  margin-top: 8px;
+  border: 1px solid var(--orange, #ff6b00);
+  background: var(--surface, #fff);
+  color: var(--orange-dark, #e55300);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.askBtn:hover {
+  background: var(--tint-orange, #fff1e6);
+}
+
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 4px 6px;
+}
+
+.suggestion {
+  border: 1px solid var(--tint-orange-border, #ffd2b3);
+  background: var(--tint-orange, #fff7f0);
+  color: var(--accent-text, #b34700);
+  font-size: 0.78rem;
+  padding: 5px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.suggestion:hover {
+  background: var(--tint-orange, #ffe9d6);
 }
 
 /* typing dots */

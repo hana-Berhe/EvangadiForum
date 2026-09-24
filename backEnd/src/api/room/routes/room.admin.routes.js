@@ -21,3 +21,19 @@ roomAdminRouter.use(requireAdmin);
  * @access Admin
  */
 roomAdminRouter.get("/", adminRoomsQueryValidation, adminListRoomsController);
+
+
+
+/**
+ * @route PATCH /api/admin/rooms/:roomId/close
+ * @desc Close a room for ever. Already closed: 409
+ * @access Admin
+ */
+roomAdminRouter.patch(
+  "/:roomId/close",
+  roomIdParamValidation,
+  loadRoom,
+  closeRoomController,
+);
+
+export { roomAdminRouter };

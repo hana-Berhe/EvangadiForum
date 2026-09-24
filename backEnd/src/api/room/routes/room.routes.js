@@ -29,6 +29,49 @@ roomRouter.get("/:roomId", roomIdParamValidation, getRoomController);
 
 export { roomRouter };
 
+// ---------------------------------------------------------------------------
+// Membership
+// ---------------------------------------------------------------------------
+
+//  Join a room.
+/**
+ * @route POST /api/rooms/:roomId/members
+ * @desc Join the room (201). Already a member: 200. Closed room: 409
+ * @access Protected
+ */
+roomRouter.post(
+  "/:roomId/members",
+  roomIdParamValidation,
+  loadRoom,
+  joinRoomController,
+);
+
+//  Leave a room.
+/**
+ * @route DELETE /api/rooms/:roomId/members/me
+ * @desc Leave the room. The user's messages stay
+ * @access Protected
+ */
+roomRouter.delete(
+  "/:roomId/members/me",
+  roomIdParamValidation,
+  loadRoom,
+  leaveRoomController,
+);
+
+//  List members.
+/**
+ * @route GET /api/rooms/:roomId/members
+ * @desc List the members. For members, and for admins
+ * @access Protected
+ */
+roomRouter.get(
+  "/:roomId/members",
+  roomIdParamValidation,
+  loadRoom,
+  requireMemberOrAdmin,
+  listMembersController,
+);
 
 // Rooms cannot be deleted, so one user must not create hundreds of them.
 // [Rooms B - Haymanot Y.] Rate limit for creating rooms.

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BookOpen, Plus, Rows3, Search, X } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -17,6 +17,7 @@ import styles from "./Dashboard.module.css";
 import ui from "../../styles/pageStates.module.css";
 
 const SEMANTIC_MIN_LENGTH = 5;
+const SEARCH_DEBOUNCE_MS = 400;
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -30,19 +31,33 @@ export default function Dashboard() {
   const [activeSearch, setActiveSearch] = useState(null);
   const [note, setNote] = useState("");
 
+  // Every request takes a new id; a response is applied only if its id is
+  // still the latest, so a slow older search never overwrites a newer one.
+  const requestIdRef = useRef(0);
+  // The search currently shown ("" = normal feed). Lets the debounced
+  // effect skip work that already ran (initial load, Enter, Clear).
+  const lastSearchKeyRef = useRef("");
+
   const loadAllQuestions = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
+    lastSearchKeyRef.current = "";
+
     setLoading(true);
     setError("");
 
     try {
       const response = await getAllQuestions();
 
+      if (requestId !== requestIdRef.current) return;
+
       setQuestions(response.data);
       setActiveSearch(null);
     } catch (err) {
-      setError(getErrorMessage(err, "Could not load questions."));
+      if (requestId === requestIdRef.current) {
+        setError(getErrorMessage(err, "Could not load questions."));
+      }
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
   }, []);
 
@@ -50,18 +65,22 @@ export default function Dashboard() {
     let cancelled = false;
 
     async function loadQuestions() {
+      const requestId = ++requestIdRef.current;
+      // A live search may start before the initial feed arrives.
+      const isStale = () => cancelled || requestId !== requestIdRef.current;
+
       try {
         const response = await getAllQuestions();
 
-        if (!cancelled) {
+        if (!isStale()) {
           setQuestions(response.data);
         }
       } catch (err) {
-        if (!cancelled) {
+        if (!isStale()) {
           setError(getErrorMessage(err, "Could not load questions."));
         }
       } finally {
-        if (!cancelled) {
+        if (!isStale()) {
           setLoading(false);
         }
       }
@@ -74,10 +93,8 @@ export default function Dashboard() {
     };
   }, []);
 
-  async function runSearch(event) {
-    event.preventDefault();
-
-    const value = searchQuery.trim();
+  async function executeSearch(rawValue, searchMode) {
+    const value = rawValue.trim();
 
     setNote("");
 
@@ -87,12 +104,19 @@ export default function Dashboard() {
     }
 
     if (searchMode === "semantic" && value.length < SEMANTIC_MIN_LENGTH) {
+      // Drop any in-flight search so it cannot land under this note.
+      requestIdRef.current += 1;
+      lastSearchKeyRef.current = `${searchMode}:${value}`;
+      setLoading(false);
       setNote(
         `Semantic search needs at least ${SEMANTIC_MIN_LENGTH} characters.`,
       );
 
       return;
     }
+
+    const requestId = ++requestIdRef.current;
+    lastSearchKeyRef.current = `${searchMode}:${value}`;
 
     setLoading(true);
     setError("");
@@ -111,6 +135,8 @@ export default function Dashboard() {
         });
       }
 
+      if (requestId !== requestIdRef.current) return;
+
       setQuestions(response.data);
 
       setActiveSearch({
@@ -118,6 +144,8 @@ export default function Dashboard() {
         mode: searchMode,
       });
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
+
       setError(
         getErrorMessage(
           err,
@@ -127,8 +155,32 @@ export default function Dashboard() {
         ),
       );
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
+  }
+
+  // Live search: run once the user pauses typing (or switches mode).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const value = searchQuery.trim();
+      const key = value ? `${searchMode}:${value}` : "";
+
+      if (key === lastSearchKeyRef.current) return;
+
+      executeSearch(searchQuery, searchMode);
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+    // executeSearch only reads refs, state setters and loadAllQuestions
+    // (stable), so re-running on its identity would only reset the timer.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, searchMode]);
+
+  // Enter / the Search button still run immediately.
+  async function runSearch(event) {
+    event.preventDefault();
+
+    await executeSearch(searchQuery, searchMode);
   }
 
   function clearSearch() {

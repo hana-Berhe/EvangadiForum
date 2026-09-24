@@ -6,11 +6,8 @@ import { Check, Pencil, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import MarkdownContent from "../MarkdownContent/MarkdownContent";
 import MarkdownEditor from "../MarkdownEditor/MarkdownEditor";
-import {
-  getAuthorInitials,
-  getAuthorName,
-  getRelativeTime,
-} from "../../utils/data";
+import { getAuthorName, getRelativeTime } from "../../utils/data";
+import UserAvatar from "../UserAvatar/UserAvatar";
 import btn from "../../styles/buttons.module.css";
 import styles from "./ReplyItem.module.css";
 import ui from "../../styles/pageStates.module.css";
@@ -42,7 +39,7 @@ export default function ReplyItem({
     <article className={styles.replyItem}>
       <div className={styles.replyHeader}>
         <div className={styles.replyAuthor}>
-          <span className={ui.threadAvatar}>{getAuthorInitials(answer)}</span>
+          <UserAvatar person={answer.author} size="thread" />
           <div>
             <strong>{author}</strong>
             <small>Answered {getRelativeTime(answer.createdAt)}</small>

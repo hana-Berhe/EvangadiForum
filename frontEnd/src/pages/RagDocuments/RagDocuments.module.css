@@ -6,20 +6,20 @@
 }
 
 .knowledgeHero {
-  background: #ffffff;
-  border: 1px solid #d8e0e8;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #d8e0e8);
   border-radius: 12px;
 }
 
 .knowledgeLibraryCard {
-  background: #ffffff;
-  border: 1px solid #d8e0e8;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #d8e0e8);
   border-radius: 12px;
 }
 
 .knowledgeMainCard {
-  background: #ffffff;
-  border: 1px solid #d8e0e8;
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #d8e0e8);
   border-radius: 12px;
 }
 
@@ -30,7 +30,7 @@
 .knowledgeEyebrow {
   display: block;
   margin-bottom: 8px;
-  color: #e85d04;
+  color: var(--accent-text, #e85d04);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -38,7 +38,7 @@
 
 .knowledgeHero h1 {
   margin: 0 0 9px;
-  color: #0f1f3d;
+  color: var(--text, #0f1f3d);
   font-size: 27px;
   line-height: 1.2;
 }
@@ -46,9 +46,26 @@
 .knowledgeHero p {
   max-width: 730px;
   margin: 0;
-  color: #526583;
+  color: var(--text-secondary, #526583);
   font-size: 14px;
   line-height: 1.65;
+}
+
+.knowledgeSteps {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
+  color: var(--text, #0f1f3d);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 620px) {
+  .knowledgeSteps {
+    display: grid;
+  }
 }
 
 .knowledgeLayout {
@@ -66,14 +83,14 @@
 
 .knowledgeSectionTitle h2 {
   margin: 0;
-  color: #0f1f3d;
+  color: var(--text, #0f1f3d);
   font-size: 15px;
   font-weight: 800;
 }
 
 .knowledgeSectionTitle p {
   margin: 5px 0 0;
-  color: #61728c;
+  color: var(--text-muted, #61728c);
   font-size: 13px;
   line-height: 1.45;
 }
@@ -81,14 +98,14 @@
 .knowledgeUploadBox {
   margin-top: 16px;
   padding: 16px;
-  border: 1px dashed #b9c8d8;
+  border: 1px dashed var(--border-strong, #b9c8d8);
   border-radius: 9px;
-  background: #fbfdff;
+  background: var(--surface-soft, #fbfdff);
 }
 
 .knowledgeUploadBox > p:first-child {
   margin: 0 0 13px;
-  color: #4f6481;
+  color: var(--text-secondary, #4f6481);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -114,9 +131,9 @@
 }
 
 .knowledgeFileButton {
-  border: 1px solid #cfd9e4;
-  background: #ffffff;
-  color: #0f1f3d;
+  border: 1px solid var(--border, #cfd9e4);
+  background: var(--surface, #ffffff);
+  color: var(--text, #0f1f3d);
   cursor: pointer;
 }
 
@@ -133,7 +150,7 @@
 
 .knowledgeSelectedFile {
   margin: 11px 0 0 !important;
-  color: #8a99ad !important;
+  color: var(--text-muted, #8a99ad) !important;
   font-size: 12px !important;
   font-style: italic;
 }
@@ -150,27 +167,27 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  border: 1px solid #d5dfe8;
+  border: 1px solid var(--border, #d5dfe8);
   border-radius: 8px;
-  background: #edf4f8;
+  background: var(--surface-muted, #edf4f8);
   text-align: left;
 }
 
 .knowledgeDocumentItem.active {
   border-color: #ff6b00;
   box-shadow: inset 3px 0 0 #ff6b00;
-  background: #fff7f0;
+  background: var(--tint-orange, #fff7f0);
 }
 
 .knowledgeDocumentItem > div {
   min-width: 0;
   display: grid;
-  gap: 6px;
+  gap: 3px;
 }
 
 .knowledgeDocumentItem strong {
   overflow: hidden;
-  color: #111f37;
+  color: var(--text, #111f37);
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -180,15 +197,67 @@
   width: fit-content;
   padding: 3px 7px;
   border-radius: 4px;
-  background: #bff3d5;
-  color: #138453;
+  background: var(--tint-green, #bff3d5);
+  color: var(--success-text, #138453);
   font-size: 11px;
   font-weight: 900;
 }
 
 .knowledgeDeleteButton {
   flex: 0 0 auto;
-  color: #44546a;
+  color: var(--text-secondary, #44546a);
+}
+
+.knowledgeDocumentMeta {
+  color: var(--text-secondary, #56657a);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.knowledgeDocumentItem .knowledgeReadyBadge {
+  margin-top: 5px;
+}
+
+.ragUploadProgress {
+  margin-top: 12px;
+  display: grid;
+  gap: 7px;
+  color: var(--text-secondary, #334155);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.ragProgressTrack {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-muted, #e4eaef);
+}
+
+.ragProgressBar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--orange);
+  transition: width 0.2s ease;
+}
+
+/* Bytes are sent; the server is still indexing. */
+.ragProgressBar.processing {
+  animation: ragPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes ragPulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ragProgressBar,
+  .ragProgressBar.processing {
+    transition: none;
+    animation: none;
+  }
 }
 
 .knowledgeMainCard {
@@ -198,7 +267,7 @@
 .knowledgeReaderFrame {
   height: 440px;
   overflow: hidden;
-  border: 1px solid #cbd5df;
+  border: 1px solid var(--border-strong, #cbd5df);
   border-radius: 5px;
   background: #2b2b2b;
 }
@@ -256,8 +325,8 @@
 }
 
 .ragHit {
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 9px;
   padding: 14px 16px;
 }
@@ -266,7 +335,7 @@
   margin: 8px 0 0;
   font-size: 0.84rem;
   line-height: 1.6;
-  color: #334155;
+  color: var(--text-secondary, #334155);
 }
 
 .ragHitHead {
@@ -281,33 +350,33 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
 }
 
 .ragHitScore {
   font-size: 0.68rem;
   font-weight: 700;
-  color: #1b7a3d;
-  background: #e7f6ec;
-  border: 1px solid #b7e3c6;
+  color: var(--success-text, #1b7a3d);
+  background: var(--tint-green, #e7f6ec);
+  border: 1px solid var(--tint-green-border, #b7e3c6);
   border-radius: 999px;
   padding: 3px 9px;
   white-space: nowrap;
 }
 
 .knowledgeReadyBadge.ready {
-  background: #e7f6ec;
-  color: #1b7a3d;
+  background: var(--tint-green, #e7f6ec);
+  color: var(--success-text, #1b7a3d);
 }
 
 .knowledgeReadyBadge.processing {
-  background: #eef4fb;
-  color: #2c4a6b;
+  background: var(--surface-soft, #eef4fb);
+  color: var(--info-text, #2c4a6b);
 }
 
 .knowledgeReadyBadge.failed {
-  background: #fdeaea;
-  color: #a52424;
+  background: var(--tint-red, #fdeaea);
+  color: var(--danger-text, #a52424);
 }
 
 .ragSection {
@@ -324,7 +393,7 @@
 .ragSectionNote {
   margin: 0 0 12px;
   font-size: 0.78rem;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
   line-height: 1.5;
 }
 
@@ -336,25 +405,25 @@
 
 .ragDivider {
   height: 1px;
-  background: #e4eaef;
+  background: var(--surface-muted, #e4eaef);
   margin: 22px 0;
 }
 
 .ragLabel {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #334155;
+  color: var(--text-secondary, #334155);
 }
 
 .ragInput,
 .ragTextarea {
   width: 100%;
-  border: 1px solid #d4dde6;
+  border: 1px solid var(--border, #d4dde6);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 0.86rem;
-  color: #172033;
-  background: #fff;
+  color: var(--text, #172033);
+  background: var(--surface, #fff);
 }
 
 .ragTextarea {
@@ -394,29 +463,29 @@
 }
 
 .ragNotice {
-  background: #eef2f6;
+  background: var(--surface-muted, #eef2f6);
   border-radius: 10px;
   padding: 34px 28px;
   text-align: center;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   font-size: 0.88rem;
   line-height: 1.6;
 }
 
 .ragError {
   margin: 4px 0 0;
-  background: #fdeaea;
-  border: 1px solid #f3c0c0;
+  background: var(--tint-red, #fdeaea);
+  border: 1px solid var(--tint-red-border, #f3c0c0);
   border-radius: 8px;
   padding: 9px 12px;
-  color: #a52424;
+  color: var(--danger-text, #a52424);
   font-size: 0.8rem;
 }
 
 .ragLibraryNote {
   margin: 18px 0 0;
   font-size: 0.83rem;
-  color: #56657a;
+  color: var(--text-secondary, #56657a);
   line-height: 1.55;
 }
 
@@ -425,12 +494,12 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 8px;
   padding: 9px 12px;
   font-size: 0.8rem;
-  color: #334155;
+  color: var(--text-secondary, #334155);
 }
 
 .ragFileChip svg {
@@ -447,7 +516,7 @@
 }
 
 .ragFileSize {
-  color: #64748b;
+  color: var(--text-muted, #64748b);
   flex: 0 0 auto;
 }
 
@@ -463,10 +532,10 @@
 .ragNoticeReason {
   margin-top: 10px !important;
   display: inline-block;
-  background: #fdeaea;
-  border: 1px solid #f3c0c0;
+  background: var(--tint-red, #fdeaea);
+  border: 1px solid var(--tint-red-border, #f3c0c0);
   border-radius: 8px;
   padding: 9px 14px;
-  color: #a52424;
+  color: var(--danger-text, #a52424);
   font-size: 0.82rem;
 }

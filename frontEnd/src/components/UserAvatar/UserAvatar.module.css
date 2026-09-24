@@ -1,0 +1,45 @@
+/* Styles for UserAvatar. Scoped to this component.
+   The two colors come from UserAvatar.jsx (they depend on the user). */
+
+.avatar {
+  flex: none;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  user-select: none;
+}
+
+.small {
+  width: 28px;
+  height: 28px;
+  font-size: 0.66rem;
+}
+
+/* Navbar and sidebar: the logged-in user. */
+.nav {
+  width: 32px;
+  height: 32px;
+  font-size: 0.74rem;
+}
+
+/* Question rows, answers and the question page. */
+.thread {
+  width: 34px;
+  height: 34px;
+  font-size: 0.78rem;
+}
+
+.medium {
+  width: 40px;
+  height: 40px;
+  font-size: 0.86rem;
+}
+
+.large {
+  width: 56px;
+  height: 56px;
+  font-size: 1.15rem;
+}

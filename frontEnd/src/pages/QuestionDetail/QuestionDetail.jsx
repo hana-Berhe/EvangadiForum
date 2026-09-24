@@ -41,8 +41,8 @@ import {
   getAuthorName,
   getErrorMessage,
   getRelativeTime,
-  getAuthorInitials,
 } from "../../utils/data";
+import UserAvatar from "../../components/UserAvatar/UserAvatar";
 import btn from "../../styles/buttons.module.css";
 import styles from "./QuestionDetail.module.css";
 import ui from "../../styles/pageStates.module.css";
@@ -421,9 +421,7 @@ export default function QuestionDetail() {
         <div>
           <article className={styles.discussionCard}>
             <div className={styles.questionAuthorLine}>
-              <span className={ui.threadAvatar}>
-                {getAuthorInitials(question)}
-              </span>
+              <UserAvatar person={question.author} size="thread" />
 
               <div>
                 <strong>{author}</strong>

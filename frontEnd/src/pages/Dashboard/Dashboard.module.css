@@ -1,17 +1,17 @@
 /* Styles for Dashboard. Scoped to this component. */
 
 .welcomeCard {
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 1px 3px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.06 * var(--shadow-boost, 1)));
 }
 
 .feedCard {
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 1px 3px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.06 * var(--shadow-boost, 1)));
 }
 
 .dashboardPage {
@@ -30,7 +30,7 @@
 }
 
 .welcomeCard > p {
-  color: #334155;
+  color: var(--text-secondary, #334155);
   font-size: 0.86rem;
   max-width: 780px;
   line-height: 1.5;
@@ -44,8 +44,8 @@
 }
 
 .quickGrid a {
-  background: #f8fafc;
-  border: 1px solid #dfe6ec;
+  background: var(--surface-soft, #f8fafc);
+  border: 1px solid var(--border, #dfe6ec);
   border-radius: 7px;
   padding: 14px;
   display: flex;
@@ -55,7 +55,7 @@
 
 .quickGrid svg {
   color: var(--orange);
-  background: #f1f5f9;
+  background: var(--surface-soft, #f1f5f9);
   padding: 6px;
   width: 34px;
   height: 34px;
@@ -70,14 +70,14 @@
 
 .quickGrid small {
   display: block;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   font-size: 0.68rem;
   margin-top: 3px;
 }
 
 .welcomeDivider {
   height: 1px;
-  background: #e5ebf0;
+  background: var(--surface-muted, #e5ebf0);
   margin: 20px 0 14px;
 }
 
@@ -92,15 +92,15 @@
 }
 
 .statsGrid.compact > div {
-  background: #f1f5f9;
-  border: 1px solid #dce5ec;
+  background: var(--surface-soft, #f1f5f9);
+  border: 1px solid var(--border, #dce5ec);
   border-radius: 7px;
   padding: 13px;
 }
 
 .statsGrid.compact small {
   display: block;
-  color: #475569;
+  color: var(--text-secondary, #475569);
   font-size: 0.68rem;
 }
 
@@ -114,8 +114,8 @@
 
 .feedHead {
   padding: 18px 20px;
-  border-bottom: 1px solid #dfe6ed;
-  background: linear-gradient(#f1f5f9, #fff);
+  border-bottom: 1px solid var(--border, #dfe6ed);
+  background: linear-gradient(var(--surface-soft, #f1f5f9), var(--surface, #fff));
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -131,7 +131,7 @@
 .feedHead p {
   margin: 3px 0 0;
   font-size: 0.68rem;
-  color: #475569;
+  color: var(--text-secondary, #475569);
 }
 
 .orangePill {
@@ -177,11 +177,11 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  background: #fff;
-  border: 1px solid #d4dde6;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #d4dde6);
   border-radius: 8px;
   padding: 0 12px;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
 }
 
 .feedSearchInput input {
@@ -197,7 +197,7 @@
 
 .feedModeToggle {
   display: inline-flex;
-  background: #f1f4f7;
+  background: var(--surface-soft, #f1f4f7);
   border-radius: 8px;
   padding: 3px;
 }
@@ -205,7 +205,7 @@
 .feedModeToggle button {
   border: 0;
   background: transparent;
-  color: #56657a;
+  color: var(--text-secondary, #56657a);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 8px 13px;
@@ -213,14 +213,14 @@
 }
 
 .feedModeToggle button.active {
-  background: #fff;
-  color: #1f2937;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+  background: var(--surface, #fff);
+  color: var(--text, #1f2937);
+  box-shadow: 0 1px 2px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.12 * var(--shadow-boost, 1)));
 }
 
 .feedSearchNote {
   width: 100%;
   margin: 0;
   font-size: 0.72rem;
-  color: #64748b;
+  color: var(--text-muted, #64748b);
 }

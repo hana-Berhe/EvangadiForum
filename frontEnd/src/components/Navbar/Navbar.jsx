@@ -1,10 +1,10 @@
-import { LogOut, Search } from "lucide-react";
+import { LogOut, Moon, Search, Sun } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import UserAvatar from "../UserAvatar/UserAvatar";
 import btn from "../../styles/buttons.module.css";
 import styles from "./Navbar.module.css";
-import ui from "../../styles/pageStates.module.css";
 const TITLES = {
   "/dashboard": [
     "Home",
@@ -28,6 +28,10 @@ export default function Navbar() {
     navigate = useNavigate(),
     { user, logout } = useAuth(),
     [search, setSearch] = useState("");
+  // index.html applies the saved theme before React mounts; start from it.
+  const [theme, setTheme] = useState(() =>
+    document.documentElement.dataset.theme === "dark" ? "dark" : "light",
+  );
   const [title, subtitle] =
     pathname.startsWith("/questions/") && !TITLES[pathname]
       ? [
@@ -40,6 +44,16 @@ export default function Navbar() {
     if (search.trim())
       navigate(`/questions?search=${encodeURIComponent(search.trim())}`);
   }
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // Storage unavailable: the theme still applies for this visit.
+    }
+    setTheme(next);
+  }
   function onLogout() {
     logout();
     navigate("/auth", { replace: true });
@@ -50,21 +64,33 @@ export default function Navbar() {
         <strong>{title}</strong>
         <small>{subtitle}</small>
       </div>
-      <form className={styles.navbarSearch} onSubmit={submit}>
-        <Search size={17} />
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search questions by keyword..."
-        />
-      </form>
+      {/* The Dashboard has its own keyword/semantic search. */}
+      {pathname !== "/dashboard" && (
+        <form className={styles.navbarSearch} onSubmit={submit}>
+          <Search size={17} />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search questions by keyword..."
+          />
+        </form>
+      )}
       <div className={styles.navbarUser}>
         <strong>
           {user.firstName} {user.lastName}
         </strong>
-        <span className={`${ui.avatar} ${ui.small}`}>
-          {`${user.firstName[0]}${user.lastName[0]}`.toUpperCase()}
-        </span>
+        <UserAvatar person={user} size="nav" />
+        <button
+          type="button"
+          className={btn.iconButton}
+          onClick={toggleTheme}
+          aria-label={
+            theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+          }
+          title={theme === "dark" ? "Light mode" : "Dark mode"}
+        >
+          {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
         <button className={btn.iconButton} onClick={onLogout}>
           <LogOut size={18} />
         </button>

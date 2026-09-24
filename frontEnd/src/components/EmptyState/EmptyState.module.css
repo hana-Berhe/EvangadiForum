@@ -8,11 +8,11 @@
   align-content: center;
   gap: 10px;
   padding: 24px;
-  background: #f1f5f9;
-  border: 1px dashed #e2e8f0;
+  background: var(--surface-soft, #f1f5f9);
+  border: 1px dashed var(--border, #e2e8f0);
   border-radius: 12px;
 }
 
 .emptyState svg {
-  color: #94a3b8;
+  color: var(--text-muted, #94a3b8);
 }

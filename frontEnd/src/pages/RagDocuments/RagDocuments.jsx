@@ -17,9 +17,28 @@ import { getErrorMessage } from "../../utils/data";
 import styles from "./RagDocuments.module.css";
 
 const formatBytes = (bytes) => {
-  if (!bytes) return "";
-  const mb = bytes / (1024 * 1024);
-  return mb >= 1 ? `${mb.toFixed(2)} MB` : `${Math.round(bytes / 1024)} KB`;
+  // byte_size can arrive as a string (BIGINT columns), so coerce first.
+  const size = Number(bytes);
+  if (!size) return "";
+  const mb = size / (1024 * 1024);
+  if (mb >= 1) return `${mb.toFixed(1)} MB`;
+  return size >= 1024 ? `${Math.round(size / 1024)} KB` : `${size} B`;
+};
+
+const formatDate = (value) => {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+const STATUS_LABELS = {
+  ready: "Ready",
+  processing: "Processing",
+  failed: "Failed",
 };
 
 export default function RagDocuments() {
@@ -32,6 +51,7 @@ export default function RagDocuments() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
 
   const [askQuery, setAskQuery] = useState("");
@@ -166,9 +186,14 @@ export default function RagDocuments() {
 
     setUploading(true);
     setUploadError("");
+    setUploadProgress(0);
 
     try {
-      const { data } = await uploadPdf(selectedFile);
+      // At 100% the bytes are sent; the same request then waits while the
+      // server extracts and indexes the PDF, shown as "Processing".
+      const { data } = await uploadPdf(selectedFile, {
+        onProgress: setUploadProgress,
+      });
       await refreshDocuments();
       selectDocument(data.document_id);
 
@@ -255,13 +280,19 @@ export default function RagDocuments() {
     <div className={styles.knowledgePage}>
       <section className={styles.knowledgeHero}>
         <span className={styles.knowledgeEyebrow}>KNOWLEDGE BASE</span>
-        <h1>Private PDF library</h1>
+        <h1>Ask questions about your own PDFs</h1>
         <p>
-          Upload study or reference PDFs to your own workspace. Each file is
-          indexed for semantic search and optional AI answers that cite passages
-          from that document only. File size limits apply on the server; other
-          users never see your uploads.
+          Upload course notes, book chapters or documentation as PDF files. Each
+          file is indexed so you can search it by meaning and ask the AI
+          questions about it. Answers are built only from passages in that
+          document and cite where they came from. Your uploads are private;
+          other users never see them.
         </p>
+        <ol className={styles.knowledgeSteps}>
+          <li>Upload a PDF.</li>
+          <li>Wait until it shows Ready.</li>
+          <li>Select it to read, search, or ask AI.</li>
+        </ol>
       </section>
 
       {listError && <p className={styles.ragError}>{listError}</p>}
@@ -271,13 +302,14 @@ export default function RagDocuments() {
         <aside className={styles.knowledgeLibraryCard}>
           <div className={styles.knowledgeSectionTitle}>
             <h2>Library</h2>
-            <p>Add PDFs here. Processing runs once per upload.</p>
+            <p>
+              Your uploaded PDFs. Select one marked Ready to use search and Ask
+              with AI.
+            </p>
           </div>
 
           <div className={styles.knowledgeUploadBox}>
-            <p>
-              Accepted format: PDF. Maximum file size is enforced by the server.
-            </p>
+            <p>PDF files only. Maximum file size: 10 MB.</p>
 
             <input
               id="rag-pdf-input"
@@ -305,9 +337,38 @@ export default function RagDocuments() {
                 disabled={!selectedFile || uploading}
               >
                 <Upload size={16} />
-                {uploading ? "Uploading..." : "Upload"}
+                {uploading
+                  ? uploadProgress < 100
+                    ? "Uploading..."
+                    : "Processing..."
+                  : "Upload"}
               </button>
             </div>
+
+            {uploading && (
+              <div className={styles.ragUploadProgress} role="status">
+                <span>
+                  {uploadProgress < 100
+                    ? `Uploading... ${uploadProgress}%`
+                    : "Processing: extracting text and building the search index..."}
+                </span>
+                <div
+                  className={styles.ragProgressTrack}
+                  role="progressbar"
+                  aria-label="Upload progress"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={uploadProgress}
+                >
+                  <div
+                    className={`${styles.ragProgressBar} ${
+                      uploadProgress >= 100 ? styles.processing : ""
+                    }`}
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
 
             {selectedFile ? (
               <div className={styles.ragFileChip}>
@@ -328,8 +389,8 @@ export default function RagDocuments() {
             <p className={styles.ragLibraryNote}>Loading your library...</p>
           ) : documents.length === 0 ? (
             <p className={styles.ragLibraryNote}>
-              Your library is empty. Upload a PDF to index it for search and
-              Q&amp;A.
+              No documents yet. Upload a PDF above, then select it to ask
+              questions about its content.
             </p>
           ) : (
             <div className={styles.knowledgeDocumentList}>
@@ -343,11 +404,28 @@ export default function RagDocuments() {
                   onClick={() => selectDocument(doc.document_id)}
                 >
                   <div>
-                    <strong>{doc.title}</strong>
+                    <strong title={doc.title}>{doc.title}</strong>
+                    {/* Metadata lines render only when the API returns them. */}
+                    <span className={styles.knowledgeDocumentMeta}>
+                      {["PDF", formatBytes(doc.byte_size)]
+                        .filter(Boolean)
+                        .join(" • ")}
+                    </span>
+                    {formatDate(doc.created_at) && (
+                      <span className={styles.knowledgeDocumentMeta}>
+                        Uploaded {formatDate(doc.created_at)}
+                      </span>
+                    )}
+                    {doc.chunk_count != null && (
+                      <span className={styles.knowledgeDocumentMeta}>
+                        {Number(doc.chunk_count)}{" "}
+                        {Number(doc.chunk_count) === 1 ? "chunk" : "chunks"}
+                      </span>
+                    )}
                     <span
                       className={`${styles.knowledgeReadyBadge} ${styles[doc.status] ?? ""}`}
                     >
-                      {doc.status.toUpperCase()}
+                      {STATUS_LABELS[doc.status] ?? doc.status}
                     </span>
                   </div>
 

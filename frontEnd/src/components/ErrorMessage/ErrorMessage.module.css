@@ -1,9 +1,9 @@
 /* Styles for ErrorMessage. Scoped to this component. */
 
 .errorMessage {
-  color: #b42318;
-  background: #fff2f0;
-  border: 1px solid #ffd6d1;
+  color: var(--danger-text, #b42318);
+  background: var(--tint-red, #fff2f0);
+  border: 1px solid var(--tint-red-border, #ffd6d1);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 0.86rem;

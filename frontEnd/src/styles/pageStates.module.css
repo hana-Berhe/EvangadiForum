@@ -11,12 +11,12 @@
 }
 
 .brandMark.inverse {
-  background: #fff;
+  background: var(--surface, #fff);
   color: var(--orange);
 }
 
 .eyebrow {
-  color: #d74e00;
+  color: var(--accent-text, #d74e00);
   font-weight: 800;
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -39,33 +39,33 @@ label {
 }
 
 small {
-  color: #64748b;
+  color: var(--text-muted, #64748b);
   font-size: 0.76rem;
 }
 
 input {
   width: 100%;
-  border: 1px solid #d4dde6;
+  border: 1px solid var(--border, #d4dde6);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface, #fff);
   padding: 12px 13px;
   outline: none;
 }
 
 textarea {
   width: 100%;
-  border: 1px solid #d4dde6;
+  border: 1px solid var(--border, #d4dde6);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface, #fff);
   padding: 12px 13px;
   outline: none;
 }
 
 .replyEdit textarea {
   width: 100%;
-  border: 1px solid #d4dde6;
+  border: 1px solid var(--border, #d4dde6);
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface, #fff);
   padding: 12px 13px;
   outline: none;
 }
@@ -86,9 +86,9 @@ textarea:focus {
 }
 
 .formError {
-  color: #b42318;
-  background: #fff2f0;
-  border: 1px solid #ffd6d1;
+  color: var(--danger-text, #b42318);
+  background: var(--tint-red, #fff2f0);
+  border: 1px solid var(--tint-red-border, #ffd6d1);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 0.86rem;
@@ -117,8 +117,8 @@ textarea:focus {
 }
 
 .panel {
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 12px;
 }
 
@@ -138,7 +138,7 @@ textarea:focus {
 .spinner {
   width: 32px;
   height: 32px;
-  border: 4px solid #e0e6ec;
+  border: 4px solid var(--border, #e0e6ec);
   border-top-color: var(--orange);
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
@@ -147,7 +147,7 @@ textarea:focus {
 .threadList {
   display: grid;
   gap: 8px;
-  background: #f8fafc;
+  background: var(--surface-soft, #f8fafc);
 }
 
 .threadRow {
@@ -155,18 +155,18 @@ textarea:focus {
   grid-template-columns: 40px 1fr;
   gap: 12px;
   padding: 16px 20px;
-  border-bottom: 1px solid #e3e9ee;
-  background: #fff;
+  border-bottom: 1px solid var(--border, #e3e9ee);
+  background: var(--surface, #fff);
   position: relative;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1), 0 -1px 0 #e3e9ee;
+  box-shadow: 0 1px 3px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.1 * var(--shadow-boost, 1))), 0 -1px 0 var(--border, #e3e9ee);
 }
 
 .threadRow:hover {
-  background: #fafcfd;
+  background: var(--surface-soft, #fafcfd);
 }
 
 .threadRow.yours {
-  background: #fafcfe;
+  background: var(--surface-soft, #fafcfe);
   border-left: 3px solid var(--orange);
   padding-left: 17px;
 }
@@ -193,7 +193,7 @@ textarea:focus {
 }
 
 .editorShell {
-  border: 1px solid #d4dde6;
+  border: 1px solid var(--border, #d4dde6);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -210,8 +210,8 @@ textarea:focus {
 }
 
 .aiPanel {
-  background: #fff7f0;
-  border-color: #ffd3b5;
+  background: var(--tint-orange, #fff7f0);
+  border-color: var(--tint-orange-border, #ffd3b5);
 }
 
 .aiPanel.compact {
@@ -233,7 +233,7 @@ h1 {
 .questionList {
   display: grid;
   gap: 0;
-  border: 1px solid #dbe3ea;
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 10px;
   overflow: hidden;
 }
@@ -248,13 +248,13 @@ h1 {
   padding: 17px 16px;
   line-height: 1.65;
   font-size: 0.86rem;
-  color: #27364a;
+  color: var(--text-secondary, #27364a);
   outline: none;
 }
 
 .proseContent {
   line-height: 1.7;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   overflow-wrap: anywhere;
 }
 
@@ -272,7 +272,7 @@ p {
 
 strong {
   font-weight: 800;
-  color: #172033;
+  color: var(--text, #172033);
 }
 
 em {
@@ -291,13 +291,13 @@ blockquote {
   margin: 1rem 0;
   padding: 0.7rem 1rem;
   border-left: 3px solid var(--orange);
-  background: #fff7f1;
-  color: #526177;
+  background: var(--tint-orange, #fff7f1);
+  color: var(--text-secondary, #526177);
 }
 
 code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  background: #edf2f6;
+  background: var(--surface-muted, #edf2f6);
   border-radius: 4px;
   padding: 0.12rem 0.3rem;
   font-size: 0.9em;
@@ -318,7 +318,7 @@ pre code {
 }
 
 a {
-  color: #e65f0e;
+  color: var(--accent-text, #e65f0e);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

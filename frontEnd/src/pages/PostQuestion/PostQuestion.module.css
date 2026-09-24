@@ -1,8 +1,8 @@
 /* Styles for PostQuestion. Scoped to this component. */
 
 .guidanceCard {
-  background: #fff;
-  border: 1px solid #dbe3ea;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
   border-radius: 12px;
 }
 
@@ -12,7 +12,7 @@
 }
 
 .askIntro p {
-  color: #334155;
+  color: var(--text-secondary, #334155);
   line-height: 1.55;
   margin: 0;
   max-width: 760px;
@@ -27,7 +27,7 @@
 }
 
 .guidanceCard {
-  background: #f1f5f9;
+  background: var(--surface-soft, #f1f5f9);
   border: 1.5px solid var(--orange);
   border-left-width: 4px;
   padding: 26px 30px;
@@ -40,13 +40,13 @@
 
 .guidanceCard p {
   font-size: 0.82rem;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   line-height: 1.55;
 }
 
 .guidanceCard li {
   font-size: 0.82rem;
-  color: #334155;
+  color: var(--text-secondary, #334155);
   line-height: 1.55;
 }
 
@@ -71,7 +71,7 @@
 .aiTipsPanel p {
   margin: 12px 0 0;
   font-size: 0.84rem;
-  color: #435268;
+  color: var(--text-secondary, #435268);
 }
 
 .aiTipList {
@@ -87,7 +87,7 @@
   align-items: flex-start;
   gap: 9px;
   font-size: 0.84rem;
-  color: #435268;
+  color: var(--text-secondary, #435268);
   line-height: 1.55;
 }
 

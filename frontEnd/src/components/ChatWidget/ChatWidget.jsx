@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { BookOpen } from "lucide-react";
 import { MessageCircle } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { RotateCcw } from "lucide-react";
 import { Send } from "lucide-react";
 import { Sparkles } from "lucide-react";
@@ -13,11 +15,83 @@ import styles from "./ChatWidget.module.css";
 const MAX_MESSAGE_CHARS = 500; // same limit as the server
 const MIN_MESSAGE_CHARS = 2;
 
+const SUGGESTIONS = [
+  "What is Node.js?",
+  "How does JWT login work?",
+  "What is RAG?",
+];
+
+// A PDF title is a file name and can be long. Keep the chip short.
+const shorten = (text, max = 28) =>
+  text && text.length > max ? `${text.slice(0, max - 1)}…` : text;
+
 const makeWelcome = (firstName) => ({
   role: "assistant",
   kind: "chat",
   content: `Hi ${firstName || "there"}! Ask me about the questions and answers in the forum, or about your own PDFs. I answer only from those, and I show you my sources.`,
 });
+
+/** Text with the [1] or [1, 2] markers turned into small badges. */
+function TextWithCitations({ text }) {
+  return text.split(/(\[\d+(?:\s*,\s*\d+)*\])/g).map((part, index) => {
+    const marker = part.match(/^\[(\d+(?:\s*,\s*\d+)*)\]$/);
+    if (!marker) return part;
+    return marker[1].split(",").map((ref) => (
+      <sup key={`${index}-${ref.trim()}`} className={styles.citation}>
+        {ref.trim()}
+      </sup>
+    ));
+  });
+}
+
+/**
+ * The assistant's text. It is always shown as plain text, never as HTML,
+ * so text written by a forum user can never run in the page.
+ * A ``` fence becomes a code block.
+ */
+function MessageText({ text }) {
+  // Splitting on a pattern with one capture group gives: text, code, text...
+  // so every odd item is the inside of a ``` fence.
+  const pieces = text.split(/```[\w+-]*\n?([\s\S]*?)```/g);
+
+  return pieces.map((piece, index) => {
+    if (index % 2 === 1) {
+      return (
+        <pre key={index} className={styles.code}>
+          <code>{piece.trim()}</code>
+        </pre>
+      );
+    }
+    if (!piece.trim()) return null;
+    return (
+      <p key={index}>
+        <TextWithCitations text={piece.trim()} />
+      </p>
+    );
+  });
+}
+
+/** One source as a small link. Orange = forum thread, blue = your PDF. */
+function SourceChip({ source, showRef, onNavigate }) {
+  const isDocument = source.type === "document";
+  const page = isDocument && source.page ? ` · p.${source.page}` : "";
+
+  return (
+    <Link
+      to={source.url}
+      className={`${styles.chip} ${isDocument ? styles.chipDoc : styles.chipThread}`}
+      onClick={onNavigate}
+      title={`${source.title}${page}`}
+    >
+      {isDocument ? <BookOpen size={12} /> : <MessageSquare size={12} />}
+      <span>
+        {showRef ? `[${source.ref}] ` : ""}
+        {shorten(source.title)}
+        {page}
+      </span>
+    </Link>
+  );
+}
 
 /**
  * Floating chat button and chat window. It is mounted once in Layout, so it
@@ -32,6 +106,7 @@ const makeWelcome = (firstName) => ({
  */
 export default function ChatWidget() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   // A discussion room has its own composer and Send button at the bottom.
   // There the closed chat button moves out of the way (see the CSS).
@@ -66,9 +141,9 @@ export default function ChatWidget() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
-  async function send(event) {
+  async function send(event, preset) {
     event?.preventDefault();
-    const text = input.trim();
+    const text = (preset ?? input).trim();
     if (text.length < MIN_MESSAGE_CHARS || busy) return;
 
     setMessages((previous) => [...previous, { role: "user", content: text }]);
@@ -83,6 +158,9 @@ export default function ChatWidget() {
           role: "assistant",
           kind: data.kind,
           content: data.answer || "",
+          sources: data.sources || [],
+          related: data.related || [],
+          asked: text,
         },
       ]);
     } catch (error) {
@@ -105,6 +183,11 @@ export default function ChatWidget() {
   function startOver() {
     setMessages([makeWelcome(user?.firstName)]);
     setInput("");
+  }
+
+  function askCommunity() {
+    setOpen(false);
+    navigate("/questions/ask");
   }
 
   const close = () => setOpen(false);
@@ -157,6 +240,8 @@ export default function ChatWidget() {
           <div className={styles.list} ref={listRef} aria-live="polite">
             {messages.map((message, index) => {
               const isUser = message.role === "user";
+              const canAskCommunity =
+                message.kind === "related" || message.kind === "notfound";
 
               return (
                 <div
@@ -168,11 +253,61 @@ export default function ChatWidget() {
                       message.kind === "error" ? ` ${styles.msgError}` : ""
                     }`}
                   >
-                    <p>{message.content}</p>
+                    <MessageText text={message.content} />
+
+                    {message.sources?.length > 0 && (
+                      <div className={styles.sources}>
+                        {message.sources.map((source) => (
+                          <SourceChip
+                            key={source.ref}
+                            source={source}
+                            showRef
+                            onNavigate={close}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {message.related?.length > 0 && (
+                      <div className={styles.sources}>
+                        {message.related.map((source) => (
+                          <SourceChip
+                            key={source.ref}
+                            source={source}
+                            onNavigate={close}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {canAskCommunity && (
+                      <button
+                        type="button"
+                        className={styles.askBtn}
+                        onClick={askCommunity}
+                      >
+                        Ask the community →
+                      </button>
+                    )}
                   </div>
                 </div>
               );
             })}
+
+            {messages.length === 1 && !busy && (
+              <div className={styles.suggestions}>
+                {SUGGESTIONS.map((question) => (
+                  <button
+                    key={question}
+                    type="button"
+                    className={styles.suggestion}
+                    onClick={() => send(null, question)}
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {busy && (
               <div className={`${styles.row} ${styles.rowBot}`}>

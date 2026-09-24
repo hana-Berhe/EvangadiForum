@@ -81,6 +81,9 @@ const getRoomService = async ({ roomId, userId }) => {
   }
   return toRoom(rows[0]);
 };
+
+
+
 /**
  * Closes a room for ever. Members can still read it, nobody can post or join.
  * There is no reopen and no delete in V1.
@@ -109,6 +112,6 @@ const closeRoomService = async ({ roomId, adminId }) => {
 export {
   listRoomsService,
   getRoomService,
-  getRoomService,
+  closeRoomService
 
 };

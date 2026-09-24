@@ -9,7 +9,7 @@ export const roomIdParamValidation = [
 ];
 
 // GET /api/admin/rooms?status=open|closed  (no status = every room)
-
+// [Rooms E - Wonde] Admin list filter.
 export const adminRoomsQueryValidation = [
   query("status")
     .optional()

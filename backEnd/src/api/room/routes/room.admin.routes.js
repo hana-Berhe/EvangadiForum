@@ -14,3 +14,10 @@ const roomAdminRouter = express.Router();
 // The role comes from MySQL on every request (middleware/admin.js).
 roomAdminRouter.use(authenticateUser);
 roomAdminRouter.use(requireAdmin);
+
+/**
+ * @route GET /api/admin/rooms
+ * @desc Every room. ?status=open or ?status=closed filters the list
+ * @access Admin
+ */
+roomAdminRouter.get("/", adminRoomsQueryValidation, adminListRoomsController);

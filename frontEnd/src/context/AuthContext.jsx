@@ -10,6 +10,9 @@ import {
 // Import login and register API functions
 import { loginUser, registerUser } from "../api/auth.api";
 
+// Import the API function that reads the current user's role
+import { getCurrentUser } from "../api/auth.api";
+
 // Import the custom event used when the session expires
 import { SESSION_EXPIRED_EVENT } from "../api/axios";
 

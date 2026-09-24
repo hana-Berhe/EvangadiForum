@@ -381,6 +381,15 @@ export function AuthProvider({ children }) {
       // true if session expired
       sessionExpired,
 
+      // [Rooms E -] Role values shared through the context.
+      // "member" or "admin" (from the backend, not from the token)
+      role,
+
+      // true if the current user is an admin
+      isAdmin,
+
+      // true when the role of the current user has arrived
+      roleReady,
       // Login function
       login,
 

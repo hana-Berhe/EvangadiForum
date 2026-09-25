@@ -40,3 +40,13 @@ export const roomIdParamValidation = [
     .toInt(),
   validationErrorHandler,
 ];
+
+// GET /api/admin/rooms?status=open|closed  (no status = every room)
+// [Rooms E - Wonde] Admin list filter.
+export const adminRoomsQueryValidation = [
+  query("status")
+    .optional()
+    .isIn(["open", "closed"])
+    .withMessage("status must be open or closed"),
+  validationErrorHandler,
+];

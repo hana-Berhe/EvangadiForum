@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute/AdminRoute";
 
 import Layout from "./components/Layout/Layout";
 
@@ -28,6 +29,11 @@ export default function App() {
           <Route path="/my-questions" element={<MyQuestions />} />
           <Route path="/questions/:questionHash" element={<QuestionDetail />} />
           <Route path="/rag-documents" element={<RagDocuments />} />
+          
+          {/* [Rooms E ] Admin-only room management route. */}
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/rooms" element={<AdminRooms />} />
+          </Route>
         </Route>
       </Route>
 

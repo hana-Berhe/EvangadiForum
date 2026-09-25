@@ -82,9 +82,37 @@ const getRoomService = async ({ roomId, userId }) => {
   return toRoom(rows[0]);
 };
 
+
+
+/**
+ * Closes a room for ever. Members can still read it, nobody can post or join.
+ * There is no reopen and no delete in V1.
+ *
+ * The UPDATE only matches an OPEN room, so two admins who close at the same
+ * moment cannot both win: the second one changes 0 rows and gets 409, and
+ * closed_by and closed_at are never overwritten.
+ *
+ * @param {{ roomId: number, adminId: number }} param
+ * @returns {Promise<Object>} The closed room.
+ * @throws {ConflictError} If the room is already closed.
+ */
+const closeRoomService = async ({ roomId, adminId }) => {
+  const result = await safeExecute(
+    `UPDATE rooms
+     SET status = 'closed', closed_at = CURRENT_TIMESTAMP, closed_by = ?
+     WHERE room_id = ? AND status = 'open'`,
+    [adminId, roomId],
+  );
+  if (result.affectedRows === 0) {
+    throw new ConflictError("This room is already closed.");
+  }
+  return getRoomService({ roomId, userId: adminId });
+};
+
 export {
   listRoomsService,
   getRoomService,
+  closeRoomService
 
 };
 

@@ -15,6 +15,7 @@ export async function adminListRooms(status) {
 
 export async function closeRoom(roomId) {
   const response = await api.patch(`/admin/rooms/${roomId}/close`);
+}
 // [Rooms C - Abel] Join, leave, members.
 // ---------- membership ----------
 export async function joinRoom(roomId) {

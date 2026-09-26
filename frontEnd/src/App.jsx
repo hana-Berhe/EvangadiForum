@@ -12,6 +12,9 @@ import PostQuestion from "./pages/PostQuestion/PostQuestion";
 import QuestionDetail from "./pages/QuestionDetail/QuestionDetail";
 import MyQuestions from "./pages/MyQuestions/MyQuestions";
 import RagDocuments from "./pages/RagDocuments/RagDocuments";
+import Rooms from "./pages/Rooms/Rooms";
+import RoomDetail from "./pages/RoomDetail/RoomDetail";
+import AdminRooms from "./pages/AdminRooms/AdminRooms";
 
 import NotFound from "./pages/NotFound/NotFound";
 
@@ -29,6 +32,8 @@ export default function App() {
           <Route path="/my-questions" element={<MyQuestions />} />
           <Route path="/questions/:questionHash" element={<QuestionDetail />} />
           <Route path="/rag-documents" element={<RagDocuments />} />
+          <Route path="/rooms" element={<Rooms />} />
+          <Route path="/rooms/:roomId" element={<RoomDetail />} />
           
           {/* [Rooms E ] Admin-only room management route. */}
           <Route element={<AdminRoute />}>

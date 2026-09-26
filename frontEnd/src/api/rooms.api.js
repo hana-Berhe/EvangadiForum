@@ -5,6 +5,10 @@ export async function listRooms() {
   const response = await api.get("/rooms");
   return response.data;
 }
+export async function getRoom(roomId) {
+  const response = await api.get(`/rooms/${roomId}`);
+  return response.data;
+}
 
 // [Rooms E - Wonde] Admin list and close.
 // ---------- admin ----------

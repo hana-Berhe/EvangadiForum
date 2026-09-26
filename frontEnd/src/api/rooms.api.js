@@ -1,7 +1,10 @@
 import api from "./axios";
 
 
-
+export async function listRooms() {
+  const response = await api.get("/rooms");
+  return response.data;
+}
 
 // [Rooms E - Wonde] Admin list and close.
 // ---------- admin ----------

@@ -1,7 +1,14 @@
 import api from "./axios";
 
 
-
+export async function listRooms() {
+  const response = await api.get("/rooms");
+  return response.data;
+}
+export async function getRoom(roomId) {
+  const response = await api.get(`/rooms/${roomId}`);
+  return response.data;
+}
 
 // [Rooms E - Wonde] Admin list and close.
 // ---------- admin ----------
@@ -15,6 +22,7 @@ export async function adminListRooms(status) {
 
 export async function closeRoom(roomId) {
   const response = await api.patch(`/admin/rooms/${roomId}/close`);
+}
 // [Rooms C - Abel] Join, leave, members.
 // ---------- membership ----------
 export async function joinRoom(roomId) {

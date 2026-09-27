@@ -1,0 +1,31 @@
+/* ROOMS FEATURE OWNERSHIP: A = Browse & view rooms. Whole file. Search "[Rooms X" (your letter) to find your parts. */
+/* Styles for RoomStatusBadge. Scoped to this component. */
+
+.badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.open {
+  background: var(--tint-green, #e3f6ec);
+  color: var(--success-text, #0b6b3f);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0f9d58;
+}
+
+.closed {
+  background: var(--surface-muted, #e8ecf1);
+  color: var(--text-secondary, #3b4758);
+}

@@ -1,41 +1,34 @@
 import api from "./axios";
 
+// Every function returns the server reply: { success, message, data }.
+// A failed request rejects. Read the text with getErrorMessage(error),
+// and the status with error.response?.status.
 
+// ---------- rooms ----------
 export async function listRooms() {
   const response = await api.get("/rooms");
   return response.data;
 }
+
 export async function getRoom(roomId) {
   const response = await api.get(`/rooms/${roomId}`);
   return response.data;
 }
 
-// [Rooms E - Wonde] Admin list and close.
-// ---------- admin ----------
-// status: "open", "closed", or nothing for every room.
-export async function adminListRooms(status) {
-  const response = await api.get("/admin/rooms", {
-    params: status ? { status } : {},
-  });
-  return response.data;
-}
-
-export async function closeRoom(roomId) {
-  const response = await api.patch(`/admin/rooms/${roomId}/close`);
-}
-// [Rooms C - Abel] Join, leave, members.
 // ---------- membership ----------
 export async function joinRoom(roomId) {
   const response = await api.post(`/rooms/${roomId}/members`);
   return response.data;
 }
 
-export async function leaveRoom(roomId) {
-  const response = await api.delete(`/rooms/${roomId}/members/me`);
+// ---------- messages ----------
+// The latest 50 messages, oldest first.
+export async function listRoomMessages(roomId) {
+  const response = await api.get(`/rooms/${roomId}/messages`);
   return response.data;
 }
 
-export async function listRoomMembers(roomId) {
-  const response = await api.get(`/rooms/${roomId}/members`);
+export async function postRoomMessage(roomId, content) {
+  const response = await api.post(`/rooms/${roomId}/messages`, { content });
   return response.data;
 }

@@ -249,6 +249,13 @@
   filter: brightness(0.95);
 }
 
+/* "87% match": never cut off, quieter than the title. */
+.chip .chipScore {
+  flex: none;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
 .askBtn {
   margin-top: 8px;
   border: 1px solid var(--orange, #ff6b00);

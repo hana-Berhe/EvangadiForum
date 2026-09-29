@@ -25,6 +25,14 @@ const SUGGESTIONS = [
 const shorten = (text, max = 28) =>
   text && text.length > max ? `${text.slice(0, max - 1)}…` : text;
 
+// How a source was found: a cosine score from the meaning search (0.874 ->
+// "87% match"), or null for the keyword safety net.
+const matchLabel = (score) => {
+  if (score === null) return "keyword match";
+  if (typeof score !== "number") return "";
+  return `${Math.round(score * 100)}% match`;
+};
+
 const makeWelcome = (firstName) => ({
   role: "assistant",
   kind: "chat",
@@ -75,6 +83,7 @@ function MessageText({ text }) {
 function SourceChip({ source, showRef, onNavigate }) {
   const isDocument = source.type === "document";
   const page = isDocument && source.page ? ` · p.${source.page}` : "";
+  const match = matchLabel(source.score);
 
   return (
     <Link
@@ -89,6 +98,7 @@ function SourceChip({ source, showRef, onNavigate }) {
         {shorten(source.title)}
         {page}
       </span>
+      {match && <span className={styles.chipScore}>{match}</span>}
     </Link>
   );
 }

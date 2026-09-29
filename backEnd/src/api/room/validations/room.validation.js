@@ -1,38 +1,11 @@
+// Discussion room request validation (express-validator). Every list ends
+// with validationErrorHandler from middleware/validation-handler.js.
 
+import { body } from "express-validator";
 import { param } from "express-validator";
 import { validationErrorHandler } from "../../../middleware/validation-handler.js";
-// "React   Study  Group" and "React Study Group" must be the same name.
-// [Rooms B - Haymanot Y.] Room name cleanup + create validation.
-const collapseSpaces = (value) => value.replace(/\s+/g, " ").trim();
 
-export const createRoomValidation = [
-  // bail() stops at the first problem, so the user gets one clear message.
-  body("name")
-    .exists()
-    .withMessage("Room name is required")
-    .bail()
-    .isString()
-    .withMessage("Room name must be text")
-    .bail()
-    .customSanitizer(collapseSpaces)
-    .notEmpty()
-    .withMessage("Room name is required")
-    .bail()
-    .isLength({ max: 60 })
-    .withMessage("Room name must be 60 characters or less"),
-  // The description is optional. null, "" and a missing field all mean "none".
-  body("description")
-    .optional({ values: "falsy" })
-    .isString()
-    .withMessage("Description must be text")
-    .bail()
-    .trim()
-    .isLength({ max: 255 })
-    .withMessage("Description must be 255 characters or less"),
-  validationErrorHandler,
-];
-
-
+// Every route that takes :roomId.
 export const roomIdParamValidation = [
   param("roomId")
     .isInt({ min: 1, max: 2147483647 })
@@ -41,12 +14,23 @@ export const roomIdParamValidation = [
   validationErrorHandler,
 ];
 
-// GET /api/admin/rooms?status=open|closed  (no status = every room)
-// [Rooms E - Wonde] Admin list filter.
-export const adminRoomsQueryValidation = [
-  query("status")
-    .optional()
-    .isIn(["open", "closed"])
-    .withMessage("status must be open or closed"),
+// POST /:roomId/messages. 2000 is the size of the content column.
+export const postMessageValidation = [
+  ...roomIdParamValidation.slice(0, -1),
+  body("content")
+    .exists()
+    .withMessage("Message is required")
+    .bail()
+    .isString()
+    .withMessage("Message must be text")
+    .bail()
+    // trim() removes spaces and empty lines at the two ends only.
+    // Line breaks inside the message stay.
+    .trim()
+    .notEmpty()
+    .withMessage("Message is required")
+    .bail()
+    .isLength({ max: 2000 })
+    .withMessage("Message must be 2000 characters or less"),
   validationErrorHandler,
 ];

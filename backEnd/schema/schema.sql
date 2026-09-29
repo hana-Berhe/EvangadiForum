@@ -131,4 +131,55 @@ CREATE TABLE `document_chunk_vectors` (
     UNIQUE KEY `uniq_chunk_vectors_chunk_id` (`chunk_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- -----------------------------------------------------------------------------
+-- 6. Discussion Rooms: fixed rooms, their members, and their messages
+-- Users cannot create rooms; only the fixed rooms at the bottom exist.
+-- -----------------------------------------------------------------------------
+DROP TABLE IF EXISTS `rooms`;
+CREATE TABLE `rooms` (
+    `room_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(60) NOT NULL,
+    `description` VARCHAR(255) NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY `uniq_rooms_name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- The many-to-many link between users and rooms.
+-- The UNIQUE key makes a second join impossible, even in a race.
+DROP TABLE IF EXISTS `room_members`;
+CREATE TABLE `room_members` (
+    `room_member_id` INT AUTO_INCREMENT PRIMARY KEY,
+    `room_id` INT NOT NULL,
+    `user_id` INT NOT NULL,
+    `joined_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`room_id`) REFERENCES `rooms`(`room_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE,
+    UNIQUE KEY `uniq_room_members_room_user` (`room_id`, `user_id`),
+    INDEX `idx_room_members_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Plain-text messages, 1 to 2000 characters. message_id is the ordering key
+-- (timestamps can tie inside one second, ids cannot). The (room_id, message_id)
+-- index serves "the latest 50 of a room".
+DROP TABLE IF EXISTS `room_messages`;
+CREATE TABLE `room_messages` (
+    `message_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `room_id` INT NOT NULL,
+    `user_id` INT NOT NULL,
+    `content` VARCHAR(2000) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`room_id`) REFERENCES `rooms`(`room_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE,
+    INDEX `idx_room_messages_room_message` (`room_id`, `message_id`),
+    INDEX `idx_room_messages_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO `rooms` (`name`, `description`) VALUES
+    ('General Discussion', 'Introduce yourself, ask anything, and chat with fellow learners.'),
+    ('Frontend Development', 'HTML, CSS, JavaScript and React: layouts, components and bugs.'),
+    ('Backend Development', 'Node.js, Express and REST APIs: routes, auth and server errors.'),
+    ('Databases & SQL', 'MySQL queries, table design and connecting your app to a database.'),
+    ('Projects & Code Review', 'Share what you built and get feedback on your code.'),
+    ('Career & Interviews', 'CVs, portfolios, interview practice and landing your first job.');
+
 SET FOREIGN_KEY_CHECKS = 1;

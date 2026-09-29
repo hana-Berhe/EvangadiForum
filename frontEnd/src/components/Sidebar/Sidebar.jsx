@@ -1,7 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { BookOpen, Home, LogOut, MessageSquare, Plus } from "lucide-react";
 import { Users } from "lucide-react";
-import { ShieldCheck } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
 import UserAvatar from "../UserAvatar/UserAvatar";
@@ -9,7 +8,7 @@ import styles from "./Sidebar.module.css";
 import ui from "../../styles/pageStates.module.css";
 
 export default function Sidebar() {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   function onLogout() {
@@ -80,25 +79,6 @@ export default function Sidebar() {
             Rooms
           </NavLink>
         </nav>
-
-        {/* Only admins see this. The server protects the page itself. */}
-        {isAdmin && (
-          <div className={styles.sidebarAdmin}>
-            <div className={styles.sidebarSectionLabel}>Admin</div>
-
-            <nav className={styles.sidebarNav}>
-              <NavLink
-                to="/admin/rooms"
-                className={({ isActive }) =>
-                  `${styles.sidebarLink}${isActive ? ` ${styles.active}` : ""}`
-                }
-              >
-                <ShieldCheck size={18} />
-                Manage rooms
-              </NavLink>
-            </nav>
-          </div>
-        )}
       </div>
 
       <div className={styles.sidebarBottom}>
@@ -116,7 +96,7 @@ export default function Sidebar() {
                 {user.firstName} {user.lastName}
               </strong>
 
-              <small>{isAdmin ? "Admin" : "Learner"}</small>
+              <small>Learner</small>
             </span>
           </div>
 

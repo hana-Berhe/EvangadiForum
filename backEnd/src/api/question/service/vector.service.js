@@ -669,6 +669,7 @@ async function generateEmbeddingsBatch(texts, options = {}) {
 export {
   normalizeQuestionText,
   calculateCosineSimilarity,
+  retrieveReadyEmbeddings,
   generateQuestionEmbedding,
   storeQuestionVector,
   findSimilarQuestionsByText,

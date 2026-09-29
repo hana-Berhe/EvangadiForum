@@ -10,9 +10,6 @@ import {
 // Import login and register API functions
 import { loginUser, registerUser } from "../api/auth.api";
 
-// Import the API function that reads the current user's role
-import { getCurrentUser } from "../api/auth.api";
-
 // Import the custom event used when the session expires
 import { SESSION_EXPIRED_EVENT } from "../api/axios";
 
@@ -184,34 +181,6 @@ export function AuthProvider({ children }) {
   // true  = session expired
   const [sessionExpired, setSessionExpired] = useState(false);
 
-
-  // ====================================================
-  // Role State
-  // ====================================================
-  // [Rooms E -] Admin role state (role, isAdmin, roleReady).
-  // The role ("member" or "admin") is NOT inside the JWT.
-  // It is read from the backend (GET /api/auth/me), so a
-  // role change works at once.
-  //
-  // userId remembers WHICH user this role belongs to.
-  // If another user logs in, the old role is ignored until
-  // the new one arrives.
-  const [roleInfo, setRoleInfo] = useState({ userId: null, role: "member" });
-
-  // true  = the role of the current user has arrived
-  // false = still loading (or nobody is logged in)
-  const roleReady = Boolean(user) && roleInfo.userId === user.id;
-
-  // Until the role arrives, treat the user as a normal member.
-  const role = roleReady ? roleInfo.role : "member";
-
-  // The role only decides what the front end SHOWS.
-  // The backend checks every admin action again.
-  const isAdmin = role === "admin";
-
-
-
-
   // ====================================================
   // isAuthenticated
   // ====================================================
@@ -326,44 +295,6 @@ export function AuthProvider({ children }) {
       window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
   }, []); // [] means the effect is set up once
 
-
-  
-  // ====================================================
-  // useEffect()
-  // ====================================================
-  // [Rooms E - Wonde] Loads the admin role from the backend.
-  // Loads the role whenever the logged-in user changes:
-  //
-  // Login or page refresh
-  //     ↓
-  // GET /api/auth/me
-  //     ↓
-  // setRoleInfo({ userId, role })
-  // ====================================================
-  useEffect(() => {
-    // Nobody is logged in, so there is no role to load
-    if (!user) return undefined;
-
-    // "active" becomes false when this effect is cleaned up
-    // (logout, or another user logged in). A late answer
-    // is then ignored.
-    let active = true;
-
-    getCurrentUser()
-      .then((data) => {
-        if (active) setRoleInfo({ userId: user.id, role: data.data.role });
-      })
-      .catch(() => {
-        // If the role cannot be loaded, stay a normal member.
-        // (A 401 is already handled by the Axios interceptor.)
-        if (active) setRoleInfo({ userId: user.id, role: "member" });
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [user]); // Runs again when the user changes
-
   // ====================================================
   // Context Value
   // ====================================================
@@ -381,15 +312,6 @@ export function AuthProvider({ children }) {
       // true if session expired
       sessionExpired,
 
-      // [Rooms E -] Role values shared through the context.
-      // "member" or "admin" (from the backend, not from the token)
-      role,
-
-      // true if the current user is an admin
-      isAdmin,
-
-      // true when the role of the current user has arrived
-      roleReady,
       // Login function
       login,
 

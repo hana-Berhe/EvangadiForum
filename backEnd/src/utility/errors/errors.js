@@ -27,6 +27,21 @@ class UnauthenticatedError extends CustomAPIError {
   }
 }
 
+// Logged in, but not allowed to do this (for example: not a room member).
+class ForbiddenError extends CustomAPIError {
+  constructor(message) {
+    super(message);
+    this.statusCode = StatusCodes.FORBIDDEN; // 403
+  }
+}
+
+class TooManyRequestsError extends CustomAPIError {
+  constructor(message) {
+    super(message);
+    this.statusCode = StatusCodes.TOO_MANY_REQUESTS; // 429
+  }
+}
+
 class ServiceUnavailableError extends CustomAPIError {
   constructor(message) {
     super(message);
@@ -39,5 +54,7 @@ export {
   BadRequestError,
   NotFoundError,
   UnauthenticatedError,
+  ForbiddenError,
+  TooManyRequestsError,
   ServiceUnavailableError,
 };

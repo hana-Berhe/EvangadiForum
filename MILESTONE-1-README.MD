@@ -6,6 +6,8 @@ Evangadi Forum is a developer Q&A platform where users can register, log in, ask
 
 Milestone 1 focuses on authentication and the initial project structure.
 
+> This page describes Milestone 1. For the current setup steps (database, sample data) and the later milestones, see the main [README](./README.MD).
+
 ### Main Features
 
 - User registration

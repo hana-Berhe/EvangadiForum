@@ -89,7 +89,7 @@ Purpose:
 - Support normal keyword search
 - Support a `mine` filter for the logged-in user's questions
 
-Protected route: Depends on implementation
+Protected route: **Yes**
 
 ---
 
@@ -134,6 +134,45 @@ Purpose:
 
 ---
 
+### 6. Similar Questions
+
+```http
+GET /api/questions/:questionHash/similar
+```
+
+Purpose:
+
+- Return questions close in meaning to this one (the "Related Questions" list)
+- Uses the stored vectors, with a stricter threshold than search
+
+---
+
+### 7. Answer Fit (AI Answer Assessment)
+
+```http
+POST /api/questions/:questionHash/answer-fit
+```
+
+Purpose:
+
+- Tell someone writing an answer whether it fits the question: `strong`, `partial` or `weak`, with a short note
+- Judges relevance, not correctness
+
+---
+
+### 8. Edit and Delete a Question
+
+```http
+PATCH /api/questions/:questionHash
+DELETE /api/questions/:questionHash
+```
+
+Purpose:
+
+- Only the author can edit or delete; anyone else gets 404
+
+---
+
 ## Answer API
 
 Base path:
@@ -160,27 +199,28 @@ Protected route: **Yes**
 ### 2. Get Answers
 
 ```http
-GET /api/answers
+GET /api/answers?questionId=12&sortBy=newest
 ```
 
 Purpose:
 
-- Return answers
-- Can be filtered by question depending on the final route design
+- Return the answers of one question
+- `sortBy`: `newest` (default) or `oldest`
 
 ---
 
-### 3. Assess Answer
+### 3. Edit and Delete an Answer
 
 ```http
-POST /api/answers/assess
+PATCH /api/answers/:answerId
+DELETE /api/answers/:answerId
 ```
 
 Purpose:
 
-- Send an answer to the AI service
-- Evaluate answer quality
-- Return useful feedback to the user
+- Only the author can edit or delete; anyone else gets 404
+
+> AI answer assessment lives under the Question API: see **7. Answer Fit** above.
 
 ---
 
@@ -210,7 +250,7 @@ Handles Gemini-powered text assistance such as:
 
 - Improve question wording
 - Give drafting suggestions
-- Support AI-assisted forum features
+- Judge whether an answer fits the question (Answer Fit)
 
 ### `answer.service.js`
 
@@ -229,9 +269,9 @@ Frontend
    ↓
 Route
    ↓
-Validation
-   ↓
 Authentication Middleware
+   ↓
+Validation
    ↓
 Controller
    ↓
@@ -248,22 +288,22 @@ Frontend
 
 ## Milestone 2 Checklist
 
-- [ ] Question folder structure
-- [ ] Answer folder structure
-- [ ] Create Question API
-- [ ] List Questions API
-- [ ] Single Question API
-- [ ] Semantic Search
-- [ ] Question Draft Coach
-- [ ] Create Answer API
-- [ ] Get Answers API
-- [ ] Answer Assessment
-- [ ] Input validation
-- [ ] Authentication on protected routes
-- [ ] Error handling
-- [ ] Postman testing
-- [ ] Frontend integration
-- [ ] Merge completed work into `main`
+- [x] Question folder structure
+- [x] Answer folder structure
+- [x] Create Question API
+- [x] List Questions API
+- [x] Single Question API
+- [x] Semantic Search
+- [x] Question Draft Coach
+- [x] Create Answer API
+- [x] Get Answers API
+- [x] Answer Assessment
+- [x] Input validation
+- [x] Authentication on protected routes
+- [x] Error handling
+- [x] Postman testing
+- [x] Frontend integration
+- [x] Merge completed work into `main`
 
 ---
 

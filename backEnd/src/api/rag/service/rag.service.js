@@ -417,6 +417,14 @@ export const queryDocumentService = async ({ documentId, userId, query }) => {
     };
   }
 
+  const { answer } = await answerFromRagChunksService({
+    query,
+    chunks: results.map((hit, index) => ({
+      ref: index + 1,
+      text: hit.excerpt,
+    })),
+  });
+
   // Honest sources: list only the chunks the answer really cites as [n].
   const citedRefs = new Set(
     [...answer.matchAll(/\[(\d+)\]/g)].map((match) => Number(match[1])),

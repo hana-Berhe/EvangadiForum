@@ -378,6 +378,280 @@ const questions = [
     ].join("\n"),
     answers: [],
   },
+  // ---------------------------------------------------------------------------
+  // FAQ threads. The AI chat assistant answers ONLY from forum threads and the
+  // user's own PDFs, so these threads are its grounded source for questions
+  // about the forum itself. Two of the chat's suggestion buttons ("How does JWT
+  // login work?" and "What is RAG?") are answered from here.
+  // ---------------------------------------------------------------------------
+  {
+    author: 1,
+    tag: "FAQ",
+    title: "What is Evangadi Forum and what can I do here?",
+    content: [
+      "I just joined. What is this forum for, and what are the main features I should try first?",
+    ].join("\n"),
+    answers: [
+      {
+        author: 0,
+        content: [
+          "Evangadi Forum is a Q&A space for Evangadi learners. You can:",
+          "",
+          "- **Ask and answer questions.** Before posting, the AI Draft Coach gives tips to make your question clearer. When you answer, AI Answer Fit tells you if your answer really addresses the question.",
+          "- **Search in two ways.** Keyword search finds the exact words. Semantic search finds questions with the same meaning, even when the words are different.",
+          "- **Use the Knowledge Base.** Upload your own PDFs (private to you), search inside them, and ask questions answered only from that PDF, with citations.",
+          "- **Ask the AI chat assistant.** It answers only from forum threads and your own PDFs, and it shows the sources it used.",
+          "- **Join Discussion Rooms.** Six fixed rooms (General Discussion, Frontend, Backend, Databases & SQL, Projects & Code Review, Career & Interviews). Join a room to read and send messages; new messages appear every 15 seconds.",
+        ].join("\n"),
+      },
+    ],
+  },
+  {
+    author: 2,
+    tag: "FAQ",
+    title: "How does JWT login work in this app?",
+    content: [
+      "What happens between typing my password on the sign-in page and being able to open protected pages like the dashboard?",
+    ].join("\n"),
+    answers: [
+      {
+        author: 1,
+        content: [
+          "Step by step:",
+          "",
+          "1. **Register** saves your password as a **bcrypt hash**, never as plain text.",
+          "2. **Login** finds your email and checks the password with `bcrypt.compare`. If it matches, the server signs a **JWT** that contains your id and name, with an expiry time.",
+          "3. The frontend saves the token in `localStorage`. The axios request interceptor then adds `Authorization: Bearer <token>` to every request.",
+          "4. On the server, the `authenticateUser` middleware verifies the signature and the expiry, and puts your id in `req.user`. The id always comes from the token, never from the request body.",
+          "5. When the token expires, the server answers **401**, the frontend clears the token, and you are sent back to the sign-in page.",
+        ].join("\n"),
+      },
+    ],
+  },
+  {
+    author: 0,
+    tag: "FAQ",
+    title: "What is RAG and how does the Knowledge Base use it?",
+    content: [
+      "The Knowledge Base says answers are built only from my PDF. What does RAG mean, and how does it work behind the scenes?",
+    ].join("\n"),
+    answers: [
+      {
+        author: 2,
+        content: [
+          "RAG means **Retrieval-Augmented Generation**: first *retrieve* the parts of your own data that match the question, then let the AI *generate* an answer from only those parts.",
+          "",
+          "In the Knowledge Base:",
+          "",
+          "1. **Upload**: the server reads the text of your PDF and cuts it into chunks of about 1000 characters that overlap a little, so no sentence is lost at a border.",
+          "2. **Embed**: every chunk becomes a vector of 768 numbers that describes its meaning.",
+          "3. **Retrieve**: your question becomes a vector too. Cosine similarity finds the closest chunks; only scores of at least 0.62 are kept, at most 5.",
+          "4. **Generate**: Gemini answers using only those numbered chunks and cites them as [1], [2]. If nothing is close enough, it says so instead of guessing.",
+          "",
+          "Your PDFs are private: nobody else can search or read them.",
+        ].join("\n"),
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Topic question for the chat suggestion "What is Node.js?".
+  // ---------------------------------------------------------------------------
+  {
+    author: 2,
+    tag: "Node",
+    title: "What is Node.js and why do we use it for the backend?",
+    content: [
+      "I know JavaScript from the browser. Why can it also run our server, and what makes Node.js a good choice for an API like ours?",
+    ].join("\n"),
+    answers: [
+      {
+        author: 0,
+        content: [
+          "Node.js is a **JavaScript runtime**: it runs JavaScript outside the browser, on the V8 engine from Chrome. So the frontend and the backend use the same language.",
+          "",
+          "Why it fits an API:",
+          "",
+          "- **Non-blocking I/O.** While one request waits for MySQL or Gemini, Node keeps serving other requests. The event loop picks up each result when it is ready.",
+          "- **npm.** Packages like Express, mysql2, bcrypt and jsonwebtoken are one install away.",
+          "- **JSON everywhere.** The API sends and receives JSON, which is native to JavaScript.",
+          "",
+          "It is not ideal for heavy CPU work (like video processing) in the same process, because that blocks the event loop.",
+        ].join("\n"),
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Semantic vs keyword demos. Each question is written WITHOUT the words of
+  // its demo search (see the demo script), so keyword search finds nothing
+  // and semantic search finds it by meaning.
+  // ---------------------------------------------------------------------------
+  {
+    author: 0,
+    tag: "React",
+    title: "Form submit reloads the whole page in React",
+    content: [
+      "When I submit my login form, the whole page reloads and my state is lost. My handler looks like this:",
+      "",
+      "```jsx",
+      "function handleSubmit() {",
+      "  login(email, password);",
+      "}",
+      "",
+      "<form onSubmit={handleSubmit}>...</form>",
+      "```",
+      "",
+      "How do I stop the reload?",
+    ].join("\n"),
+    answers: [
+      {
+        author: 1,
+        content: [
+          "A form's default action is to send the data and load a new page. Call `preventDefault()` on the event first:",
+          "",
+          "```jsx",
+          "function handleSubmit(event) {",
+          "  event.preventDefault();",
+          "  login(email, password);",
+          "}",
+          "```",
+        ].join("\n"),
+      },
+    ],
+  },
+  {
+    author: 1,
+    tag: "Node",
+    title: "How can I keep secrets like the database password out of GitHub?",
+    content: [
+      "My `db.config.js` has the MySQL password and the Gemini key written in the code. A teammate said this must never be pushed. What is the right way?",
+    ].join("\n"),
+    answers: [
+      {
+        author: 2,
+        content: [
+          "Move every secret into a `.env` file and read it with `process.env`:",
+          "",
+          "```js",
+          "import dotenv from \"dotenv\";",
+          "dotenv.config();",
+          "const password = process.env.DB_PASSWORD;",
+          "```",
+          "",
+          "Then add `.env` to `.gitignore`, so git never sees it, and commit a `.env.example` with empty values so teammates know which variables to fill in. If a secret was already pushed, change it: deleting the line does not remove it from the history.",
+        ].join("\n"),
+      },
+    ],
+  },
+  {
+    author: 2,
+    tag: "React",
+    title: "Array.map shows nothing on the screen in my component",
+    content: [
+      "My `questions` array has 10 items (I checked with `console.log`), but nothing appears:",
+      "",
+      "```jsx",
+      "{questions.map((q) => {",
+      "  <QuestionCard key={q.id} question={q} />;",
+      "})}",
+      "```",
+    ].join("\n"),
+    answers: [
+      {
+        author: 0,
+        content: [
+          "With curly braces, an arrow function needs an explicit `return`. Without it, `map` returns an array of `undefined`, and React draws nothing. Use parentheses instead:",
+          "",
+          "```jsx",
+          "{questions.map((q) => (",
+          "  <QuestionCard key={q.id} question={q} />",
+          "))}",
+          "```",
+        ].join("\n"),
+      },
+    ],
+  },
+  {
+    author: 0,
+    tag: "MySQL",
+    title: "MySQL says Too many connections after a while",
+    content: [
+      "My API works for a few minutes, then every query fails with `ER_CON_COUNT_ERROR: Too many connections`. I call `mysql.createConnection()` at the start of every route.",
+    ].join("\n"),
+    answers: [
+      {
+        author: 1,
+        content: [
+          "Every `createConnection()` opens a new connection, and they are never closed, so MySQL reaches its limit. Create **one pool** when the server starts and reuse it:",
+          "",
+          "```js",
+          "const db = mysql.createPool({ connectionLimit: 10, ...config });",
+          "const [rows] = await db.execute(sql, params);",
+          "```",
+          "",
+          "The pool keeps a few connections ready and gives them back after each query.",
+        ].join("\n"),
+      },
+    ],
+  },
+  {
+    author: 1,
+    tag: "Node",
+    title: "bcrypt compare always returns false",
+    content: [
+      "Registration works, but signing in with the same email and password always fails. I hash with `bcrypt.hash` when registering, and I check with `bcrypt.compare(password, user.password)`.",
+    ].join("\n"),
+    answers: [
+      {
+        author: 2,
+        content: [
+          "Check the column name: if the hash is saved in `password_hash`, then `user.password` is `undefined` and `compare` returns false. Use `bcrypt.compare(password, user.password_hash)`.",
+          "",
+          "Also make sure you do not hash the password twice (for example once in the controller and again in the service), and that the column is long enough: a bcrypt hash is 60 characters.",
+        ].join("\n"),
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // Partners for Related Questions: close in meaning to an existing question.
+  // ---------------------------------------------------------------------------
+  {
+    author: 1,
+    tag: "CSS",
+    title: "How do I center content inside a card using CSS grid?",
+    content: [
+      "I have a card with an icon and a short text. I want both in the middle of the card, vertically and horizontally, but with CSS grid instead of flexbox.",
+    ].join("\n"),
+    answers: [
+      {
+        author: 2,
+        content: [
+          "`place-items` sets both directions at once:",
+          "",
+          "```css",
+          ".card {",
+          "  display: grid;",
+          "  place-items: center;",
+          "  min-height: 200px;",
+          "}",
+          "```",
+          "",
+          "Like with flexbox, the card needs a height, or there is no space to center in.",
+        ].join("\n"),
+      },
+    ],
+  },
+  {
+    author: 2,
+    tag: "Node",
+    title: "Express says Cannot GET /api/users even though the route exists",
+    content: [
+      "I wrote `router.get(\"/users\", getUsers)` in `user.routes.js`, but the browser shows `Cannot GET /api/users`. The server starts without errors.",
+    ].join("\n"),
+    answers: [],
+  },
 ];
 
 async function seed() {

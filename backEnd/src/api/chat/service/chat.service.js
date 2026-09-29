@@ -6,11 +6,16 @@
 //
 // Steps for one message:
 //   1. A greeting gets a fixed reply. No AI call.
-//   2. Make sure this user's PDF chunks are in Qdrant.
-//   3. Turn the message into a vector (Gemini embedding, RETRIEVAL_QUERY).
-//   4. Ask Qdrant for the closest points. Keep the ones above the threshold.
+//   2. Turn the message into a vector (Gemini embedding, RETRIEVAL_QUERY).
+//   3. Read the ready vectors from MySQL: every question, and the PDF chunks
+//      of THIS user only. Score each one with cosine similarity in Node.
+//   4. Keep the scores above the threshold, best first, at most MAX_SOURCES.
+//      Only when NOTHING is close enough: look for the message's keywords in
+//      every question and answer (plain SQL LIKE, no vectors). This is the
+//      safety net for words that only appear in an answer.
 //   5. Nothing close enough -> say "I do not know". No Gemini text call.
-//   6. Read the real text fresh from MySQL (MySQL is the source of truth).
+//   6. Read the real text from MySQL: each matched question with ALL of its
+//      answers, and each matched PDF chunk. Answers are never searched.
 //   7. Ask Gemini to answer using only these numbered sources.
 //   8. Show only the sources the answer really cites as [n].
 //
@@ -24,24 +29,72 @@ import { safeExecute } from "../../../../schema/db.config.js";
 import { ServiceUnavailableError } from "../../../utility/errors/errors.js";
 import { generateQuestionEmbedding } from "../../question/service/vector.service.js";
 import { normalizeQuestionText } from "../../question/service/vector.service.js";
+import { calculateCosineSimilarity } from "../../question/service/vector.service.js";
+import { retrieveReadyEmbeddings } from "../../question/service/vector.service.js";
 import { answerFromChatSourcesService } from "../../question/service/geminiTextCoach.service.js";
-import { qdrant } from "../config/qdrant.config.js";
-import { ensureChatCollection } from "../config/qdrant.config.js";
-import { POINT_TYPES } from "../config/qdrant.config.js";
-import { syncUserDocumentChunks } from "./index.service.js";
 
 // Minimum cosine score per type. Questions and PDF chunks use the same
 // vectors and the same query embedding as search, so they start at the
-// measured 0.62. The answer value is NOT measured yet: "npm run measure:chat"
-// (a later step) will replace it with a real number.
+// measured 0.62.
 const THRESHOLDS = {
-  [POINT_TYPES.question]: Number(process.env.CHAT_QUESTION_THRESHOLD) || 0.62,
-  [POINT_TYPES.answer]: Number(process.env.CHAT_ANSWER_THRESHOLD) || 0.62,
-  [POINT_TYPES.document]: Number(process.env.CHAT_DOCUMENT_THRESHOLD) || 0.62,
+  question: Number(process.env.CHAT_QUESTION_THRESHOLD) || 0.62,
+  document: Number(process.env.CHAT_DOCUMENT_THRESHOLD) || 0.62,
 };
-const QDRANT_LIMIT = 12; // points asked from Qdrant
 const MAX_SOURCES = Number(process.env.CHAT_MAX_SOURCES) || 5; // sent to Gemini
-const MAX_SOURCE_CHARS = 1500; // per source, in the prompt
+const MAX_SOURCE_CHARS = 1500; // per PDF chunk, in the prompt
+// A thread holds the question and ALL its answers, so it gets more room.
+const MAX_THREAD_CHARS = 3000;
+// Keyword search: at most this many words from the message, each at least
+// MIN_KEYWORD_LENGTH letters, and at most this many threads found.
+const MAX_KEYWORDS = 5;
+const MIN_KEYWORD_LENGTH = 4;
+const MAX_KEYWORD_THREADS = 3;
+// Common words that would match almost every thread.
+const STOP_WORDS = new Set([
+  "about",
+  "also",
+  "does",
+  "doing",
+  "from",
+  "have",
+  "help",
+  "into",
+  "just",
+  "know",
+  "like",
+  "make",
+  "need",
+  "please",
+  "should",
+  "some",
+  "tell",
+  "than",
+  "that",
+  "their",
+  "them",
+  "then",
+  "there",
+  "these",
+  "they",
+  "this",
+  "used",
+  "using",
+  "want",
+  "what",
+  "when",
+  "where",
+  "which",
+  "while",
+  "with",
+  "would",
+  "could",
+  "your",
+  "mean",
+  "means",
+  "work",
+  "works",
+  "explain",
+]);
 const MAX_QUESTION_CHARS = 600;
 const MAX_ANSWER_CHARS = 500;
 
@@ -51,86 +104,129 @@ const RELATED_TEXT =
   "I could not find a clear answer in the forum or in your PDFs. These threads look related:";
 
 const GREETING_PATTERN =
-  /^(hi|hello|hey|selam|good (morning|afternoon|evening)|thanks|thank you|thank u|ok|okay|bye)\b[\s!.,?]*$/i;
+  /^(hi|hi there|hello|hey|selam|good (morning|afternoon|evening)|thanks|thank you|thank u|ok|okay|bye)\b[\s!.,?]*$/i;
 
 function greetingReply(firstName) {
   const name = firstName ? ` ${firstName}` : "";
   return `Hi${name}! Ask me about anything in the forum or in your own PDFs. I answer only from those, and I show you my sources.`;
 }
 
-// ---------- step 4: search Qdrant ----------
-async function searchPoints({ vector, userId }) {
-  try {
-    const collection = await ensureChatCollection();
-    const result = await qdrant.query(collection, {
-      query: vector,
-      limit: QDRANT_LIMIT,
-      with_payload: true,
-      // Every question and answer, plus the PDF chunks of THIS user only.
-      filter: {
-        should: [
-          { key: "type", match: { value: POINT_TYPES.question } },
-          { key: "type", match: { value: POINT_TYPES.answer } },
-          {
-            must: [
-              { key: "type", match: { value: POINT_TYPES.document } },
-              { key: "user_id", match: { value: Number(userId) } },
-            ],
-          },
-        ],
-      },
-    });
-    return result.points ?? [];
-  } catch (error) {
-    console.error("chat searchPoints:", error);
-    throw new ServiceUnavailableError(
-      "The AI assistant cannot reach its search index right now. Please try again later.",
-    );
+// ---------- step 3: score the vectors stored in MySQL ----------
+
+// Cosine score of one stored vector against the query vector.
+// MySQL gives a JSON column back as an array or as a string. A vector that
+// cannot be read or has the wrong size returns null and is skipped.
+function scoreVector(queryVector, stored) {
+  let vector = stored;
+  if (typeof vector === "string") {
+    try {
+      vector = JSON.parse(vector);
+    } catch {
+      return null;
+    }
   }
+  if (!Array.isArray(vector) || vector.length !== queryVector.length) {
+    return null;
+  }
+  return calculateCosineSimilarity(queryVector, vector);
 }
 
-// Keeps the hits above the threshold of their own type.
-function keepCloseHits(points) {
-  return points.filter((point) => {
-    const threshold = THRESHOLDS[point.payload?.type];
-    return threshold !== undefined && point.score >= threshold;
-  });
+// Every ready question vector. Questions are public, so no user filter.
+async function searchQuestionVectors(queryVector) {
+  const rows = await retrieveReadyEmbeddings();
+  const candidates = [];
+  for (const row of rows) {
+    const score = scoreVector(queryVector, row.embedding);
+    if (score !== null && score >= THRESHOLDS.question) {
+      candidates.push({ kind: "thread", questionId: row.questionId, score });
+    }
+  }
+  return candidates;
 }
 
-// A question hit and an answer hit of the same thread become ONE candidate.
-// Returns candidates, best score first.
-function groupHits(hits) {
-  const threads = new Map(); // question_id -> candidate
-  const chunks = [];
+// First lock: only the ready chunks of THIS user's ready PDFs are read.
+// Another user's vectors never leave MySQL.
+async function searchChunkVectors(queryVector, userId) {
+  const rows = await safeExecute(
+    `SELECT c.chunk_id, v.embedding
+     FROM document_chunk_vectors v
+     JOIN document_chunks c ON c.chunk_id = v.chunk_id
+     JOIN documents d ON d.document_id = c.document_id
+     WHERE d.user_id = ? AND d.status = 'ready' AND v.status = 'ready'`,
+    [userId],
+  );
+  const candidates = [];
+  for (const row of rows) {
+    const score = scoreVector(queryVector, row.embedding);
+    if (score !== null && score >= THRESHOLDS.document) {
+      candidates.push({ kind: "document", chunkId: row.chunk_id, score });
+    }
+  }
+  return candidates;
+}
 
-  for (const hit of hits) {
-    const { type } = hit.payload;
-    if (type === POINT_TYPES.document) {
-      chunks.push({
-        kind: "document",
-        chunkId: hit.payload.chunk_id,
-        score: hit.score,
-      });
-      continue;
+// The useful words of the message: lower case, letters and digits only,
+// no short words, no common words, no repeats.
+function extractKeywords(message) {
+  const words = message.toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [];
+  const keywords = words.filter(
+    (word) => word.length >= MIN_KEYWORD_LENGTH && !STOP_WORDS.has(word),
+  );
+  return [...new Set(keywords)].slice(0, MAX_KEYWORDS);
+}
+
+// Finds threads whose question OR answers contain the message's keywords.
+// This catches words that only appear in an answer (answers have no vector).
+// A thread ranks higher when it contains more of the keywords. When the
+// message has 2+ keywords, a thread must contain at least 2 of them.
+// The keywords hold only letters and digits, so LIKE needs no escaping.
+async function searchKeywordThreads(message) {
+  const keywords = extractKeywords(message);
+  if (keywords.length === 0) return [];
+  const patterns = keywords.map((keyword) => `%${keyword}%`);
+  const anyOf = (column) => keywords.map(() => `${column} LIKE ?`).join(" OR ");
+
+  const rows = await safeExecute(
+    `SELECT question_id, CONCAT(title, ' ', content) AS text
+     FROM questions
+     WHERE ${anyOf("title")} OR ${anyOf("content")}
+     UNION ALL
+     SELECT question_id, content AS text
+     FROM answers
+     WHERE ${anyOf("content")}
+     LIMIT 200`,
+    [...patterns, ...patterns, ...patterns],
+  );
+
+  // question_id -> the keywords found anywhere in that thread
+  const found = new Map();
+  for (const row of rows) {
+    const text = `${row.text || ""}`.toLowerCase();
+    const words = found.get(row.question_id) ?? new Set();
+    for (const keyword of keywords) {
+      if (text.includes(keyword)) words.add(keyword);
     }
-    const questionId = hit.payload.question_id;
-    const thread = threads.get(questionId) ?? {
-      kind: "thread",
-      questionId,
-      score: hit.score,
-      hitAnswerIds: [],
-    };
-    thread.score = Math.max(thread.score, hit.score);
-    if (type === POINT_TYPES.answer) {
-      thread.hitAnswerIds.push(hit.payload.answer_id);
-    }
-    threads.set(questionId, thread);
+    found.set(row.question_id, words);
   }
 
-  return [...threads.values(), ...chunks]
+  const minHits = Math.min(2, keywords.length);
+  return [...found]
+    .filter(([, words]) => words.size >= minHits)
+    .sort((a, b) => b[1].size - a[1].size)
+    .slice(0, MAX_KEYWORD_THREADS)
+    .map(([questionId]) => ({ kind: "thread", questionId, score: null }));
+}
+
+// Questions and PDF chunks compete in one list. Best score first.
+function pickBestCandidates(threads, chunks) {
+  return [...threads, ...chunks]
     .sort((a, b) => b.score - a.score)
     .slice(0, MAX_SOURCES);
 }
+
+// A keyword match has no cosine score, so its score is null.
+const roundScore = (score) =>
+  score === null ? null : Number(score.toFixed(3));
 
 const placeholders = (items) => items.map(() => "?").join(", ");
 
@@ -162,12 +258,12 @@ async function loadThreads(candidates) {
   }
   return threads;
 }
-
+// returns a map of chunk_id -> { chunk_id, content, page_start, document_id, title }
 async function loadChunks(candidates, userId) {
   const ids = candidates.map((candidate) => candidate.chunkId);
   if (ids.length === 0) return new Map();
 
-  // Second lock: even if the Qdrant filter had a bug, the text of another
+  // Second lock: even if the search query had a bug, the text of another
   // user's PDF can never leave MySQL, because of "d.user_id = ?".
   const rows = await safeExecute(
     `SELECT c.chunk_id, c.content, c.page_start, d.document_id, d.title
@@ -184,20 +280,17 @@ const cut = (text, max) => {
   return clean.length > max ? `${clean.slice(0, max)}...` : clean;
 };
 
-// The text of one thread for the prompt. The answers that matched the
-// message come first, so they are not cut off in a long thread.
-function buildThreadText(thread, hitAnswerIds) {
-  const isHit = (answer) => hitAnswerIds.includes(answer.answer_id);
-  const ordered = [
-    ...thread.answers.filter(isHit),
-    ...thread.answers.filter((answer) => !isHit(answer)),
-  ];
+// The text of one thread for the prompt: the question, then all of its
+// answers, oldest first.
+function buildThreadText(thread) {
   const lines = [`Question: ${cut(thread.content, MAX_QUESTION_CHARS)}`];
-  if (ordered.length === 0) lines.push("This question has no answers yet.");
-  for (const answer of ordered) {
+  if (thread.answers.length === 0) {
+    lines.push("This question has no answers yet.");
+  }
+  for (const answer of thread.answers) {
     lines.push(`Answer: ${cut(answer.content, MAX_ANSWER_CHARS)}`);
   }
-  return cut(lines.join("\n"), MAX_SOURCE_CHARS);
+  return cut(lines.join("\n"), MAX_THREAD_CHARS);
 }
 
 // Builds the numbered sources. A hit that MySQL no longer has is dropped.
@@ -221,9 +314,9 @@ async function buildSources({ candidates, userId }) {
         type: "question",
         title: thread.title,
         url: `/questions/${thread.question_hash}`,
-        score: Number(candidate.score.toFixed(3)),
+        score: roundScore(candidate.score),
         label: `Forum thread: ${thread.title}`,
-        text: buildThreadText(thread, candidate.hitAnswerIds),
+        text: buildThreadText(thread),
       });
     } else {
       const chunk = chunks.get(candidate.chunkId);
@@ -235,7 +328,7 @@ async function buildSources({ candidates, userId }) {
         url: "/rag-documents",
         documentId: chunk.document_id,
         page: chunk.page_start,
-        score: Number(candidate.score.toFixed(3)),
+        score: roundScore(candidate.score),
         label: `The user's PDF "${chunk.title}", page ${chunk.page_start ?? "?"}`,
         text: cut(chunk.content, MAX_SOURCE_CHARS),
       });
@@ -245,6 +338,8 @@ async function buildSources({ candidates, userId }) {
 }
 
 // What the client gets for one source: no prompt text, no label.
+// The model never writes a link, so the server builds it.
+// sources are numbered in the order they were sent to Gemini, starting at 1.
 const toPublicSource = ({ label, text, ...source }) => source;
 
 const reply = (kind, answer, extra = {}) => ({
@@ -267,14 +362,7 @@ export const chatService = async ({ userId, firstName, message }) => {
     return reply("chat", greetingReply(firstName));
   }
 
-  // 2. This user's PDF chunks. A problem here must not stop the chat.
-  try {
-    await syncUserDocumentChunks(userId);
-  } catch (error) {
-    console.error("chat syncUserDocumentChunks:", error.message);
-  }
-
-  // 3. Message -> vector, the same way as semantic search.
+  // 2. Message -> vector, the same way as semantic search.
   let vector;
   try {
     const { embedding } = await generateQuestionEmbedding(
@@ -288,9 +376,25 @@ export const chatService = async ({ userId, firstName, message }) => {
     );
   }
 
-  // 4. Closest points, then the threshold of each type.
-  const points = await searchPoints({ vector, userId });
-  const candidates = groupHits(keepCloseHits(points));
+  // 3 + 4. Score the MySQL vectors, keep the best few above the threshold.
+  // Keywords are only the safety net, used when the meaning search found
+  // nothing close enough.
+  let candidates;
+  try {
+    const [threads, chunks] = await Promise.all([
+      searchQuestionVectors(vector),
+      searchChunkVectors(vector, userId),
+    ]);
+    candidates = pickBestCandidates(threads, chunks);
+    if (candidates.length === 0) {
+      candidates = await searchKeywordThreads(message);
+    }
+  } catch (error) {
+    console.error("chat search:", error);
+    throw new ServiceUnavailableError(
+      "The AI assistant cannot reach its search index right now. Please try again later.",
+    );
+  }
 
   // 5 + 6. Real text from MySQL. Nothing left -> honest "I do not know".
   const sources = await buildSources({ candidates, userId });
@@ -327,5 +431,11 @@ export const chatService = async ({ userId, firstName, message }) => {
   return reply("notfound", NOT_FOUND_TEXT);
 };
 
-// Exported for tests and for the measure script.
-export { keepCloseHits, groupHits, buildThreadText, GREETING_PATTERN };
+// Exported for tests.
+export {
+  scoreVector,
+  extractKeywords,
+  pickBestCandidates,
+  buildThreadText,
+  GREETING_PATTERN,
+};

@@ -1,0 +1,604 @@
+/* Styles for the room page. Scoped to this component. */
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+  color: var(--text-secondary, #334155);
+  font-weight: 600;
+  text-decoration: none;
+  justify-self: start;
+}
+
+.back:hover {
+  color: var(--accent-text, #b84a00);
+}
+
+/* ---------- layout: chat card + right column ---------- */
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 18px;
+  align-items: start;
+}
+
+/* One card holds the room header, the messages and the composer. */
+.chatCard {
+  min-width: 0;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px
+    rgba(var(--shadow-rgb, 15, 23, 42), calc(0.06 * var(--shadow-boost, 1)));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ---------- room header (top of the card) ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border, #e6ecf2);
+}
+
+.roomIcon {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--tint-orange, #fff1e6);
+  color: var(--accent-text, #b84a00);
+  display: grid;
+  place-items: center;
+}
+
+.headerText {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.headerTitle h1 {
+  margin: 0;
+  font-size: 1.3rem;
+  overflow-wrap: anywhere;
+}
+
+.headerText p {
+  margin: 3px 0 0;
+  color: var(--text-secondary, #334155);
+  overflow-wrap: anywhere;
+}
+
+.headerCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary, #526077);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.header button {
+  flex: none;
+  min-height: 44px;
+}
+
+/* The member count is also in the two cards on the right. On a normal
+   laptop the header needs that room for the room name and the buttons. */
+@media (max-width: 1500px) {
+  .headerCount {
+    display: none;
+  }
+}
+
+.cardNotice {
+  padding: 12px 20px 0;
+}
+
+/* ---------- messages (middle of the card) ---------- */
+.list {
+  /* The list scrolls inside itself, so the composer stays in view. */
+  height: clamp(300px, calc(100dvh - 400px), 900px);
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.older {
+  align-self: center;
+  flex: none;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border, #dbe3ea);
+  background: var(--surface, #fff);
+  color: var(--text-secondary, #334155);
+  font-weight: 600;
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.older:hover:not(:disabled) {
+  border-color: var(--orange);
+}
+
+.noMessages {
+  margin: auto;
+  color: var(--text-secondary, #526077);
+}
+
+.messages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* Your own messages sit on the right, with your avatar after the bubble. */
+.messageOwn {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: min(68%, 640px);
+  min-width: 0;
+  background: var(--surface-soft, #f4f7fa);
+  border: 1px solid var(--border, #e6ecf2);
+  border-radius: 4px 14px 14px 14px;
+  padding: 10px 14px;
+}
+
+.bubbleOwn {
+  background: var(--tint-orange, #fff1e6);
+  border-color: var(--tint-orange-border, #ffd9bd);
+  border-radius: 14px 4px 14px 14px;
+}
+
+.messageHead {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-size: 0.78rem;
+}
+
+.messageHead strong {
+  flex: 1;
+  min-width: 0;
+}
+
+.bubbleOwn .messageHead strong {
+  color: var(--accent-text, #b84a00);
+}
+
+.messageHead time {
+  color: var(--text-secondary, #526077);
+  white-space: nowrap;
+}
+
+.bubble p {
+  margin: 2px 0 0;
+  /* Plain text: keep the line breaks the writer typed, break long words. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+/* ---------- bottom of the card: composer or a banner ---------- */
+.cardFoot {
+  padding: 14px 20px 16px;
+  border-top: 1px solid var(--border, #e6ecf2);
+  background: var(--surface-soft, #fbfcfd);
+}
+
+/* ---------- leave confirmation ---------- */
+.confirm {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: var(--tint-red, #fff2f0);
+  border-bottom: 1px solid var(--tint-red-border, #ffd6d1);
+  padding: 12px 20px;
+}
+
+.confirm p {
+  flex: 1;
+  min-width: 220px;
+  margin: 0;
+  color: var(--danger-text, #7a1b12);
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.confirm button {
+  min-height: 44px;
+}
+
+.dangerButton {
+  padding: 0 20px;
+  border-radius: 8px;
+  border: 1px solid #b42318;
+  background: #b42318;
+  color: #fff;
+  font-weight: 700;
+}
+
+.dangerButton:hover {
+  background: #8f1b12;
+}
+
+.dangerButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dangerOutline {
+  padding: 0 20px;
+  border-radius: 8px;
+  border: 1px solid #b42318;
+  background: var(--surface, #fff);
+  color: var(--danger-text, #b42318);
+  font-weight: 700;
+}
+
+.dangerOutline:hover {
+  background: var(--tint-red, #fff2f0);
+}
+
+/* ---------- banners ---------- */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.banner svg {
+  flex: none;
+}
+
+.bannerClosed {
+  background: var(--surface-muted, #e8ecf1);
+  border: 1px solid var(--border-strong, #cdd6e0);
+  color: var(--text-secondary, #2b3747);
+}
+
+.bannerAdmin {
+  background: var(--tint-blue, #e6f0ff);
+  border: 1px solid var(--tint-blue-border, #bfd4ff);
+  color: var(--info-text, #1a3f9c);
+}
+
+/* ---------- composer ---------- */
+.composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 10px;
+  align-items: end;
+}
+
+.composer textarea {
+  min-height: 64px;
+  max-height: 200px;
+  resize: vertical;
+  font: inherit;
+}
+
+.composer button {
+  min-height: 44px;
+}
+
+/* The Send button never fades: it stays the brand orange while sending too. */
+.composer button:disabled {
+  opacity: 1;
+  cursor: progress;
+}
+
+.composerHint,
+.sendError {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.sendError {
+  color: var(--danger-text, #b42318);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- right column: about + members ---------- */
+.side {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.sideCard {
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px
+    rgba(var(--shadow-rgb, 15, 23, 42), calc(0.06 * var(--shadow-boost, 1)));
+  padding: 18px 20px;
+  min-width: 0;
+}
+
+.sideCard h2 {
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border, #e6ecf2);
+  font-size: 0.98rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.aboutText {
+  margin: 14px 0 16px;
+  color: var(--text-secondary, #334155);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.stats {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.stats div {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 8px;
+  align-items: center;
+  color: var(--text-secondary, #526077);
+}
+
+.stats svg {
+  grid-row: 1 / 3;
+}
+
+.stats dd {
+  margin: 0;
+  color: var(--text, var(--ink));
+  font-weight: 700;
+  font-size: 0.92rem;
+  line-height: 1.2;
+}
+
+.stats dt {
+  font-size: 0.76rem;
+}
+
+.createdBy {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border, #e6ecf2);
+  font-size: 0.84rem;
+  color: var(--text-secondary, #526077);
+}
+
+.createdBy strong {
+  color: var(--text, var(--ink));
+}
+
+.memberList {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.memberList li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.memberText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+}
+
+.memberText strong {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.memberText small {
+  color: var(--text-secondary, #526077);
+}
+
+.memberTags {
+  flex: none;
+  display: flex;
+  gap: 4px;
+}
+
+.tag {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.tagYou {
+  background: var(--tint-orange, #fff1e6);
+  color: var(--accent-text, #b84a00);
+}
+
+.tagCreator {
+  background: var(--tint-blue, #e6f0ff);
+  color: var(--info-text, #1a3f9c);
+}
+
+.memberList .noMembers {
+  color: var(--text-secondary, #526077);
+}
+
+/* ---------- not a member ---------- */
+.joinCard {
+  justify-self: center;
+  width: min(520px, 100%);
+  margin-top: 24px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--border, #dbe3ea);
+  border-radius: 14px;
+  box-shadow: 0 1px 3px
+    rgba(var(--shadow-rgb, 15, 23, 42), calc(0.06 * var(--shadow-boost, 1)));
+  padding: 32px;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.joinIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--tint-orange, #fff1e6);
+  color: var(--accent-text, #b84a00);
+  display: grid;
+  place-items: center;
+}
+
+.joinTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.joinTitle h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  overflow-wrap: anywhere;
+}
+
+.joinCard p {
+  margin: 0;
+  color: var(--text-secondary, #334155);
+  overflow-wrap: anywhere;
+}
+
+.joinMeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 18px;
+  color: var(--text-secondary, #526077);
+  font-size: 0.84rem;
+}
+
+.joinCard .joinNote {
+  color: var(--text-secondary, #526077);
+}
+
+.joinButton {
+  min-width: 220px;
+  min-height: 44px;
+}
+
+.back:focus-visible,
+.header button:focus-visible,
+.confirm button:focus-visible,
+.older:focus-visible,
+.composer button:focus-visible,
+.joinButton:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+@media (max-width: 1100px) {
+  /* The right column moves under the chat card. */
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .side {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    align-items: start;
+  }
+}
+
+@media (max-width: 700px) {
+  .header,
+  .list,
+  .cardFoot,
+  .confirm {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .roomIcon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .header button {
+    flex: 1 1 auto;
+  }
+
+  .list {
+    height: clamp(260px, calc(100dvh - 470px), 900px);
+  }
+
+  .bubble {
+    max-width: 80%;
+  }
+
+  .joinCard {
+    padding: 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .older {
+    transition: none;
+  }
+}

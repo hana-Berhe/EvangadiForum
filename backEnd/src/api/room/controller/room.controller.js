@@ -1,8 +1,8 @@
 import { StatusCodes } from "http-status-codes";
 import { listRoomsService } from "../service/room.service.js";
-import { createRoomService } from "../service/room.service.js";
+import { getRoomService } from "../service/room.service.js";
 
- /**
+/**
  * Lists every room, newest activity first.
  */
 export const listRoomsController = async (req, res, next) => {
@@ -19,27 +19,19 @@ export const listRoomsController = async (req, res, next) => {
   }
 };
 
-
 /**
  * Returns one room.
  */
-// [Rooms B - Haymanot Y.] Create a room.
-/**
- * Creates a room. The creator becomes its first member.
- * Only name and description are read from the body. Anything else
- * (for example "role" or "created_by") is ignored.
- */
-export const createRoomController = async (req, res, next) => {
+export const getRoomController = async (req, res, next) => {
   try {
-    const room = await createRoomService({
+    const room = await getRoomService({
+      roomId: req.params.roomId,
       userId: req.user.id,
-      name: req.body.name,
-      description: req.body.description,
     });
 
-    res.status(StatusCodes.CREATED).json({
+    res.status(StatusCodes.OK).json({
       success: true,
-      message: "Room created",
+      message: "Room",
       data: room,
     });
   } catch (error) {

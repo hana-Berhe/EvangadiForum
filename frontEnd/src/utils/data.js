@@ -6,6 +6,10 @@ export function getAuthorName(item) {
   return `${item.author.firstName} ${item.author.lastName}`;
 }
 
+/** "1 member", "3 members". */
+export const plural = (count, word) =>
+  `${count} ${word}${count === 1 ? "" : "s"}`;
+
 /**
  * Two-letter initials for avatar bubbles, derived from getAuthorName.
  */

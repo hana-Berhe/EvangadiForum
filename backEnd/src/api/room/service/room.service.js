@@ -1,44 +1,41 @@
+// Discussion rooms: list them, read one.
+//
+// A room is returned in one shape everywhere (see toRoom below).
+// "isMember" is always about the user who is asking.
+
 import { safeExecute } from "../../../../schema/db.config.js";
 import { NotFoundError } from "../../../utility/errors/errors.js";
 
+// One SELECT for the list and for a single room. The first "?" is always the
+// id of the user who is asking (for is_member).
+// last_activity_at: the newest message, or the creation time of an empty room.
+
+// COALESCE: if there are no messages, use the room's creation time.
+// SELECT MAX(created_at) FROM room_messages WHERE room_id = r.room_id
+// is_member: does the user who is asking belong to this room?
+// EXISTS: true if the subquery returns at least one row, false if it returns none.
 
 const ROOM_SELECT = `
   SELECT
-    r.room_id, r.name, r.description, r.status, r.created_at, r.closed_at,
-    r.created_by, cu.first_name AS creator_first_name, cu.last_name AS creator_last_name,
-    r.closed_by, xu.first_name AS closer_first_name, xu.last_name AS closer_last_name,
+    r.room_id, r.name, r.description, r.created_at,
     (SELECT COUNT(*) FROM room_members m WHERE m.room_id = r.room_id) AS member_count,
     (SELECT COUNT(*) FROM room_messages g WHERE g.room_id = r.room_id) AS message_count,
     COALESCE(
-      (SELECT MAX(g2.created_at) FROM room_messages g2 WHERE g2.room_id = r.room_id),
+      ( SELECT MAX(g2.created_at) FROM room_messages g2 WHERE g2.room_id = r.room_id),
       r.created_at
-    ) AS last_activity_at,
+      )AS last_activity_at,
     EXISTS(
       SELECT 1 FROM room_members me WHERE me.room_id = r.room_id AND me.user_id = ?
     ) AS is_member
-  FROM rooms r
-  LEFT JOIN users cu ON cu.user_id = r.created_by
-  LEFT JOIN users xu ON xu.user_id = r.closed_by`;
+  FROM rooms r`;
 
- 
+// toRoom: convert a row from the database into a room object for the API.
 
 const toRoom = (row) => ({
   id: row.room_id,
   name: row.name,
   description: row.description,
-  status: row.status,
   createdAt: row.created_at,
-  createdBy: toPerson(
-    row.created_by,
-    row.creator_first_name,
-    row.creator_last_name,
-  ),
-  closedAt: row.closed_at,
-  closedBy: toPerson(
-    row.closed_by,
-    row.closer_first_name,
-    row.closer_last_name,
-  ),
   memberCount: Number(row.member_count),
   messageCount: Number(row.message_count),
   lastActivityAt: row.last_activity_at,
@@ -46,20 +43,15 @@ const toRoom = (row) => ({
 });
 
 /**
- * Every room, newest activity first. Open and closed together, or only one
- * status (the admin dashboard filter).
+ * Every room, newest activity first.
  * @param {number} userId - The user who is asking (for isMember).
- * @param {{ status?: "open" | "closed" }} [filter]
  * @returns {Promise<Array<Object>>}
  */
-const listRoomsService = async (userId, { status } = {}) => {
-  const where = status ? "WHERE r.status = ?" : "";
-  const params = status ? [userId, status] : [userId];
+const listRoomsService = async (userId) => {
   const rows = await safeExecute(
     `${ROOM_SELECT}
-  ${where}
-  ORDER BY last_activity_at DESC, r.room_id DESC`,
-    params,
+  ORDER BY last_activity_at DESC, r.room_id ASC`,
+    [userId],
   );
   return rows.map(toRoom);
 };
@@ -82,88 +74,4 @@ const getRoomService = async ({ roomId, userId }) => {
   return toRoom(rows[0]);
 };
 
-
-
-/**
- * Closes a room for ever. Members can still read it, nobody can post or join.
- * There is no reopen and no delete in V1.
- *
- * The UPDATE only matches an OPEN room, so two admins who close at the same
- * moment cannot both win: the second one changes 0 rows and gets 409, and
- * closed_by and closed_at are never overwritten.
- *
- * @param {{ roomId: number, adminId: number }} param
- * @returns {Promise<Object>} The closed room.
- * @throws {ConflictError} If the room is already closed.
- */
-const closeRoomService = async ({ roomId, adminId }) => {
-  const result = await safeExecute(
-    `UPDATE rooms
-     SET status = 'closed', closed_at = CURRENT_TIMESTAMP, closed_by = ?
-     WHERE room_id = ? AND status = 'open'`,
-    [adminId, roomId],
-  );
-  if (result.affectedRows === 0) {
-    throw new ConflictError("This room is already closed.");
-  }
-  return getRoomService({ roomId, userId: adminId });
-};
-
-export {
-  listRoomsService,
-  getRoomService,
-  closeRoomService
-
-};
-
-
-
-
-
-
-
-
-
-
-
-
-// [Rooms B - Haymanot Y.] createRoomService.
-/**
- * Creates a room and makes the creator its first member, in ONE transaction:
- * a room without its creator as a member must never exist.
- *
- * The name check is left to the database (UNIQUE key). "Check first, then
- * insert" has a gap where two people can create the same name at the same
- * moment. The UNIQUE key has no gap.
- *
- * @param {{ userId: number, name: string, description?: string }} param
- * @returns {Promise<Object>} The new room.
- * @throws {ConflictError} If the name is already taken.
- */
-const createRoomService = async ({ userId, name, description }) => {
-  const cleanDescription = `${description ?? ""}`.trim() || null;
-
-  let roomId;
-  try {
-    roomId = await withTransaction(async (execute) => {
-      const room = await execute(
-        "INSERT INTO rooms (name, description, created_by) VALUES (?, ?, ?)",
-        [name, cleanDescription, userId],
-      );
-      await execute(
-        "INSERT INTO room_members (room_id, user_id) VALUES (?, ?)",
-        [room.insertId, userId],
-      );
-      return room.insertId;
-    });
-  } catch (error) {
-    if (error.code === "ER_DUP_ENTRY") {
-      throw new ConflictError(
-        "A room with this name already exists. Choose another name.",
-      );
-    }
-    throw error;
-  }
-
-  return getRoomService({ roomId, userId });
-};
+export { listRoomsService, getRoomService };

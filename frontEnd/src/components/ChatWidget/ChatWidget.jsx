@@ -19,6 +19,7 @@ const SUGGESTIONS = [
   "What is Node.js?",
   "How does JWT login work?",
   "What is RAG?",
+  "What is Evangadi Forum?",
 ];
 
 // A PDF title is a file name and can be long. Keep the chip short.

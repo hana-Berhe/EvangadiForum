@@ -63,8 +63,9 @@ Change only the lines your task needs. Do not reformat, reorder or rename things
 
 ## 9. Database
 
-- **Never run `schema/schema.sql` on a database that has data.** It begins with `DROP TABLE`. The three RAG tables are already in it, so check with `SHOW TABLES;` before doing anything.
-- Need sample data? `npm run seed` inside `backEnd`.
+- **Never run `schema/schema.sql` on a database that has data.** It begins with `DROP TABLE`. It creates every table, including the RAG and Discussion Rooms tables.
+- To start fresh, create a **new** database (we use `evangadi_forum_v2`), import `schema.sql` into it, and set `DB_NAME` in `.env`. Your old database stays untouched.
+- Need sample data? `npm run seed` inside `backEnd` (on an empty database).
 
 ## 10. Secrets and uploads
 

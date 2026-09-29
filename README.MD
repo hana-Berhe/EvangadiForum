@@ -1,6 +1,6 @@
 # Evangadi Forum
 
-Evangadi Forum is a developer Q&A platform where users can register, log in, ask programming questions, share answers, search for related discussions, and learn from the community.
+Evangadi Forum is a developer Q&A platform where users can register, log in, ask programming questions, share answers, search for related discussions, ask questions about their own PDFs, chat with an AI assistant that answers from the forum, talk in discussion rooms, and learn from the community.
 
 The project is organized into milestones so each major stage can be developed, tested, reviewed, and deployed incrementally.
 
@@ -49,20 +49,30 @@ Main features include:
 
 ### Milestone 3 — AI & RAG
 
-Milestone 3 will extend the platform with advanced AI and Retrieval-Augmented Generation (RAG) functionality.
+Milestone 3 adds a private Knowledge Base built on Retrieval-Augmented Generation (RAG).
 
-Planned areas include:
+Main features include:
 
-- Document/PDF upload
-- Document text extraction
-- Chunking
-- Embedding generation
-- Vector storage and retrieval
-- Similarity search
-- Retrieval-Augmented Generation
-- AI answers grounded in uploaded content
+- PDF upload, text extraction and chunking
+- Embeddings for every chunk
+- Semantic search inside one document
+- AI answers grounded in the PDF, with citations and page numbers
+- Reading, listing and deleting your own documents
 
-> The Milestone 3 README can be linked here when the milestone begins.
+➡️ [View Milestone 3 README](./MILESTONE-3-README.md)
+
+---
+
+### Milestone 4 — Extra Features: AI Chat Assistant & Discussion Rooms
+
+Milestone 4 adds two features on top of the forum.
+
+Main features include:
+
+- AI chat assistant that answers only from forum threads and your own PDFs, and shows its sources
+- Discussion Rooms: six fixed rooms to join and talk in, with new messages every 15 seconds
+
+➡️ [View Milestone 4 README](./MILESTONE-4-README.md)
 
 ---
 
@@ -76,7 +86,10 @@ EvangadiForum/
 │   │   ├── api/
 │   │   │   ├── auth/
 │   │   │   ├── question/
-│   │   │   └── answer/
+│   │   │   ├── answer/
+│   │   │   ├── rag/
+│   │   │   ├── chat/
+│   │   │   └── room/
 │   │   ├── middleware/
 │   │   └── utility/
 │   ├── .env.example
@@ -96,6 +109,10 @@ EvangadiForum/
 │
 ├── MILESTONE-1-README.MD
 ├── MILESTONE-2-README.md
+├── MILESTONE-3-README.md
+├── MILESTONE-4-README.md
+├── CONTRIBUTING.md
+├── CONTRIBUTORS.md
 └── README.md
 ```
 
@@ -110,6 +127,8 @@ EvangadiForum/
 - React Router
 - Axios
 - CSS Modules
+- Framer Motion
+- Lucide React
 
 ### Backend
 
@@ -117,7 +136,10 @@ EvangadiForum/
 - Express
 - MySQL
 - JWT
-- bcrypt
+- bcryptjs
+- express-validator
+- multer
+- pdf-parse
 - dotenv
 - CORS
 
@@ -127,6 +149,7 @@ EvangadiForum/
 - Embeddings
 - Vector similarity
 - Semantic search
+- Retrieval-Augmented Generation (RAG)
 
 ---
 
@@ -161,23 +184,33 @@ Create a `.env` file inside the `backEnd` folder and use `.env.example` as a ref
 
 The frontend reads one variable, `VITE_API_BASE_URL`. See `frontEnd/.env.example`.
 
-### 5. Add Sample Data (optional)
+### 5. Create the Database
+
+In phpMyAdmin (or the MySQL command line):
+
+1. Create a new, empty database, for example `evangadi_forum_v2`, with collation `utf8mb4_unicode_ci`.
+2. Select it and import `backEnd/schema/schema.sql`. This creates all tables, including the six fixed Discussion Rooms.
+3. In `backEnd/.env`, set `DB_NAME` to that database.
+
+> `schema.sql` recreates every table. Never run it on a database that has data you want to keep: use a new database instead.
+
+### 6. Add Sample Data (optional)
 
 ```bash
 cd backEnd
 npm run seed
 ```
 
-Adds 3 users, 10 questions and 12 answers through the same services the API uses. It only adds rows, and it stops if the sample users already exist. Log in with `sara.seed@example.com` and the password `Evangadi123`.
+Adds 3 users, 21 questions and 22 answers through the same services the API uses, including FAQ threads the AI chat assistant can answer from. It only adds rows, and it stops if the sample users already exist. Log in with `sara.seed@example.com` and the password `Evangadi123`.
 
-### 6. Run the Backend
+### 7. Run the Backend
 
 ```bash
 cd backEnd
 npm run dev
 ```
 
-### 7. Run the Frontend
+### 8. Run the Frontend
 
 Open another terminal:
 
@@ -212,10 +245,13 @@ Handles:
 Handles:
 
 - Creating questions
-- Listing questions
+- Listing questions (keyword search, "my questions")
 - Viewing a single question
 - Semantic search
+- Similar questions
 - AI drafting assistance
+- AI answer assessment (`/:questionHash/answer-fit`)
+- Editing and deleting your own questions
 
 ### Answers
 
@@ -227,7 +263,41 @@ Handles:
 
 - Creating answers
 - Retrieving answers
-- AI-assisted answer assessment
+- Editing and deleting your own answers
+
+### Knowledge Base (RAG)
+
+```text
+/api/rag
+```
+
+Handles:
+
+- Uploading, listing, reading and deleting your own PDFs
+- Semantic search inside a PDF
+- AI answers grounded in a PDF, with citations
+
+### AI Chat Assistant
+
+```text
+/api/chat
+```
+
+Handles:
+
+- Answering a message from forum threads and your own PDFs, with sources
+
+### Discussion Rooms
+
+```text
+/api/rooms
+```
+
+Handles:
+
+- Listing and opening rooms
+- Joining a room
+- Reading and sending messages (members only)
 
 ---
 
@@ -238,9 +308,9 @@ Frontend
    ↓
 Route
    ↓
-Validation
-   ↓
 Authentication Middleware
+   ↓
+Validation
    ↓
 Controller
    ↓
@@ -270,10 +340,13 @@ git checkout -b feature/task-name
 After completing the task:
 
 ```bash
-git add .
+git status
+git add path/to/your-file.js
 git commit -m "describe completed task"
 git push -u origin feature/task-name
 ```
+
+Add files by name and read `git status` first, so `.env` files and uploads never get committed. See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 Then:
 
@@ -330,12 +403,23 @@ Merge to main
 Update Deployment
         ↓
 Milestone 3
-AI + RAG
+Knowledge Base (RAG)
+        ↓
+Merge to main
+        ↓
+Milestone 4
+AI Chat Assistant + Discussion Rooms
         ↓
 Merge to main
         ↓
 Final Deployment
 ```
+
+---
+
+## Contributors
+
+Built by a team of eight. See [CONTRIBUTORS.md](./CONTRIBUTORS.md) for who built what in each milestone.
 
 ---
 

@@ -178,6 +178,12 @@ export default function RagDocuments() {
       return;
     }
 
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError("The PDF is larger than the 10MB limit.");
+      event.target.value = "";
+      return;
+    }
+
     setSelectedFile(file);
   }
 

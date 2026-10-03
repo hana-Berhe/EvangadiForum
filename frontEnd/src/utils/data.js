@@ -24,11 +24,7 @@ export function getAuthorInitials(item) {
 }
 
 export function getErrorMessage(error, fallback = "Something went wrong.") {
-  return (
-    error?.response?.data?.msg ||
-    error?.message ||
-    fallback
-  );
+  return error?.response?.data?.msg || error?.message || fallback;
 }
 
 export function getRelativeTime(value) {

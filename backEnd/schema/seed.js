@@ -534,7 +534,7 @@ const questions = [
           "Move every secret into a `.env` file and read it with `process.env`:",
           "",
           "```js",
-          "import dotenv from \"dotenv\";",
+          'import dotenv from "dotenv";',
           "dotenv.config();",
           "const password = process.env.DB_PASSWORD;",
           "```",
@@ -648,7 +648,7 @@ const questions = [
     tag: "Node",
     title: "Express says Cannot GET /api/users even though the route exists",
     content: [
-      "I wrote `router.get(\"/users\", getUsers)` in `user.routes.js`, but the browser shows `Cannot GET /api/users`. The server starts without errors.",
+      'I wrote `router.get("/users", getUsers)` in `user.routes.js`, but the browser shows `Cannot GET /api/users`. The server starts without errors.',
     ].join("\n"),
     answers: [],
   },

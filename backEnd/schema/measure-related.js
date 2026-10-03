@@ -184,7 +184,9 @@ async function testSearch(seed) {
       .map((s) => String(s.id));
     const bestWrong = Math.max(
       0,
-      ...data.filter((r) => wrongSeedIds.includes(String(r.id))).map((r) => r.score),
+      ...data
+        .filter((r) => wrongSeedIds.includes(String(r.id)))
+        .map((r) => r.score),
     );
     highestWrong = Math.max(highestWrong, bestWrong);
 
@@ -234,9 +236,7 @@ async function main() {
   console.log(
     `  lowest score of an expected result: ${search.lowestHit.toFixed(3)} | highest score of a wrong topic: ${search.highestWrong.toFixed(3)}`,
   );
-  console.log(
-    "\nA good threshold sits between the two numbers on each line.",
-  );
+  console.log("\nA good threshold sits between the two numbers on each line.");
 }
 
 main()

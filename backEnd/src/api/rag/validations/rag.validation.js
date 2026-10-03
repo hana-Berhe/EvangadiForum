@@ -3,7 +3,6 @@ import { param } from "express-validator";
 import { query } from "express-validator";
 import { validationErrorHandler } from "../../../middleware/validation-handler.js";
 
-
 // ---- T-24b (Haymanot Y.): documentIdParamValidation (shared by 4 tasks) ----
 export const documentIdParamValidation = [
   param("documentId")

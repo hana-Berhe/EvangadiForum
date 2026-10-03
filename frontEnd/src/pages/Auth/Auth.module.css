@@ -171,8 +171,10 @@
   border-radius: 16px;
   padding: clamp(28px, 5vh, 48px) clamp(20px, 6vw, 48px);
   box-shadow:
-    0 1px 3px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.08 * var(--shadow-boost, 1))),
-    0 8px 24px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.06 * var(--shadow-boost, 1)));
+    0 1px 3px
+      rgba(var(--shadow-rgb, 15, 23, 42), calc(0.08 * var(--shadow-boost, 1))),
+    0 8px 24px
+      rgba(var(--shadow-rgb, 15, 23, 42), calc(0.06 * var(--shadow-boost, 1)));
 }
 
 .authCard h1 {

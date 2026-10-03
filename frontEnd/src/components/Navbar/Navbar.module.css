@@ -4,7 +4,8 @@
   height: 79px;
   background: var(--surface, #fff);
   border-bottom: 1px solid var(--border, #dfe6ed);
-  box-shadow: 0 1px 3px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.05 * var(--shadow-boost, 1)));
+  box-shadow: 0 1px 3px
+    rgba(var(--shadow-rgb, 15, 23, 42), calc(0.05 * var(--shadow-boost, 1)));
   display: grid;
   grid-template-columns: minmax(0, auto) minmax(200px, 1fr) auto;
   align-items: center;

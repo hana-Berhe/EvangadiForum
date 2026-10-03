@@ -17,12 +17,11 @@ export default function Footer() {
 
       {/* links tag  */}
       <nav className={styles.siteFooterLinks} aria-label="Footer links">
-  <Link to="/dashboard">About</Link>
-  <Link to="/dashboard">Privacy</Link>
-  <Link to="/dashboard">Terms</Link>
-  <Link to="/dashboard">Contact</Link>
-</nav>
+        <Link to="/dashboard">About</Link>
+        <Link to="/dashboard">Privacy</Link>
+        <Link to="/dashboard">Terms</Link>
+        <Link to="/dashboard">Contact</Link>
+      </nav>
     </footer>
   );
 }
-

@@ -39,12 +39,33 @@ function clearStoredSession() {
 function readStoredUser() {
   // try is used because a missing or damaged token cannot be decoded
   try {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      if (parsedUser?.id) {
+        return {
+          id: parsedUser.id,
+          firstName: parsedUser.firstName ?? "",
+          lastName: parsedUser.lastName ?? "",
+          email: parsedUser.email ?? "",
+          bio: parsedUser.bio ?? "",
+          avatar: parsedUser.avatar ?? null,
+        };
+      }
+    }
+
     // Read the payload part of the saved token
     const { id, firstName, lastName } = decodeTokenPayload(
       localStorage.getItem("token"),
     );
 
-    return { id, firstName, lastName };
+    return {
+      id,
+      firstName,
+      lastName,
+      email: "",
+      avatar: null,
+    };
   } catch {
     // If there is no token, or it cannot be decoded,
     // return null instead of crashing the application
@@ -219,6 +240,7 @@ export function AuthProvider({ children }) {
     //
     // Save JWT token in localStorage
     localStorage.setItem("token", data.data.token);
+    localStorage.setItem("user", JSON.stringify(data.data.user));
 
     // Build the user from the token and update React user state
     setUser(readStoredUser());

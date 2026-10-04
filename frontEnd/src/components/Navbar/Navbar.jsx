@@ -22,6 +22,10 @@ const TITLES = {
     "Knowledge Base",
     "Course files, retrieval, and grounded references.",
   ],
+  "/profile": [
+    "My Profile",
+    "View and update your personal information, bio, and avatar.",
+  ],
 };
 export default function Navbar() {
   const { pathname } = useLocation(),
@@ -79,7 +83,14 @@ export default function Navbar() {
         <strong>
           {user.firstName} {user.lastName}
         </strong>
-        <UserAvatar person={user} size="nav" />
+        <button
+          type="button"
+          className={styles.profileButton}
+          onClick={() => navigate("/profile")}
+          aria-label="Navigate to user profile"
+        >
+          <UserAvatar person={user} size="nav" />
+        </button>
         <button
           type="button"
           className={btn.iconButton}

@@ -232,6 +232,7 @@ async function findSimilarQuestionsByText({ sourceText, threshold, k }) {
       u.user_id AS userId,
       u.first_name AS firstName,
       u.last_name AS lastName,
+      u.avatar AS avatar,
       COUNT(DISTINCT a.answer_id) AS answerCount
     FROM questions q
     JOIN users u ON u.user_id = q.user_id
@@ -267,6 +268,7 @@ async function findSimilarQuestionsByText({ sourceText, threshold, k }) {
         id: row.userId,
         firstName: row.firstName,
         lastName: row.lastName,
+        avatar: row.avatar ?? null,
       },
     };
   });
@@ -420,6 +422,7 @@ async function findSimilarQuestionsByQuestionId({ questionId, threshold, k }) {
         u.user_id AS userId,
         u.first_name AS firstName,
         u.last_name AS lastName,
+        u.avatar AS avatar,
         COUNT(DISTINCT a.answer_id) AS answerCount
       FROM questions q
       JOIN users u ON u.user_id = q.user_id
@@ -459,6 +462,7 @@ async function findSimilarQuestionsByQuestionId({ questionId, threshold, k }) {
           id: detailRow.userId,
           firstName: detailRow.firstName,
           lastName: detailRow.lastName,
+          avatar: detailRow.avatar ?? null,
         },
       };
     });

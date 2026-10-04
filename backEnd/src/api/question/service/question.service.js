@@ -57,6 +57,7 @@ const getQuestionsService = async (filters) => {
       u.user_id AS userId,
       u.first_name AS firstName,
       u.last_name AS lastName,
+      u.avatar AS avatar,
       COUNT(DISTINCT a.answer_id) AS answerCount
     FROM questions q
     JOIN users u ON u.user_id = q.user_id
@@ -82,6 +83,7 @@ const getQuestionsService = async (filters) => {
         id: question.userId,
         firstName: question.firstName,
         lastName: question.lastName,
+        avatar: question.avatar ?? null,
       },
     })),
     meta: {
@@ -108,6 +110,7 @@ const getSingleQuestionService = async ({ questionHash }) => {
       u.user_id AS userId,
       u.first_name AS firstName,
       u.last_name AS lastName,
+      u.avatar AS avatar,
       COUNT(DISTINCT a.answer_id) AS answerCount
     FROM questions q
     JOIN users u ON u.user_id = q.user_id
@@ -132,7 +135,8 @@ const getSingleQuestionService = async ({ questionHash }) => {
       a.updated_at AS updatedAt,
       au.user_id AS userId,
       au.first_name AS firstName,
-      au.last_name AS lastName
+      au.last_name AS lastName,
+      au.avatar AS avatar
     FROM answers a
     JOIN users au ON au.user_id = a.user_id
     WHERE a.question_id = ?
@@ -154,6 +158,7 @@ const getSingleQuestionService = async ({ questionHash }) => {
         id: question.userId,
         firstName: question.firstName,
         lastName: question.lastName,
+        avatar: question.avatar ?? null,
       },
     },
     answers: answers.map((answer) => ({
@@ -165,6 +170,7 @@ const getSingleQuestionService = async ({ questionHash }) => {
         id: answer.userId,
         firstName: answer.firstName,
         lastName: answer.lastName,
+        avatar: answer.avatar ?? null,
       },
     })),
     answersMeta: {

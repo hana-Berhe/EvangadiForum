@@ -75,6 +75,8 @@ export const registerService = async ({
     firstName,
     lastName,
     email: normalizedEmail,
+    bio: "",
+    avatar: null,
   };
 };
 
@@ -90,7 +92,7 @@ export const registerService = async ({
 export const loginService = async ({ email, password }) => {
   const normalizedEmail = normalizeEmail(email);
   const sql =
-    "SELECT user_id, first_name, last_name, email, password_hash FROM users WHERE email = ? LIMIT 1";
+    "SELECT user_id, first_name, last_name, email, bio, avatar, password_hash FROM users WHERE email = ? LIMIT 1";
   const rows = await safeExecute(sql, [normalizedEmail]);
 
   if (rows.length === 0) {
@@ -118,6 +120,8 @@ export const loginService = async ({ email, password }) => {
       firstName: user.first_name,
       lastName: user.last_name,
       email: user.email,
+      bio: user.bio ?? "",
+      avatar: user.avatar ?? null,
     },
     token,
   };

@@ -1,0 +1,277 @@
+.pageShell {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100%;
+}
+
+.card {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #dfe6ed);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(var(--shadow-rgb, 15, 23, 42), 0.04);
+  padding: 28px;
+}
+
+.profileHeaderCard,
+.infoCard {
+  background: var(--surface, #ffffff);
+  border: 1px solid var(--border, #dfe6ed);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(var(--shadow-rgb, 15, 23, 42), 0.04);
+}
+
+.profileHeaderCard {
+  padding: 28px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.avatarBlock {
+  flex-shrink: 0;
+}
+
+.headerInfo {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0 0 8px 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-text, #ff6b00);
+  font-weight: 700;
+}
+
+.headerInfo h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: var(--text, #172033);
+}
+
+.email,
+.bioText {
+  margin: 10px 0 0 0;
+  color: var(--text-secondary, #475569);
+}
+
+.bioText {
+  max-width: 680px;
+  line-height: 1.6;
+}
+
+.infoCard {
+  padding: 28px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--text, #172033);
+}
+
+.primaryButton,
+.secondaryButton {
+  border: 0;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 10px 18px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.primaryButton {
+  background: linear-gradient(135deg, var(--orange, #ff6b00), var(--orange-dark, #e55300));
+  color: white;
+}
+
+.secondaryButton {
+  background: var(--surface-soft, #eff4f8);
+  color: var(--text, #172033);
+  border: 1px solid var(--border, #dfe6ed);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover {
+  transform: translateY(-1px);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.infoGrid,
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.infoGrid > div,
+.formGrid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label,
+.formGrid span,
+.avatarLabel {
+  color: var(--text-secondary, #475569);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.infoGrid strong {
+  color: var(--text, #172033);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.avatarSummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGrid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text, #172033);
+}
+
+.formGrid input,
+.formGrid textarea {
+  width: 100%;
+  border: 1px solid var(--border, #dfe6ed);
+  border-radius: 10px;
+  background: var(--surface-soft, #f8fafc);
+  padding: 12px 14px;
+  color: var(--text, #172033);
+  font: inherit;
+}
+
+.formGrid textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.formGrid input:disabled {
+  background: var(--surface-soft, #eef2f7);
+  color: var(--text-secondary, #475569);
+}
+
+.avatarUploadSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.uploadPreviewRow {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.previewBox {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--border, #dfe6ed);
+  background: var(--surface-soft, #f5f7fb);
+}
+
+.previewBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-secondary, #475569);
+}
+
+.fileInput {
+  padding: 10px 12px;
+  border: 1px dashed var(--border-strong, #9aa9b8);
+  border-radius: 10px;
+  background: var(--surface-soft, #f8fafc);
+}
+
+.inlineActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loadingText,
+.errorText,
+.formError {
+  margin: 0;
+  color: var(--text, #172033);
+}
+
+.errorText,
+.formError {
+  color: var(--danger-text, #dc2626);
+}
+
+@media (max-width: 768px) {
+  .profileHeaderCard,
+  .infoCard,
+  .card {
+    padding: 20px;
+  }
+
+  .headerRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .infoGrid,
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .inlineActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

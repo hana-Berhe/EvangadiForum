@@ -37,6 +37,7 @@ const mapAnswer = (row) => ({
     id: row.userId,
     firstName: row.firstName,
     lastName: row.lastName,
+    avatar: row.avatar ?? null,
   },
 });
 
@@ -56,7 +57,8 @@ const createAnswerService = async ({ questionId, userId, content }) => {
       a.updated_at AS updatedAt,
       u.user_id AS userId,
       u.first_name AS firstName,
-      u.last_name AS lastName
+      u.last_name AS lastName,
+      u.avatar AS avatar
     FROM answers a
     JOIN users u ON u.user_id = a.user_id
     WHERE a.answer_id = ?
@@ -98,7 +100,8 @@ const getAnswersService = async ({ questionId, sortBy = "newest" }) => {
       a.updated_at AS updatedAt,
       u.user_id AS userId,
       u.first_name AS firstName,
-      u.last_name AS lastName
+      u.last_name AS lastName,
+      u.avatar AS avatar
     FROM answers a
     JOIN users u ON u.user_id = a.user_id
     WHERE a.question_id = ?

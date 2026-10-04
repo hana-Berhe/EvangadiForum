@@ -8,7 +8,7 @@ import { validationErrorHandler } from "../../../middleware/validation-handler.j
 // Every route that takes :roomId.
 export const roomIdParamValidation = [
   param("roomId")
-    .isInt({ min: 1, max: 2147483647 })
+    .isInt({ min: 1, max: 6 })
     .withMessage("Room id must be a positive integer")
     .toInt(),
   validationErrorHandler,

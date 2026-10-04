@@ -8,7 +8,6 @@ import { db } from "./schema/db.config.js";
 import { mainRouter } from "./src/mainRoutes.js";
 import { errorHandler, notFound } from "./src/middleware/error-handler.js";
 
-
 const app = express();
 
 // middleware
@@ -25,6 +24,7 @@ app.use(notFound);
 app.use(errorHandler);
 
 // connection and server configuration
+const PORT = process.env.PORT || 5000;
 
 async function startServer() {
   try {
@@ -32,11 +32,15 @@ async function startServer() {
     connection.release();
     console.log("Connected to database");
 
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
     });
   } catch (error) {
-    console.log(error);
+    console.error(
+      "Database connection failed. Server not started:",
+      error.message,
+    );
+    process.exit(1);
   }
 }
 

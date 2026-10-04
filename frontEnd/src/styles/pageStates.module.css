@@ -158,7 +158,10 @@ textarea:focus {
   border-bottom: 1px solid var(--border, #e3e9ee);
   background: var(--surface, #fff);
   position: relative;
-  box-shadow: 0 1px 3px rgba(var(--shadow-rgb, 15, 23, 42), calc(0.1 * var(--shadow-boost, 1))), 0 -1px 0 var(--border, #e3e9ee);
+  box-shadow:
+    0 1px 3px
+      rgba(var(--shadow-rgb, 15, 23, 42), calc(0.1 * var(--shadow-boost, 1))),
+    0 -1px 0 var(--border, #e3e9ee);
 }
 
 .threadRow:hover {

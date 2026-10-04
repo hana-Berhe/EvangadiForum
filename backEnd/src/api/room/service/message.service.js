@@ -9,7 +9,7 @@ const PAGE_SIZE = 50;
 
 const MESSAGE_SELECT = `
   SELECT g.message_id, g.content, g.created_at,
-         u.user_id, u.first_name, u.last_name
+        u.user_id, u.first_name, u.last_name, u.avatar
   FROM room_messages g
   JOIN users u ON u.user_id = g.user_id`;
 
@@ -21,6 +21,7 @@ const toMessage = (row) => ({
     id: row.user_id,
     firstName: row.first_name,
     lastName: row.last_name,
+    avatar: row.avatar ?? null,
   },
 });
 

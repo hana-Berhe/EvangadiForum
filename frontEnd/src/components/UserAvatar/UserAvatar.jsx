@@ -1,20 +1,17 @@
+import { useState } from "react";
 import styles from "./UserAvatar.module.css";
 
-// Soft background + darker initials of the same color family.
-// Every pair is checked for readable contrast.
 const COLORS = [
-  { background: "#ede4ff", color: "#6b3fc4" }, // purple
-  { background: "#d9e8ff", color: "#1f5fbf" }, // blue
-  { background: "#dcf5e3", color: "#1f7a3d" }, // green
-  { background: "#ffe4d1", color: "#b04508" }, // orange
-  { background: "#ffdfe9", color: "#c0396b" }, // pink
-  { background: "#d5f3f1", color: "#0f766e" }, // teal
-  { background: "#fff1c9", color: "#8a6100" }, // yellow
-  { background: "#ffe0dd", color: "#b3362b" }, // red
+  { background: "#ede4ff", color: "#6b3fc4" },
+  { background: "#d9e8ff", color: "#1f5fbf" },
+  { background: "#dcf5e3", color: "#1f7a3d" },
+  { background: "#ffe4d1", color: "#b04508" },
+  { background: "#ffdfe9", color: "#c0396b" },
+  { background: "#d5f3f1", color: "#0f766e" },
+  { background: "#fff1c9", color: "#8a6100" },
+  { background: "#ffe0dd", color: "#b3362b" },
 ];
 
-// The color comes from the user id, so one person has the same color in
-// every room and on every page. Without an id, the name decides.
 function colorFor(person) {
   const id = Number(person?.id);
   if (Number.isInteger(id) && id > 0) return COLORS[id % COLORS.length];
@@ -30,18 +27,44 @@ function initialsOf(person) {
   return `${first}${last}`.toUpperCase() || "?";
 }
 
-/**
- * A round avatar with two initials.
- * @param {{ person: { id?: number, firstName?: string, lastName?: string },
- *           size?: "small" | "nav" | "thread" | "medium" | "large" }} props
- */
+function resolveAvatarUrl(avatar) {
+  if (!avatar || typeof avatar !== "string") return null;
+  const trimmed = avatar.trim();
+  if (!trimmed) return null;
+
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")) {
+    return trimmed;
+  }
+
+  if (trimmed.startsWith("/")) {
+    const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+    const origin = apiBase.replace(/\/api$/, "");
+    return `${origin}${trimmed}`;
+  }
+
+  return trimmed;
+}
+
 export default function UserAvatar({ person, size = "medium" }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const avatarUrl = resolveAvatarUrl(person?.avatar);
+
+  if (avatarUrl && !imageFailed) {
+    return (
+      <img
+        src={avatarUrl}
+        alt=""
+        className={`${styles.avatar} ${styles[size] ?? styles.medium}`}
+        style={{ objectFit: "cover" }}
+        onError={() => setImageFailed(true)}
+      />
+    );
+  }
+
   return (
     <span
       className={`${styles.avatar} ${styles[size] ?? styles.medium}`}
       style={colorFor(person)}
-      // The name is already written next to the avatar, so a screen reader
-      // does not need to read the initials too.
       aria-hidden="true"
     >
       {initialsOf(person)}

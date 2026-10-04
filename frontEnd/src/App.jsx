@@ -12,6 +12,7 @@ import MyQuestions from "./pages/MyQuestions/MyQuestions";
 import RagDocuments from "./pages/RagDocuments/RagDocuments";
 import Rooms from "./pages/Rooms/Rooms";
 import RoomDetail from "./pages/RoomDetail/RoomDetail";
+import Profile from "./pages/Profile/Profile";
 
 import NotFound from "./pages/NotFound/NotFound";
 
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/rag-documents" element={<RagDocuments />} />
           <Route path="/rooms" element={<Rooms />} />
           <Route path="/rooms/:roomId" element={<RoomDetail />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>
 

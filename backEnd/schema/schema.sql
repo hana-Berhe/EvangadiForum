@@ -13,6 +13,8 @@ CREATE TABLE `users` (
     `first_name` VARCHAR(50) NOT NULL,
     `last_name` VARCHAR(50) NOT NULL,
     `email` VARCHAR(320) NOT NULL UNIQUE,
+    `bio` TEXT NULL,
+    `avatar` VARCHAR(255) NULL,
     `password_hash` VARCHAR(255) NOT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

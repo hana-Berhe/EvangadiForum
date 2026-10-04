@@ -26,7 +26,13 @@ function readStoredUser() {
       localStorage.getItem("token"),
     );
 
-    return { id, firstName, lastName };
+    return {
+      id,
+      firstName,
+      lastName,
+      email: "",
+      avatar: null,
+    };
   } catch {
     return null;
   }
@@ -105,6 +111,8 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
+
+      updateUser,
     }),
 
     [user, isAuthenticated, sessionExpired],

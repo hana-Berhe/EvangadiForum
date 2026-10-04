@@ -276,6 +276,10 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  function updateUser(updatedUser) {
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  }
   // ====================================================
   // useEffect()
   // ====================================================
@@ -342,6 +346,8 @@ export function AuthProvider({ children }) {
 
       // Logout function
       logout,
+
+      updateUser,
     }),
 
     // Re-create the value when these values change

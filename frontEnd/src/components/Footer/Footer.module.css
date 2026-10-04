@@ -6,7 +6,10 @@
 
 .siteFooter {
   width: 100%;
-  background: linear-gradient(var(--surface-soft, #f1f5f9), var(--surface, #fff) 42px);
+  background: linear-gradient(
+    var(--surface-soft, #f1f5f9),
+    var(--surface, #fff) 42px
+  );
   border-top: 1px solid var(--border, #e1e7ed);
   /* Right side: room for the floating AI chat button (56px + its 22px gap),
      so it never covers the last footer link. */

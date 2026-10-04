@@ -5,7 +5,7 @@ class CustomAPIError extends Error {
     super(message);
   }
 }
-//users side 
+//users side
 class BadRequestError extends CustomAPIError {
   constructor(message) {
     super(message);

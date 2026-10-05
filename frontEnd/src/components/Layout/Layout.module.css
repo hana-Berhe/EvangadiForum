@@ -5,6 +5,11 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   background: var(--page, #f8fafc);
+  transition: grid-template-columns 0.22s ease;
+}
+
+.appLayout.sidebarCollapsed {
+  grid-template-columns: 72px 1fr;
 }
 
 .appMain {
@@ -21,6 +26,10 @@
 @media (max-width: 980px) {
   .appLayout {
     grid-template-columns: 200px 1fr;
+  }
+
+  .appLayout.sidebarCollapsed {
+    grid-template-columns: 72px 1fr;
   }
 }
 

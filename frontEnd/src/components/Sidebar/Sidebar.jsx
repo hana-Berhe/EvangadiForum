@@ -7,7 +7,7 @@ import UserAvatar from "../UserAvatar/UserAvatar";
 import styles from "./Sidebar.module.css";
 import ui from "../../styles/pageStates.module.css";
 
-export default function Sidebar() {
+export default function Sidebar({ isCollapsed, onToggle }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -17,14 +17,16 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className={styles.sidebar}>
+    <aside
+      className={`${styles.sidebar}${isCollapsed ? ` ${styles.collapsed}` : ""}`}
+    >
       <div>
         <NavLink to="/" className={styles.sidebarBrand}>
           <span className={`${ui.brandMark} ${styles.brandTile}`}>
             <MessageSquare size={20} />
           </span>
 
-          <span>
+          <span className={styles.brandText}>
             <strong>
               Evangadi <span className={styles.brandAccent}>Forum</span>
             </strong>
@@ -46,7 +48,7 @@ export default function Sidebar() {
             }
           >
             <Home size={18} />
-            Home
+            <span>Home</span>
           </NavLink>
 
           <NavLink
@@ -56,7 +58,7 @@ export default function Sidebar() {
             }
           >
             <MessageSquare size={18} />
-            Your Topics
+            <span>Your Topics</span>
           </NavLink>
 
           <NavLink
@@ -66,7 +68,7 @@ export default function Sidebar() {
             }
           >
             <BookOpen size={18} />
-            Knowledge Base
+            <span>Knowledge Base</span>
           </NavLink>
 
           <NavLink
@@ -76,7 +78,7 @@ export default function Sidebar() {
             }
           >
             <Users size={18} />
-            Rooms
+            <span>Rooms</span>
           </NavLink>
         </nav>
       </div>
@@ -84,12 +86,21 @@ export default function Sidebar() {
       <div className={styles.sidebarBottom}>
         <NavLink to="/questions/ask" className={styles.sidebarNew}>
           <Plus size={17} />
-          New Question
+          <span>New Question</span>
         </NavLink>
 
         <div className={styles.sidebarUser}>
           <div className={styles.userInfo}>
-            <UserAvatar person={user} size="nav" />
+            <button
+              type="button"
+              className={styles.avatarToggle}
+              onClick={onToggle}
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              aria-expanded={!isCollapsed}
+              title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              <UserAvatar person={user} size="nav" />
+            </button>
 
             <span className={styles.userText}>
               <strong>

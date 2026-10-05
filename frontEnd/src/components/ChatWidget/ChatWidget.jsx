@@ -37,7 +37,8 @@ const matchLabel = (score) => {
 const makeWelcome = (firstName) => ({
   role: "assistant",
   kind: "chat",
-  content: `Hi ${firstName || "there"}! Ask me about the questions and answers in the forum, or about your own PDFs. I answer only from those, and I show you my sources.`,
+  content: `Hi ${firstName || "there"}! 👋 I'm the Evangadi Forum assistant. Ask me about the questions and answers in the forum, or about your own PDFs. I answer only from those, and I show you my sources.`,
+  suggestions: SUGGESTIONS,
 });
 
 /** Text with the [1] or [1, 2] markers turned into small badges. */
@@ -104,13 +105,22 @@ function SourceChip({ source, showRef, onNavigate }) {
   );
 }
 
+/** The small round assistant picture, in the header and next to replies. */
+function BotAvatar() {
+  return (
+    <span className={styles.avatar} aria-hidden="true">
+      <Sparkles size={14} />
+    </span>
+  );
+}
+
 /**
  * Floating chat button and chat window. It is mounted once in Layout, so it
  * is on every page after login. The messages live in React state: closing the
  * window keeps them, and logging out removes them (Layout unmounts).
  *
  * The server sends a "kind" with every reply:
- *   chat     -> greeting, plain text
+ *   chat     -> small talk, with suggested next questions
  *   answer   -> answered, with source chips
  *   related  -> not answered, related threads + "Ask the community"
  *   notfound -> nothing in our data, "Ask the community"
@@ -152,12 +162,18 @@ export default function ChatWidget() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
-  async function send(event, preset) {
+  // retry=true sends the question again without adding it to the list twice.
+  async function send(event, preset, retry = false) {
     event?.preventDefault();
     const text = (preset ?? input).trim();
     if (text.length < MIN_MESSAGE_CHARS || busy) return;
 
-    setMessages((previous) => [...previous, { role: "user", content: text }]);
+    if (!retry) {
+      setMessages((previous) => [
+        ...previous,
+        { role: "user", content: text },
+      ]);
+    }
     setInput("");
     setBusy(true);
     try {
@@ -171,6 +187,7 @@ export default function ChatWidget() {
           content: data.answer || "",
           sources: data.sources || [],
           related: data.related || [],
+          suggestions: data.suggestions || [],
           asked: text,
         },
       ]);
@@ -184,11 +201,18 @@ export default function ChatWidget() {
             error,
             "Sorry, I could not answer right now.",
           ),
+          asked: text,
         },
       ]);
     } finally {
       setBusy(false);
     }
+  }
+
+  // The error bubble goes away and the same question is sent again.
+  function tryAgain(failed) {
+    setMessages((previous) => previous.filter((item) => item !== failed));
+    send(null, failed.asked, true);
   }
 
   function startOver() {
@@ -202,6 +226,13 @@ export default function ChatWidget() {
   }
 
   const close = () => setOpen(false);
+
+  // Suggested next questions: the ones sent with the newest reply.
+  const lastMessage = messages[messages.length - 1];
+  const suggestions =
+    !busy && lastMessage.role === "assistant"
+      ? lastMessage.suggestions || []
+      : [];
 
   return (
     <>
@@ -224,10 +255,13 @@ export default function ChatWidget() {
           aria-label="Forum assistant"
         >
           <header className={styles.header}>
-            <Sparkles size={18} />
+            <BotAvatar />
             <div>
-              <strong>Ask the forum</strong>
-              <small>Answers from threads and your own PDFs</small>
+              <strong>Evangadi Assistant</strong>
+              <small>
+                <span className={styles.statusDot} aria-hidden="true" />
+                Online · answers from the forum and your PDFs
+              </small>
             </div>
             <button
               type="button"
@@ -259,6 +293,7 @@ export default function ChatWidget() {
                   key={index}
                   className={`${styles.row} ${isUser ? styles.rowUser : styles.rowBot}`}
                 >
+                  {!isUser && <BotAvatar />}
                   <div
                     className={`${styles.msg} ${isUser ? styles.msgUser : styles.msgBot}${
                       message.kind === "error" ? ` ${styles.msgError}` : ""
@@ -268,6 +303,7 @@ export default function ChatWidget() {
 
                     {message.sources?.length > 0 && (
                       <div className={styles.sources}>
+                        <span className={styles.sourcesLabel}>Sources</span>
                         {message.sources.map((source) => (
                           <SourceChip
                             key={source.ref}
@@ -300,14 +336,24 @@ export default function ChatWidget() {
                         Ask the community →
                       </button>
                     )}
+
+                    {message.kind === "error" && message.asked && (
+                      <button
+                        type="button"
+                        className={styles.askBtn}
+                        onClick={() => tryAgain(message)}
+                      >
+                        Try again
+                      </button>
+                    )}
                   </div>
                 </div>
               );
             })}
 
-            {messages.length === 1 && !busy && (
+            {suggestions.length > 0 && (
               <div className={styles.suggestions}>
-                {SUGGESTIONS.map((question) => (
+                {suggestions.map((question) => (
                   <button
                     key={question}
                     type="button"
@@ -322,6 +368,7 @@ export default function ChatWidget() {
 
             {busy && (
               <div className={`${styles.row} ${styles.rowBot}`}>
+                <BotAvatar />
                 <div
                   className={`${styles.msg} ${styles.msgBot} ${styles.typing}`}
                   aria-label="The assistant is thinking"

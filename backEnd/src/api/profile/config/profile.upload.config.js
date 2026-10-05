@@ -9,7 +9,7 @@ import { BadRequestError } from "../../../utility/errors/errors.js";
 export const PROFILE_UPLOAD_DIR =
   process.env.PROFILE_UPLOAD_DIR || "uploads/profiles";
 export const PROFILE_MAX_UPLOAD_MB =
-  Number(process.env.PROFILE_MAX_UPLOAD_MB) || 1;
+  Number(process.env.PROFILE_MAX_UPLOAD_MB) || 2;
 
 // Store each user's uploaded image under a dedicated folder so files are isolated
 // by owner and old images can be safely removed when a profile is replaced.
@@ -47,7 +47,7 @@ export const profileUpload = multer({
       allowed
         ? null
         : new BadRequestError(
-            "Only JPG, PNG, and WebP images are allowed. Maximum size is 1MB.",
+            "Only JPG, PNG, and WebP images are allowed. Maximum size is 2MB.",
           ),
       allowed,
     );

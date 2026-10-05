@@ -103,6 +103,33 @@
   font-size: 0.75rem;
 }
 
+/* The assistant's round picture and the green "Online" dot. */
+.avatar {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--orange, #ff6b00);
+  color: #fff;
+}
+
+.header .avatar {
+  width: 34px;
+  height: 34px;
+}
+
+.statusDot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #22a45d;
+  vertical-align: 1px;
+}
+
 .iconBtn {
   border: 0;
   background: none;
@@ -141,6 +168,8 @@
 
 .rowBot {
   justify-content: flex-start;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 .msg {
@@ -256,6 +285,15 @@
   opacity: 0.75;
 }
 
+.sourcesLabel {
+  width: 100%;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted, #64748b);
+}
+
 .askBtn {
   margin-top: 8px;
   border: 1px solid var(--orange, #ff6b00);
@@ -276,7 +314,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 2px 4px 6px;
+  padding: 2px 4px 6px 36px;
 }
 
 .suggestion {

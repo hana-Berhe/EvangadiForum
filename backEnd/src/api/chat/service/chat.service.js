@@ -5,7 +5,7 @@
 //   - the PDFs of the user who is asking (never another user's)
 //
 // Steps for one message:
-//   1. A greeting gets a fixed reply. No AI call.
+//   1. Small talk (hi, thanks, who are you...) gets a fixed reply. No AI call.
 //   2. Turn the message into a vector (Gemini embedding, RETRIEVAL_QUERY).
 //   3. Read the ready vectors from MySQL: every question, and the PDF chunks
 //      of THIS user only. Score each one with cosine similarity in Node.
@@ -20,7 +20,7 @@
 //   8. Show only the sources the answer really cites as [n].
 //
 // The reply has a "kind":
-//   chat     -> greeting
+//   chat     -> small talk, with suggested next questions
 //   answer   -> answered, with sources
 //   related  -> not answered, but these threads are close
 //   notfound -> nothing in our data. The UI offers "Ask the community".
@@ -103,12 +103,118 @@ const NOT_FOUND_TEXT =
 const RELATED_TEXT =
   "I could not find a clear answer in the forum or in your PDFs. These threads look related:";
 
-const GREETING_PATTERN =
-  /^(hi|hi there|hello|hey|selam|good (morning|afternoon|evening)|thanks|thank you|thank u|ok|okay|bye)\b[\s!.,?]*$/i;
+// ---------- step 1: small talk ----------
+// Short social messages ("hi", "thank you", "who are you?") get a fixed,
+// friendly reply with no AI call, like the helpers on professional websites.
+// Each kind has a few replies, so the assistant does not repeat itself, and
+// a few suggested next questions, shown as buttons in the chat window.
+// A message only counts as small talk when it is ALL small talk:
+// "thanks, but what is JWT?" is a real question and goes to the search.
 
-function greetingReply(firstName) {
+const SMALL_TALK = [
+  {
+    kind: "greeting",
+    pattern:
+      /^(hi|hii+|hello|hey|hey there|hi there|hello there|selam|salam|good (morning|afternoon|evening))( (assistant|bot|there))?$/,
+    replies: [
+      (name) =>
+        `Hi${name}! 👋 I'm the Evangadi Forum assistant. Ask me anything about the forum's questions or your own PDFs, and I'll show you where my answer comes from.`,
+      (name) =>
+        `Hello${name}! What are you working on today? I can search the forum threads and your PDFs for you.`,
+    ],
+    suggestions: [
+      "What can you do?",
+      "How does JWT login work?",
+      "What is RAG?",
+    ],
+  },
+  {
+    kind: "howAreYou",
+    pattern:
+      /^((hi|hello|hey) )?(how are you|how r u|how are u|how is it going|hows it going|how do you do|whats up|what is up|sup)( today)?$/,
+    replies: [
+      (name) =>
+        `I'm doing great, thanks for asking${name}! Ready to help. What would you like to know?`,
+      () =>
+        "All good here, and ready to dig through the forum for you. What's your question?",
+    ],
+    suggestions: ["What can you do?", "What is Node.js?"],
+  },
+  {
+    kind: "about",
+    pattern:
+      /^(who are you|what are you|what can you do|what do you do|how do you work|how can you help( me)?|help|help me|what should i ask( you)?)$/,
+    replies: [
+      () =>
+        "I'm the Evangadi Forum assistant. I answer questions using two things only: the questions and answers in this forum, and the PDFs you uploaded to your Knowledge Base. Every answer shows its sources, so you can check them. If I can't find something, I'll tell you honestly and help you ask the community.",
+    ],
+    suggestions: [
+      "How does JWT login work?",
+      "What is RAG?",
+      "What is Evangadi Forum?",
+    ],
+  },
+  {
+    kind: "thanks",
+    pattern:
+      /^((ok|okay|great|perfect|nice|cool|awesome) )?(thanks|thank you|thank u|thanks a lot|thank you so much|thanks so much|thx|ty|many thanks|appreciate it|i appreciate it)( (a lot|so much|very much))?( (assistant|bot))?$/,
+    replies: [
+      (name) => `You're welcome${name}! 😊 Anything else I can help with?`,
+      () => "Happy to help! Ask me anything else whenever you need.",
+      () => "Anytime! Good luck with your learning.",
+    ],
+    suggestions: ["What can you do?", "What is RAG?"],
+  },
+  {
+    kind: "acknowledge",
+    pattern:
+      /^(ok|okay|ok cool|okay cool|cool|great|nice|perfect|awesome|got it|i see|alright|all right|makes sense|understood)$/,
+    replies: [
+      () => "Great! Is there anything else you'd like to know?",
+      () => "👍 Let me know if you have another question.",
+    ],
+    suggestions: ["What can you do?", "What is Node.js?"],
+  },
+  {
+    kind: "bye",
+    pattern:
+      /^((ok|okay|thanks|thank you) )?(bye|bye bye|goodbye|good bye|see you|see ya|see you later|good night|have a nice day)$/,
+    replies: [
+      (name) => `Bye${name}! 👋 Come back anytime you get stuck.`,
+      (name) => `See you${name}! Good luck with your project.`,
+    ],
+    suggestions: [],
+  },
+];
+
+// "Thank you!!" -> "thank you", "Hi, there 😊" -> "hi there".
+function normalizeSmallTalk(message) {
+  return message
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/[^a-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const pickOne = (list) => list[Math.floor(Math.random() * list.length)];
+
+/**
+ * A fixed reply for small talk, or null for a real question.
+ * @param {string} message
+ * @param {string} [firstName]
+ * @returns {{ kind: string; text: string; suggestions: string[] } | null}
+ */
+function smallTalkReply(message, firstName) {
+  const text = normalizeSmallTalk(message);
+  const match = SMALL_TALK.find((entry) => entry.pattern.test(text));
+  if (!match) return null;
   const name = firstName ? ` ${firstName}` : "";
-  return `Hi${name}! Ask me about anything in the forum or in your own PDFs. I answer only from those, and I show you my sources.`;
+  return {
+    kind: match.kind,
+    text: pickOne(match.replies)(name),
+    suggestions: match.suggestions,
+  };
 }
 
 // ---------- step 3: score the vectors stored in MySQL ----------
@@ -357,9 +463,12 @@ const reply = (kind, answer, extra = {}) => ({
  * @returns {Promise<{ kind: string; answer: string; grounded: boolean; sources: Array<Object>; related: Array<Object> }>}
  */
 export const chatService = async ({ userId, firstName, message }) => {
-  // 1. Greeting: fixed reply, no AI call.
-  if (GREETING_PATTERN.test(message.trim())) {
-    return reply("chat", greetingReply(firstName));
+  // 1. Small talk: fixed reply, no AI call.
+  const smallTalk = smallTalkReply(message, firstName);
+  if (smallTalk) {
+    return reply("chat", smallTalk.text, {
+      suggestions: smallTalk.suggestions,
+    });
   }
 
   // 2. Message -> vector, the same way as semantic search.
@@ -437,5 +546,5 @@ export {
   extractKeywords,
   pickBestCandidates,
   buildThreadText,
-  GREETING_PATTERN,
+  smallTalkReply,
 };

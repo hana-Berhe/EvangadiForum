@@ -203,6 +203,15 @@ npm run seed
 
 Adds 3 users, 21 questions and 22 answers through the same services the API uses, including FAQ threads the AI chat assistant can answer from. It only adds rows, and it stops if the sample users already exist. Log in with `sara.seed@example.com` and the password `Evangadi123`.
 
+To add the "How do I use the forum?" FAQ threads the AI chat assistant answers from, run:
+
+```bash
+cd backEnd
+npm run seed:faq
+```
+
+It is independent of `npm run seed`: it also works on a database that already has data, and it skips threads that are already there.
+
 ### 7. Run the Backend
 
 ```bash

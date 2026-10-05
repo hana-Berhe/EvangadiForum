@@ -3,13 +3,19 @@ import { BookOpen, Home, LogOut, MessageSquare, Plus } from "lucide-react";
 import { Users } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../context/ProfileContext";
 import UserAvatar from "../UserAvatar/UserAvatar";
 import styles from "./Sidebar.module.css";
 import ui from "../../styles/pageStates.module.css";
 
 export default function Sidebar({ isCollapsed, onToggle }) {
   const { user, logout } = useAuth();
+  const { profile } = useProfile();
   const navigate = useNavigate();
+  const displayUser =
+    profile && Number(profile.id) === Number(user?.id)
+      ? { ...user, ...profile }
+      : user;
 
   function onLogout() {
     logout();
@@ -21,10 +27,10 @@ export default function Sidebar({ isCollapsed, onToggle }) {
       className={`${styles.sidebar}${isCollapsed ? ` ${styles.collapsed}` : ""}`}
     >
       <div>
-        <NavLink to="/" className={styles.sidebarBrand}>
-          <span className={`${ui.brandMark} ${styles.brandTile}`}>
+        <nav className={styles.sidebarBrand}>
+          <NavLink to="/" className={`${ui.brandMark} ${styles.brandTile}`}>
             <MessageSquare size={20} />
-          </span>
+          </NavLink>
 
           <span className={styles.brandText}>
             <strong>
@@ -36,7 +42,7 @@ export default function Sidebar({ isCollapsed, onToggle }) {
               Ask with context.
             </small>
           </span>
-        </NavLink>
+        </nav>
 
         <div className={styles.sidebarSectionLabel}>Navigate</div>
 
@@ -99,12 +105,12 @@ export default function Sidebar({ isCollapsed, onToggle }) {
               aria-expanded={!isCollapsed}
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <UserAvatar person={user} size="nav" />
+              <UserAvatar person={displayUser} size="nav" />
             </button>
 
             <span className={styles.userText}>
               <strong>
-                {user.firstName} {user.lastName}
+                {displayUser.firstName} {displayUser.lastName}
               </strong>
 
               <small>Learner</small>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../context/ProfileContext";
 import { getUserProfile, updateUserProfile } from "../../api/profile.api";
 import UserAvatar from "../../components/UserAvatar/UserAvatar";
 import styles from "./Profile.module.css";
@@ -16,7 +17,11 @@ function getAvatarPreviewUrl(avatar) {
   const base = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
   const origin = base.replace(/\/api$/, "");
 
-  if (avatar.startsWith("http://") || avatar.startsWith("https://") || avatar.startsWith("data:")) {
+  if (
+    avatar.startsWith("http://") ||
+    avatar.startsWith("https://") ||
+    avatar.startsWith("data:")
+  ) {
     return avatar;
   }
 
@@ -28,7 +33,8 @@ function getAvatarPreviewUrl(avatar) {
 }
 
 export default function Profile() {
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
+  const { setProfile: setSharedProfile } = useProfile();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState(emptyForm());
@@ -56,6 +62,7 @@ export default function Profile() {
         if (!isMounted) return;
 
         setProfile(nextProfile);
+        setSharedProfile(nextProfile);
         setForm(emptyForm(nextProfile));
         setPreviewUrl(getAvatarPreviewUrl(nextProfile?.avatar));
       } catch (err) {
@@ -76,7 +83,7 @@ export default function Profile() {
     return () => {
       isMounted = false;
     };
-  }, [navigate, user]);
+  }, [navigate, setSharedProfile, user]);
 
   function handleInputChange(event) {
     const { name, value } = event.target;
@@ -146,7 +153,7 @@ export default function Profile() {
       const response = await updateUserProfile(user.id, payload);
       const nextProfile = response.data?.data ?? response.data;
 
-      updateUser(nextProfile);
+      setSharedProfile(nextProfile);
 
       setProfile(nextProfile);
       setForm(emptyForm(nextProfile));

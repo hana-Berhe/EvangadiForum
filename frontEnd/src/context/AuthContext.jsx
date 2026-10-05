@@ -31,7 +31,6 @@ function readStoredUser() {
       firstName,
       lastName,
       email: "",
-      avatar: null,
     };
   } catch {
     return null;
@@ -92,11 +91,6 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
-  function updateUser(updatedUser) {
-    setUser(updatedUser);
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-  }
-
   useEffect(() => {
     function handleSessionExpired() {
       clearStoredSession();
@@ -116,7 +110,6 @@ export function AuthProvider({ children }) {
       login,
       register,
       logout,
-      updateUser,
     }),
 
     [user, isAuthenticated, sessionExpired],

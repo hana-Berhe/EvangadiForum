@@ -2,6 +2,7 @@ import { LogOut, Moon, Search, Sun } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../context/ProfileContext";
 import UserAvatar from "../UserAvatar/UserAvatar";
 import btn from "../../styles/buttons.module.css";
 import styles from "./Navbar.module.css";
@@ -31,7 +32,12 @@ export default function Navbar() {
   const { pathname } = useLocation(),
     navigate = useNavigate(),
     { user, logout } = useAuth(),
+    { profile } = useProfile(),
     [search, setSearch] = useState("");
+  const displayUser =
+    profile && Number(profile.id) === Number(user?.id)
+      ? { ...user, ...profile }
+      : user;
   // index.html applies the saved theme before React mounts; start from it.
   const [theme, setTheme] = useState(() =>
     document.documentElement.dataset.theme === "dark" ? "dark" : "light",
@@ -81,7 +87,7 @@ export default function Navbar() {
       )}
       <div className={styles.navbarUser}>
         <strong>
-          {user.firstName} {user.lastName}
+          {displayUser.firstName} {displayUser.lastName}
         </strong>
         <button
           type="button"
@@ -89,7 +95,7 @@ export default function Navbar() {
           onClick={() => navigate("/profile")}
           aria-label="Navigate to user profile"
         >
-          <UserAvatar person={user} size="nav" />
+          <UserAvatar person={displayUser} size="nav" />
         </button>
         <button
           type="button"

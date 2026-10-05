@@ -143,7 +143,7 @@ export const updateUserProfileService = async ({
       lastName: updatedProfile.lastName,
     },
     JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || "5M" },
+    { expiresIn: process.env.JWT_EXPIRES_IN || "1d" },
   );
 
   return {

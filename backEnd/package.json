@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "test": "node --test",
     "seed": "node schema/seed.js",
     "measure": "node schema/measure-related.js",
     "reembed": "node schema/reembed.js",

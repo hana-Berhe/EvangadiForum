@@ -7,6 +7,7 @@ import cors from "cors";
 import { db } from "./schema/db.config.js";
 import { mainRouter } from "./src/mainRoutes.js";
 import { errorHandler, notFound } from "./src/middleware/error-handler.js";
+import { PROFILE_UPLOAD_DIR } from "./src/api/profile/config/profile.upload.config.js";
 
 const app = express();
 
@@ -14,7 +15,10 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use("/uploads", express.static("uploads"));
+// Only profile photos are public. Users' PDFs (uploads/rag) are NOT served
+// here; they are only reachable through GET /api/rag/documents/:id/file,
+// which checks that the document belongs to the logged-in user.
+app.use("/uploads/profiles", express.static(PROFILE_UPLOAD_DIR));
 
 //Main api
 app.use("/api", mainRouter);

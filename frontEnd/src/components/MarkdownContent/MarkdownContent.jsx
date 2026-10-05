@@ -56,6 +56,21 @@ export default function MarkdownContent({ children = "" }) {
       continue;
     }
 
+    // Headings: "# Title" ... "###### Title".
+    // Shifted down two levels ("#" -> <h3>) so a post's headings never
+    // compete with the page's own title.
+    const heading = line.match(/^\s*(#{1,6})\s+(.*)$/);
+    if (heading) {
+      const Tag = `h${Math.min(heading[1].length + 2, 6)}`;
+      nodes.push(
+        <Tag key={`h-${index}`}>
+          {parseInline(heading[2].trim(), `h-${index}`)}
+        </Tag>,
+      );
+      index += 1;
+      continue;
+    }
+
     if (/^\s*[-*]\s+/.test(line)) {
       const items = [];
       while (index < lines.length && /^\s*[-*]\s+/.test(lines[index])) {
@@ -123,7 +138,8 @@ export default function MarkdownContent({ children = "" }) {
       !lines[index].trim().startsWith("```") &&
       !/^\s*[-*]\s+/.test(lines[index]) &&
       !/^\s*\d+\.\s+/.test(lines[index]) &&
-      !/^\s*>\s?/.test(lines[index])
+      !/^\s*>\s?/.test(lines[index]) &&
+      !/^\s*#{1,6}\s+/.test(lines[index])
     ) {
       paragraph.push(lines[index]);
       index += 1;

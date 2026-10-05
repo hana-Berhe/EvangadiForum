@@ -3,6 +3,7 @@ import {
   Bold,
   Code2,
   Eye,
+  Heading2,
   Italic,
   Link as LinkIcon,
   List,
@@ -157,6 +158,9 @@ export default function MarkdownEditor({
           )}
           {toolbarButton("Code", <Code2 size={16} />, applyCode)}
           {toolbarButton("Link", <LinkIcon size={16} />, applyLink)}
+          {toolbarButton("Heading", <Heading2 size={16} />, () =>
+            applyPrefix(() => "## "),
+          )}
           {toolbarButton("Bulleted list", <List size={16} />, () =>
             applyPrefix(() => "- "),
           )}

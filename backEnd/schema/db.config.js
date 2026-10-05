@@ -4,10 +4,15 @@ dotenv.config();
 
 const db = mysql.createPool({
   host: process.env.DB_HOST,
+  // Cloud databases (Aiven, TiDB...) use their own port. Locally: 3306.
+  port: Number(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   charset: "utf8mb4",
+  // Cloud databases require an encrypted connection. Set DB_SSL=true there.
+  // Locally it stays off, exactly as before.
+  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : undefined,
 });
 
 const ensureParams = (params) => {

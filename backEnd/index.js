@@ -11,6 +11,11 @@ import { PROFILE_UPLOAD_DIR } from "./src/api/profile/config/profile.upload.conf
 
 const app = express();
 
+// When deployed (Render, Railway, Vercel, Nginx...), requests reach this app
+// through a proxy. This makes req.ip the visitor's real IP instead of the
+// proxy's, so the login rate limit counts each visitor separately.
+app.set("trust proxy", 1);
+
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

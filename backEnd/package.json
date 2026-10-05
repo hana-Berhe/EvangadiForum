@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "migrate": "node schema/migrate.js",
+    "backfill-tags": "node schema/backfill-tags.js",
     "seed": "node schema/seed.js",
     "seed:faq": "node schema/seed-faq.js",
     "measure": "node schema/measure-related.js",

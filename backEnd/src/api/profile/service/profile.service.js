@@ -45,7 +45,7 @@ export const getUserProfileService = async (requestedUserId, currentUserId) => {
 
   const rows = await safeExecute(
     `SELECT user_id, first_name, last_name, email, bio, avatar
-       FROM users
+      FROM users
       WHERE user_id = ?
       LIMIT 1`,
     [requestedUserId],
@@ -143,7 +143,7 @@ export const updateUserProfileService = async ({
       lastName: updatedProfile.lastName,
     },
     JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || "1d" },
+    { expiresIn: process.env.JWT_EXPIRES_IN || "5M" },
   );
 
   return {

@@ -96,8 +96,8 @@ export default function Profile() {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Please choose an image smaller than 5MB.");
+    if (file.size > 2 * 1024 * 1024) {
+      setError("Please choose an image smaller than 2MB.");
       return;
     }
 
@@ -239,13 +239,6 @@ export default function Profile() {
                 <span className={styles.label}>Bio</span>
                 <strong>{profile.bio || "No bio provided."}</strong>
               </div>
-              <div className={styles.fullWidth}>
-                <span className={styles.label}>Profile Picture</span>
-                <div className={styles.avatarSummary}>
-                  <UserAvatar person={profile} size="small" />
-                  <strong>{profile.avatar ? "Image uploaded" : "Using initials"}</strong>
-                </div>
-              </div>
             </div>
           </>
         ) : (
@@ -332,7 +325,7 @@ export default function Profile() {
                     onChange={handleFileChange}
                     className={styles.fileInput}
                   />
-                  <p>JPG, PNG, or WebP • up to 5MB</p>
+                  <p>JPG, PNG, or WebP • up to 2MB</p>
                 </div>
               </div>
             </div>

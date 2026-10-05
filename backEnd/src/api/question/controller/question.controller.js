@@ -46,6 +46,7 @@ const getQuestionsController = async (req, res, next) => {
     const filters = {
       search: req.query.search,
       mine: req.query.mine,
+      tag: req.query.tag,
       userId: req.user.id, // Pass the authenticated user's ID
     };
 

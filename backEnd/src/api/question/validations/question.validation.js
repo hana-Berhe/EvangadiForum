@@ -1,5 +1,8 @@
 import { body, param, query } from "express-validator";
 import { validationErrorHandler } from "../../../middleware/validation-handler.js";
+import { QUESTION_TAGS } from "../constants/question-tags.js";
+
+const QUESTION_TAG_NAMES = QUESTION_TAGS.map(({ name }) => name);
 
 // here is unfinished code,
 /** Same body rules as posting a question — AI coach only reads draft text. */
@@ -15,6 +18,13 @@ const getQuestionsValidation = [
     .isBoolean()
     .withMessage("Mine must be a boolean")
     .toBoolean(),
+  query("tag")
+    .optional()
+    .isString()
+    .withMessage("Tag must be a string")
+    .bail()
+    .isIn(QUESTION_TAG_NAMES)
+    .withMessage("Tag must be one of the supported question tags."),
   validationErrorHandler,
 ];
 

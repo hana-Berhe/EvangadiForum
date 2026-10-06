@@ -1,5 +1,36 @@
 # Evangadi Forum
 
+## 🌐 Live demo
+
+**Website:** https://evangadi-forum-xi-jade.vercel.app
+
+Create your own account, or log in with a sample learner:
+
+| Email                   | Password      |
+| ----------------------- | ------------- |
+| `sara.seed@example.com` | `Evangadi123` |
+
+> The backend runs on a free server that sleeps after 15 minutes without
+> visitors. The first request after that can take up to 50 seconds.
+
+### How it is deployed
+
+| Part                         | Hosting       | Notes                                                   |
+| ---------------------------- | ------------- | ------------------------------------------------------- |
+| Frontend (React + Vite)      | Vercel        | Rebuilds automatically when `main` changes              |
+| Backend (Node + Express)     | Render        | Rebuilds automatically when `backEnd` changes on `main` |
+| Database (MySQL)             | Aiven         | Created from `backEnd/schema/schema.sql`                |
+| AI (embeddings, coach, chat) | Google Gemini |                                                         |
+
+Profile photos are stored in MySQL, so they survive server restarts.
+
+## ✅ Running the tests
+
+```bash
+cd backEnd && npm test    # 52 tests: chunking, AI JSON parsing, rate limits, tags, avatar checks
+cd frontEnd && npm test   # 17 tests: Markdown rendering and safety, API address handling
+```
+
 Evangadi Forum is a developer Q&A platform where users can register, log in, ask programming questions, share answers, search for related discussions, ask questions about their own PDFs, chat with an AI assistant that answers from the forum, talk in discussion rooms, and learn from the community.
 
 The project is organized into milestones so each major stage can be developed, tested, reviewed, and deployed incrementally.

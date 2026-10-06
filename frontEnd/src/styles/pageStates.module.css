@@ -374,3 +374,10 @@ a {
 .tagRow {
   margin: 2px 0 14px;
 }
+
+
+@media (max-width: 480px) {
+  .tagBadge {
+    display: none;
+  }
+}

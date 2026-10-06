@@ -1,5 +1,6 @@
 import { useState } from "react";
 import styles from "./UserAvatar.module.css";
+import { API_ORIGIN } from "../../api/config.js";
 
 const COLORS = [
   { background: "#ede4ff", color: "#6b3fc4" },
@@ -37,9 +38,7 @@ function resolveAvatarUrl(avatar) {
   }
 
   if (trimmed.startsWith("/")) {
-    const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
-    const origin = apiBase.replace(/\/api$/, "");
-    return `${origin}${trimmed}`;
+    return `${API_ORIGIN}${trimmed}`;
   }
 
   return trimmed;

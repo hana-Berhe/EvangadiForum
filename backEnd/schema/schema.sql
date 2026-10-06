@@ -24,6 +24,23 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -----------------------------------------------------------------------------
+-- 1b. User Avatars Table
+-- Profile photos are stored in the database, not on the server's disk, so they
+-- survive server restarts and redeploys (Render's free disk is wiped on every
+-- restart). users.avatar holds the URL that serves the image:
+-- /api/users/:id/avatar?v=<timestamp>
+-- -----------------------------------------------------------------------------
+DROP TABLE IF EXISTS `user_avatars`;
+CREATE TABLE `user_avatars` (
+    `user_id` INT PRIMARY KEY,
+    `mime_type` VARCHAR(30) NOT NULL,
+    `image` MEDIUMBLOB NOT NULL, -- up to 16 MB; uploads are capped at 2 MB
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
 -- 2. Questions Table
 -- Stores the main questions posted by users.
 -- Supports full-text search on title and content for exact match search.
@@ -35,6 +52,7 @@ CREATE TABLE `questions` (
     `user_id` INT NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `content` TEXT NOT NULL, -- Detailed content including code sections
+    `tag` VARCHAR(50) NULL, -- Topic chosen by the AI ("react", "database", ...)
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CHECK (CHAR_LENGTH(`title`) >= 5),
@@ -44,6 +62,7 @@ CREATE TABLE `questions` (
     
     INDEX `idx_questions_user_id` (`user_id`),
     INDEX `idx_questions_created_at` (`created_at`),
+    INDEX `idx_questions_tag` (`tag`),
     
     -- Full-text search index for exact match search mode
     FULLTEXT KEY `ft_questions_search` (`title`, `content`)

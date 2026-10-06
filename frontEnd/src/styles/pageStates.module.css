@@ -353,3 +353,24 @@ a {
 .replyEdit .editorShell {
   margin-top: 12px;
 }
+
+/* Topic tag on a question ("react", "database", ...). Set automatically by the
+   AI when the question is posted. */
+.tagBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--tint-blue-border, #bfdbfe);
+  background: var(--tint-blue, #eff6ff);
+  color: var(--info-text, #1d4ed8);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* Space around the tag under a question's title. */
+.tagRow {
+  margin: 2px 0 14px;
+}

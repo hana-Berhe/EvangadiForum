@@ -26,6 +26,12 @@ export default function QuestionCard({ question, yours = false }) {
         <p>{question.content}</p>
 
         <div className={styles.threadMeta}>
+          {question.tag && (
+            <span className={ui.tagBadge} title="Topic">
+              {question.tag}
+            </span>
+          )}
+
           <span>
             <MessageSquare size={13} /> {question.answerCount} replies
           </span>

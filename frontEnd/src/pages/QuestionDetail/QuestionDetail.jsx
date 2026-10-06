@@ -472,6 +472,14 @@ export default function QuestionDetail() {
               <>
                 <h1>{question.title}</h1>
 
+                {question.tag && (
+                  <div className={ui.tagRow}>
+                    <span className={ui.tagBadge} title="Topic">
+                      {question.tag}
+                    </span>
+                  </div>
+                )}
+
                 <div
                   className={`${styles.discussionContent} ${ui.proseContent}`}
                 >

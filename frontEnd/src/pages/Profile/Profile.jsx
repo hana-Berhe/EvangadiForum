@@ -5,6 +5,7 @@ import { useProfile } from "../../context/ProfileContext";
 import { getUserProfile, updateUserProfile } from "../../api/profile.api";
 import UserAvatar from "../../components/UserAvatar/UserAvatar";
 import styles from "./Profile.module.css";
+import { API_ORIGIN } from "../../api/config.js";
 
 const emptyForm = (profile = {}) => ({
   firstName: profile.firstName ?? "",
@@ -14,8 +15,7 @@ const emptyForm = (profile = {}) => ({
 
 function getAvatarPreviewUrl(avatar) {
   if (!avatar) return null;
-  const base = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
-  const origin = base.replace(/\/api$/, "");
+  const origin = API_ORIGIN;
 
   if (
     avatar.startsWith("http://") ||

@@ -1,6 +1,4 @@
-import fs from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
 import multer from "multer";
 import { BadRequestError } from "../../../utility/errors/errors.js";
 
@@ -11,21 +9,10 @@ export const PROFILE_UPLOAD_DIR =
 export const PROFILE_MAX_UPLOAD_MB =
   Number(process.env.PROFILE_MAX_UPLOAD_MB) || 2;
 
-// Store each user's uploaded image under a dedicated folder so files are isolated
-// by owner and old images can be safely removed when a profile is replaced.
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    const dir = path.resolve(PROFILE_UPLOAD_DIR, String(req.user.id));
-    fs.mkdir(dir, { recursive: true }, (error) => cb(error, dir));
-  },
-  filename(req, file, cb) {
-    const extension = path.extname(file.originalname || ".jpg").toLowerCase();
-    // Use a timestamp + random suffix so users can re-upload without collisions and
-    // no server-generated name leaks the original filename.
-    const fileName = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}${extension}`;
-    cb(null, fileName);
-  },
-});
+// Keep the uploaded image in memory: the service saves it in MySQL
+// (user_avatars), not on disk. A server's disk on free hosting (Render) is
+// wiped on every restart, so files saved there would disappear.
+const storage = multer.memoryStorage();
 
 // Profile uploads are intentionally restricted to a single image file with strict
 // size and MIME limits to keep the profile feature safe and predictable.

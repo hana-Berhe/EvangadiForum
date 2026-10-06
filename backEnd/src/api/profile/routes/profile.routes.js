@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getAvatarImageController,
   getUserProfileController,
   updateUserProfileController,
 } from "../controller/profile.controller.js";
@@ -14,6 +15,13 @@ import {
 } from "../config/profile.upload.config.js";
 
 const profileRouter = express.Router();
+
+/**
+ * @route GET /api/users/:id/avatar
+ * @desc The user's profile photo (stored in MySQL)
+ * @access Public, so <img> tags can load it
+ */
+profileRouter.get("/:id/avatar", profileIdValidation, getAvatarImageController);
 
 profileRouter.get(
   "/:id",

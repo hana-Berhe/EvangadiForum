@@ -25,6 +25,31 @@ const formatProfile = (user) => ({
   avatar: user.avatar ?? null,
 });
 
+// The first bytes of a file show its real type, whatever its name or the
+// browser claims. Avatars are served from the API, so only real images are
+// accepted: a renamed HTML or script file is rejected here.
+export const detectImageType = (buffer) => {
+  if (!buffer || buffer.length < 12) return null;
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return "image/jpeg";
+  }
+  if (
+    buffer[0] === 0x89 &&
+    buffer.toString("ascii", 1, 4) === "PNG" &&
+    buffer[4] === 0x0d &&
+    buffer[5] === 0x0a
+  ) {
+    return "image/png";
+  }
+  if (
+    buffer.toString("ascii", 0, 4) === "RIFF" &&
+    buffer.toString("ascii", 8, 12) === "WEBP"
+  ) {
+    return "image/webp";
+  }
+  return null;
+};
+
 const ensureOwnProfile = (requestedUserId, currentUserId) => {
   if (Number(requestedUserId) !== Number(currentUserId)) {
     throw new ForbiddenError("You can only access your own profile.");
@@ -104,12 +129,26 @@ export const updateUserProfileService = async ({
   let nextAvatar = previousAvatar;
 
   if (file) {
-    const relativePath = path
-      .relative(path.resolve("uploads/profiles"), file.path)
-      .replace(/\\/g, "/");
+    const mimeType = detectImageType(file.buffer);
+    if (!mimeType) {
+      throw new BadRequestError(
+        "This file is not a valid JPG, PNG, or WebP image.",
+      );
+    }
 
-    nextAvatar = `/uploads/profiles/${relativePath}`;
+    // Saved in MySQL so the photo survives server restarts (see schema.sql).
+    await safeExecute(
+      `INSERT INTO user_avatars (user_id, mime_type, image)
+       VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE mime_type = VALUES(mime_type), image = VALUES(image)`,
+      [requestedUserId, mimeType, file.buffer],
+    );
 
+    // ?v= changes on every upload, so browsers show the new photo instead of
+    // a cached old one.
+    nextAvatar = `/api/users/${Number(requestedUserId)}/avatar?v=${Date.now()}`;
+
+    // Photos from before this change were files on disk: remove the old one.
     if (previousAvatar && previousAvatar.startsWith("/uploads/profiles/")) {
       await deleteProfileImageFile(previousAvatar);
     }
@@ -150,4 +189,15 @@ export const updateUserProfileService = async ({
     ...updatedProfile,
     token,
   };
+};
+
+// Public, like the old /uploads/profiles files: an <img> tag cannot send a
+// login token. Returns null when the user has no stored photo.
+export const getAvatarImageService = async (userId) => {
+  const rows = await safeExecute(
+    `SELECT mime_type, image FROM user_avatars WHERE user_id = ? LIMIT 1`,
+    [userId],
+  );
+  if (rows.length === 0) return null;
+  return { mimeType: rows[0].mime_type, image: rows[0].image };
 };

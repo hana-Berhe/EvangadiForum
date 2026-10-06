@@ -10,12 +10,20 @@ let lastWarmAttemptAt = 0;
 const TAG_EMBEDDING_RETRY_DELAY_MS = 60_000;
 
 const getTagEmbeddingTexts = () =>
-  QUESTION_TAGS.map(({ name, description }) => `${name}: ${description}`);
+  QUESTION_TAGS.map(
+    ({ name, description, examples }) =>
+      `${name}: ${description}. Topics: ${examples}`,
+  );
 
 const initializeQuestionTagEmbeddings = async () => {
   if (tagEmbeddings) return tagEmbeddings;
   if (!tagEmbeddingsPromise) {
-    tagEmbeddingsPromise = generateEmbeddingsBatch(getTagEmbeddingTexts())
+    // Questions are stored as RETRIEVAL_DOCUMENT vectors, so the tags are
+    // embedded as RETRIEVAL_QUERY: Gemini is trained to match a query
+    // against documents, the same pairing semantic search uses.
+    tagEmbeddingsPromise = generateEmbeddingsBatch(getTagEmbeddingTexts(), {
+      taskType: "RETRIEVAL_QUERY",
+    })
       .then((embeddings) => {
         tagEmbeddings = embeddings;
         return embeddings;

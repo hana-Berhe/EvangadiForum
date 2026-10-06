@@ -152,7 +152,7 @@ textarea:focus {
 
 .threadRow {
   display: grid;
-  grid-template-columns: 40px 1fr;
+  grid-template-columns: 44px 1fr;
   gap: 12px;
   padding: 16px 20px;
   border-bottom: 1px solid var(--border, #e3e9ee);
@@ -361,11 +361,11 @@ a {
   align-items: center;
   padding: 2px 8px;
   border-radius: 999px;
-  border: 1px solid var(--tint-blue-border, #bfdbfe);
-  background: var(--tint-blue, #eff6ff);
-  color: var(--info-text, #1d4ed8);
+  border: 1px solid var(--tint-orange-border, #fed7bd);
+  background: var(--tint-orange, #fff4ec);
+  color: var(--accent-text, #d95500);
   font-size: 0.62rem;
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.5;
   white-space: nowrap;
 }

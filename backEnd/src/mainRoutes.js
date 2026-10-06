@@ -7,6 +7,7 @@ import { ragRouter } from "./api/rag/routes/rag.routes.js";
 import { chatRouter } from "./api/chat/routes/chat.routes.js";
 import { roomRouter } from "./api/room/routes/room.routes.js";
 import { profileRouter } from "./api/profile/routes/profile.routes.js";
+import { tagRouter } from "./api/tag/routes/tag.routes.js";
 
 export const mainRouter = express.Router();
 
@@ -17,3 +18,4 @@ mainRouter.use("/rag", ragRouter);
 mainRouter.use("/chat", chatRouter);
 mainRouter.use("/rooms", roomRouter);
 mainRouter.use("/users", profileRouter);
+mainRouter.use("/tags", tagRouter);

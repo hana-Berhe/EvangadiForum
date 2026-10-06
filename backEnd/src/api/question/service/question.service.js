@@ -9,6 +9,10 @@ import {
   storeQuestionVector,
 } from "./vector.service.js";
 import {
+  getQuestionTag,
+  warmQuestionTagEmbeddings,
+} from "./question-tagging.service.js";
+import {
   BadRequestError,
   NotFoundError,
 } from "../../../utility/errors/errors.js";
@@ -28,6 +32,11 @@ const buildQuestionFilters = (filters) => {
   if (filters.mine && filters.userId) {
     conditions.push("q.user_id = ?");
     params.push(filters.userId);
+  }
+
+  if (filters.tag) {
+    conditions.push("q.tag = ?");
+    params.push(filters.tag);
   }
 
   if (conditions.length === 0) {
@@ -52,6 +61,7 @@ const getQuestionsService = async (filters) => {
       q.question_hash AS questionHash,
       q.title,
       q.content,
+      q.tag,
       q.created_at AS createdAt,
       q.updated_at AS updatedAt,
       u.user_id AS userId,
@@ -76,6 +86,7 @@ const getQuestionsService = async (filters) => {
       questionHash: question.questionHash,
       title: question.title,
       content: question.content,
+      tag: question.tag,
       answerCount: question.answerCount,
       createdAt: question.createdAt,
       updatedAt: question.updatedAt,
@@ -105,6 +116,7 @@ const getSingleQuestionService = async ({ questionHash }) => {
       q.question_hash AS questionHash,
       q.title,
       q.content,
+      q.tag,
       q.created_at AS createdAt,
       q.updated_at AS updatedAt,
       u.user_id AS userId,
@@ -151,6 +163,7 @@ const getSingleQuestionService = async ({ questionHash }) => {
       questionHash: question.questionHash,
       title: question.title,
       content: question.content,
+      tag: question.tag,
       answerCount: question.answerCount,
       createdAt: question.createdAt,
       updatedAt: question.updatedAt,
@@ -193,7 +206,7 @@ const createQuestionWithVectorService = async (payload) => {
 
   // Prepare the SQL statement for inserting a new question
   const insertQuestionSql =
-    "INSERT INTO questions (question_hash, user_id, title, content) VALUES (?, ?, ?, ?)";
+    "INSERT INTO questions (question_hash, user_id, title, content, tag) VALUES (?, ?, ?, ?, NULL)";
 
   // Generate a unique hash for the question
   const questionHash = generateQuestionHash();
@@ -227,6 +240,7 @@ const createQuestionWithVectorService = async (payload) => {
     title,
     content,
     userId,
+    tag: null,
   };
 
   // Normalize the question text (title and content) to prepare it for vector embedding
@@ -235,6 +249,7 @@ const createQuestionWithVectorService = async (payload) => {
     content: payload.content,
   });
 
+  let questionEmbedding;
   try {
     // Generate the vector embedding for the normalized question text
     const embeddingResult = await generateQuestionEmbedding(sourceText, {
@@ -249,6 +264,8 @@ const createQuestionWithVectorService = async (payload) => {
     ) {
       throw new Error("Gemini API returned an empty or invalid embedding");
     }
+
+    questionEmbedding = embeddingResult.embedding;
 
     // Store the generated vector embedding in the database with a 'ready' status
     await storeQuestionVector({
@@ -272,6 +289,32 @@ const createQuestionWithVectorService = async (payload) => {
       embedding: [],
       status: "failed",
     }).catch((e) => console.error("Failed to save failed status", e));
+  }
+
+  if (questionEmbedding) {
+    try {
+      const tag = getQuestionTag(questionEmbedding);
+      await safeExecute("UPDATE questions SET tag = ? WHERE question_id = ?", [
+        tag,
+        questionId,
+      ]);
+      creationResult.tag = tag;
+    } catch (error) {
+      console.error("Failed to tag question", questionId, error);
+      warmQuestionTagEmbeddings();
+      try {
+        await safeExecute(
+          "UPDATE questions SET tag = NULL WHERE question_id = ?",
+          [questionId],
+        );
+      } catch (updateError) {
+        console.error(
+          "Failed to clear question tag after tagging error",
+          questionId,
+          updateError,
+        );
+      }
+    }
   }
 
   // Return the created question object
@@ -350,7 +393,7 @@ const updateQuestionService = async ({
   content,
 }) => {
   const rows = await safeExecute(
-    "SELECT question_id AS id, user_id, title, content FROM questions WHERE question_hash = ?",
+    "SELECT question_id AS id, user_id, title, content, tag FROM questions WHERE question_hash = ?",
     [questionHash],
   );
   if (rows.length === 0 || rows[0].user_id !== userId) {
@@ -358,20 +401,25 @@ const updateQuestionService = async ({
   }
   const question = rows[0];
 
+  const contentChanged =
+    title !== question.title || content !== question.content;
+  let updatedTag = contentChanged ? null : question.tag;
   await safeExecute(
-    "UPDATE questions SET title = ?, content = ? WHERE question_id = ?",
-    [title, content, question.id],
+    "UPDATE questions SET title = ?, content = ?, tag = ? WHERE question_id = ?",
+    [title, content, contentChanged ? null : question.tag, question.id],
   );
 
   // The embedding is built from the title and the content, so refresh it only
   // when one of them changed. If Gemini fails, the edit is kept and the vector
   // is marked failed, the same as on create.
-  if (title !== question.title || content !== question.content) {
+  if (contentChanged) {
     const sourceText = normalizeQuestionText({ title, content });
+    let embedding;
     try {
-      const { embedding } = await generateQuestionEmbedding(sourceText, {
+      const result = await generateQuestionEmbedding(sourceText, {
         questionId: question.id,
       });
+      embedding = result.embedding;
       await storeQuestionVector({
         questionId: question.id,
         sourceText,
@@ -387,9 +435,38 @@ const updateQuestionService = async ({
         status: "failed",
       }).catch((e) => console.error("Failed to save failed status", e));
     }
+
+    if (embedding) {
+      try {
+        const tag = getQuestionTag(embedding);
+        await safeExecute(
+          "UPDATE questions SET tag = ? WHERE question_id = ?",
+          [tag, question.id],
+        );
+        updatedTag = tag;
+      } catch (error) {
+        console.error("Failed to retag question", question.id, error);
+        warmQuestionTagEmbeddings();
+        await safeExecute(
+          "UPDATE questions SET tag = NULL WHERE question_id = ?",
+          [question.id],
+        ).catch((updateError) =>
+          console.error(
+            "Failed to clear tag after retagging error",
+            question.id,
+            updateError,
+          ),
+        );
+      }
+    }
   }
 
-  return { questionHash, title, content };
+  return {
+    questionHash,
+    title,
+    content,
+    tag: updatedTag,
+  };
 };
 
 // Its answers and its stored vector are removed by ON DELETE CASCADE.

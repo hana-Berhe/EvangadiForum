@@ -8,6 +8,7 @@ import { db } from "./schema/db.config.js";
 import { mainRouter } from "./src/mainRoutes.js";
 import { errorHandler, notFound } from "./src/middleware/error-handler.js";
 import { PROFILE_UPLOAD_DIR } from "./src/api/profile/config/profile.upload.config.js";
+import { warmQuestionTagEmbeddings } from "./src/api/question/service/question-tagging.service.js";
 
 const app = express();
 
@@ -53,4 +54,5 @@ async function startServer() {
   }
 }
 
+warmQuestionTagEmbeddings();
 startServer();

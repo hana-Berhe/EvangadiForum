@@ -10,6 +10,9 @@
   letter-spacing: 0.02em;
   line-height: 1;
   user-select: none;
+  /* Photos fill the circle without being stretched: a tall or wide photo is
+     cropped to its centre instead of squashed. */
+  object-fit: cover;
 }
 
 .small {
@@ -20,26 +23,27 @@
 
 /* Navbar and sidebar: the logged-in user. */
 .nav {
-  width: 32px;
-  height: 32px;
-  font-size: 0.74rem;
+  width: 44px;
+  height: 44px;
+  font-size: 0.95rem;
 }
 
-/* Question rows, answers and the question page. */
+/* Question rows, answers, the question page, and room messages (medium).
+   Same size everywhere a person appears next to what they wrote. */
 .thread {
-  width: 42px;
-  height: 42px;
-  font-size: 0.9rem;
+  width: 52px;
+  height: 52px;
+  font-size: 1.05rem;
 }
 
 .medium {
-  width: 40px;
-  height: 40px;
-  font-size: 0.86rem;
+  width: 52px;
+  height: 52px;
+  font-size: 1.05rem;
 }
 
 .large {
-  width: 56px;
-  height: 56px;
-  font-size: 1.15rem;
+  width: 88px;
+  height: 88px;
+  font-size: 1.75rem;
 }

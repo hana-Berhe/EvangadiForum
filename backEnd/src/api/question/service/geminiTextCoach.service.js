@@ -294,6 +294,7 @@ Rules:
   });
 
 export {
+  parseJsonObject, // exported for tests
   assessAnswerAgainstQuestionService,
   generateQuestionDraftCoachService,
   answerFromRagChunksService,

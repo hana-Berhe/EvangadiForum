@@ -261,6 +261,30 @@ h1 {
   overflow-wrap: anywhere;
 }
 
+/* Headings written in posts ("# ..." renders as h3, "##" as h4, ...). */
+.proseContent h3,
+.proseContent h4,
+.proseContent h5,
+.proseContent h6 {
+  margin: 1.1em 0 0.4em;
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--text, #0f172a);
+}
+
+.proseContent h3 {
+  font-size: 1.25rem;
+}
+
+.proseContent h4 {
+  font-size: 1.1rem;
+}
+
+.proseContent h5,
+.proseContent h6 {
+  font-size: 1rem;
+}
+
 *:first-child {
   margin-top: 0;
 }

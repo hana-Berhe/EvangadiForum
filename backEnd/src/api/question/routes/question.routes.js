@@ -23,6 +23,13 @@ import {
 } from "../validations/question.validation.js";
 
 import { authenticateUser } from "../../../middleware/authentication.js";
+import { createUserRateLimit } from "../../../middleware/user-rate-limit.js";
+
+// Each AI call costs Gemini quota, so limit how often one user can ask.
+const aiRateLimit = createUserRateLimit({
+  max: Number(process.env.AI_RATE_LIMIT_PER_MIN) || 10,
+  what: "AI requests",
+});
 
 const questionRouter = express.Router();
 
@@ -46,6 +53,7 @@ questionRouter.post(
 questionRouter.post(
   "/draft-coach",
   authenticateUser,
+  aiRateLimit,
   generateQuestionDraftCoachValidation,
   generateQuestionDraftCoachController,
 );
@@ -106,6 +114,7 @@ questionRouter.get(
 questionRouter.post(
   "/:questionHash/answer-fit",
   authenticateUser,
+  aiRateLimit,
   assessAnswerAgainstQuestionValidation,
   assessAnswerAgainstQuestionController,
 );

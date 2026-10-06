@@ -8,18 +8,19 @@ import {
   registerValidation,
   loginValidation,
 } from "../validations/auth.validation.js";
+import { authRateLimit } from "../../../middleware/auth-rate-limit.js";
 
 /**
  * @route POST /api/auth/register
  * @desc Register a new user
  * @access Public
  */
-authRouter.post("/register", registerValidation, registerController);
+authRouter.post("/register", authRateLimit, registerValidation, registerController);
 
 /**
  * @route POST /api/auth/login
  * @desc Authenticate user and get token
  * @access Public
  */
-authRouter.post("/login", loginValidation, loginController);
+authRouter.post("/login", authRateLimit, loginValidation, loginController);
 export { authRouter };

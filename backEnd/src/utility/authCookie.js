@@ -1,5 +1,7 @@
-// Settings for the login cookie. Login and logout both use these,
-// so the cookie is always created and cleared the same way.
+import jwt from "jsonwebtoken";
+
+// Settings for the login cookie. Login, logout and profile updates all use
+// these, so the cookie is always created and cleared the same way.
 
 export const AUTH_COOKIE_NAME = "token";
 
@@ -9,3 +11,17 @@ export const authCookieOptions = {
   sameSite: "lax", // blocks most cross-site request tricks
   path: "/",
 };
+
+/**
+ * Stores the JWT in an httpOnly cookie that expires together with the token.
+ *
+ * @param {import('express').Response} res
+ * @param {string} token
+ */
+export function setAuthCookie(res, token) {
+  const { exp } = jwt.decode(token);
+  res.cookie(AUTH_COOKIE_NAME, token, {
+    ...authCookieOptions,
+    maxAge: exp * 1000 - Date.now(),
+  });
+}

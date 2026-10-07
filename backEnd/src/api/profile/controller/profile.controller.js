@@ -4,6 +4,7 @@ import {
   getUserProfileService,
   updateUserProfileService,
 } from "../service/profile.service.js";
+import { setAuthCookie } from "../../../utility/authCookie.js";
 
 export const getUserProfileController = async (req, res, next) => {
   try {
@@ -28,6 +29,12 @@ export const updateUserProfileController = async (req, res, next) => {
       bio: req.body.bio,
       file: req.file,
     });
+
+    // The name may have changed, so the service signed a new token.
+    // Store it in the login cookie so the session shows the new name.
+    if (updatedProfile.token) {
+      setAuthCookie(res, updatedProfile.token);
+    }
 
     res.status(StatusCodes.OK).json({
       success: true,

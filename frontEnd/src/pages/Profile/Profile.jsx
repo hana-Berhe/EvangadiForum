@@ -33,7 +33,7 @@ function getAvatarPreviewUrl(avatar) {
 }
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { setProfile: setSharedProfile } = useProfile();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -161,11 +161,9 @@ export default function Profile() {
       setSelectedFile(null);
       setPreviewUrl(getAvatarPreviewUrl(nextProfile?.avatar));
 
-      if (nextProfile.token) {
-        localStorage.setItem("token", nextProfile.token);
-      }
-
-      localStorage.setItem("user", JSON.stringify(nextProfile));
+      // The backend stored a new login cookie with the updated name; reload
+      // the logged-in user so the navbar and sidebar show it.
+      await refreshUser();
     } catch (err) {
       setError(
         err?.response?.data?.msg ||

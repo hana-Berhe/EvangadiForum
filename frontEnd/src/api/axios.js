@@ -3,30 +3,27 @@ import { API_BASE_URL } from "./config.js";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  // The browser sends the httpOnly auth cookie automatically.
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
-
 // Name of the event AuthContext listens for. Interceptors live outside React,
-// so they cannot call setUser directly — they announce it and the provider reacts.
+// so they cannot call setUser directly; they announce it and the provider reacts.
 export const SESSION_EXPIRED_EVENT = "auth:session-expired";
 
-// A 401 from login or register means "wrong password", not "your session ended".
-// Those belong to the form, so they must not tear the session down.
+// A 401 from these routes is expected (wrong password, or simply not logged
+// in yet), so it must not be treated as "your session ended".
 function isAuthEndpoint(url = "") {
-  return url.includes("/auth/login") || url.includes("/auth/register");
+  return (
+    url.includes("/auth/login") ||
+    url.includes("/auth/register") ||
+    url.includes("/auth/me") ||
+    url.includes("/auth/logout")
+  );
 }
 
 api.interceptors.response.use(
@@ -36,8 +33,6 @@ api.interceptors.response.use(
       error.response?.status === 401 && !isAuthEndpoint(error.config?.url);
 
     if (isSessionLoss) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
       window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT));
     }
 

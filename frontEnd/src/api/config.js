@@ -1,5 +1,7 @@
 // The backend address, taken from VITE_API_BASE_URL and cleaned up so small
 // differences in how it is written cannot break the app:
+//   "/api"                              ok (production on Vercel: the
+//                                       vercel.json rewrite forwards it to Render)
 //   "https://my-api.onrender.com/api"   ok
 //   "https://my-api.onrender.com/api/"  ok (trailing slash removed)
 //   "https://my-api.onrender.com"       ok ("/api" added)

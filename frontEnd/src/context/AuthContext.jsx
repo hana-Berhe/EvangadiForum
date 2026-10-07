@@ -6,80 +6,83 @@ import {
   useState,
 } from "react";
 
-import { loginUser, registerUser } from "../api/auth.api";
+import {
+  getCurrentUser,
+  loginUser,
+  logoutUser,
+  registerUser,
+} from "../api/auth.api";
 
 import { SESSION_EXPIRED_EVENT } from "../api/axios";
 
 const AuthContext = createContext(null);
 
-function clearStoredSession() {
-  // Remove JWT token from browser storage
-  localStorage.removeItem("token");
-
-  // Remove stored user information from browser storage
-  localStorage.removeItem("user");
-}
-
-function readStoredUser() {
-  try {
-    const { id, firstName, lastName } = decodeTokenPayload(
-      localStorage.getItem("token"),
-    );
-
-    return {
-      id,
-      firstName,
-      lastName,
-      email: "",
-    };
-  } catch {
-    return null;
-  }
-}
-
-function decodeTokenPayload(token) {
-  const segment = token
-    .split(".")[1]
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
-  const padded = segment.padEnd(Math.ceil(segment.length / 4) * 4, "=");
-  const bytes = Uint8Array.from(
-    atob(padded),
-    (char) => char.charCodeAt(0),
-  );
-  return JSON.parse(new TextDecoder().decode(bytes));
-}
-
-function isTokenExpired(token) {
-  if (!token) return true;
-  try {
-    const payload = decodeTokenPayload(token);
-    if (!payload.exp) return false;
-    return payload.exp * 1000 <= Date.now();
-  } catch {
-    return true;
-  }
+function toSessionUser(data) {
+  if (!data?.id) return null;
+  return {
+    id: data.id,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: "",
+  };
 }
 
 export function AuthProvider({ children }) {
-  const storedToken = localStorage.getItem("token");
+  const [user, setUser] = useState(null);
 
-  const [user, setUser] = useState(
-    !isTokenExpired(storedToken) ? readStoredUser() : null,
-  );
+  // True until the first /auth/me check finishes. Protected pages must wait
+  // for it, or a logged-in user would be sent to the login page on reload.
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   const [sessionExpired, setSessionExpired] = useState(false);
-  const isAuthenticated = Boolean(
-    user && storedToken && !isTokenExpired(storedToken),
-  );
+  const isAuthenticated = Boolean(user);
+
+  // On page load, ask the backend who is logged in (based on the cookie).
+  useEffect(() => {
+    let cancelled = false;
+
+    getCurrentUser()
+      .then((data) => {
+        if (!cancelled) setUser(toSessionUser(data.data));
+      })
+      .catch(() => {
+        if (!cancelled) setUser(null);
+      })
+      .finally(() => {
+        if (!cancelled) setIsCheckingSession(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleSessionExpired() {
+      setUser(null);
+      setSessionExpired(true);
+    }
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () =>
+      window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+  }, []);
 
   async function login(credentials) {
     const data = await loginUser(credentials);
-    localStorage.setItem("token", data.data.token);
-    setUser(readStoredUser());
+    setUser(toSessionUser(data.data.user));
     setSessionExpired(false);
-
     return data;
+  }
+
+  // Re-reads the logged-in user from the backend, e.g. after a profile edit
+  // changed the name (the backend then issues a new cookie).
+  async function refreshUser() {
+    try {
+      const data = await getCurrentUser();
+      setUser(toSessionUser(data.data));
+    } catch {
+      // Keep the current user; a real session loss is handled elsewhere.
+    }
   }
 
   async function register(payload) {
@@ -87,39 +90,30 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    clearStoredSession();
+    // Clear the user right away so the UI updates, then clear the cookie.
     setUser(null);
+    return logoutUser().catch(() => {
+      // The cookie may already be gone; nothing else to do.
+    });
   }
-
-  useEffect(() => {
-    function handleSessionExpired() {
-      clearStoredSession();
-      setUser(null);
-      setSessionExpired(true);
-    }
-    window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
-    return () =>
-      window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
-  }, []); // [] means the effect is set up once
 
   const value = useMemo(
     () => ({
       user,
       isAuthenticated,
+      isCheckingSession,
       sessionExpired,
       login,
       register,
       logout,
+      refreshUser,
     }),
 
-    [user, isAuthenticated, sessionExpired],
+    [user, isAuthenticated, isCheckingSession, sessionExpired],
   );
 
   return (
-    <AuthContext.Provider value={value}>
-      {/* Render the components inside AuthProvider */}
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
   );
 }
 

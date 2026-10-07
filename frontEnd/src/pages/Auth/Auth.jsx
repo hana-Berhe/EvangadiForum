@@ -26,7 +26,13 @@ import avatar3 from "../../assets/avatar3.png";
 const REGISTER_SUCCESS_DELAY_MS = 1500;
 
 export default function Auth() {
-  const { isAuthenticated, sessionExpired, login, register } = useAuth();
+  const {
+    isAuthenticated,
+    isCheckingSession,
+    sessionExpired,
+    login,
+    register,
+  } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,6 +61,11 @@ export default function Auth() {
   const switchTimer = useRef(null);
 
   useEffect(() => () => clearTimeout(switchTimer.current), []);
+
+  // Wait for the session check, so a logged-in user doesn't see the form flash.
+  if (isCheckingSession) {
+    return null;
+  }
 
   if (isAuthenticated) {
     return <Navigate to={redirectTo} replace />;

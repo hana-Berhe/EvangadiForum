@@ -1,39 +1,44 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { ProfileContext } from "./ProfileContext";
-
-function cacheKey(userId) {
-  return `profile:${userId}`;
-}
-
-function readCachedProfile(userId) {
-  try {
-    const profile = JSON.parse(localStorage.getItem(cacheKey(userId)));
-    return Number(profile?.id) === Number(userId) ? profile : null;
-  } catch {
-    return null;
-  }
-}
+import { getUserProfile } from "../api/profile.api";
 
 export function ProfileProvider({ children }) {
   const { user } = useAuth();
-  const [storedProfile, setStoredProfile] = useState(() => ({
-    userId: user?.id,
-    profile: user?.id ? readCachedProfile(user.id) : null,
-  }));
+  const [storedProfile, setStoredProfile] = useState({
+    userId: null,
+    profile: null,
+  });
+
+  useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+
+    getUserProfile(user.id)
+      .then((result) => {
+        const loaded = result?.data ?? result;
+        if (!cancelled && Number(loaded?.id) === Number(user.id)) {
+          setStoredProfile({ userId: user.id, profile: loaded });
+        }
+      })
+      .catch(() => {
+        // Keep showing initials if the profile can't be loaded.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  // Only expose a profile that belongs to the current user.
   const profile =
-    Number(storedProfile.userId) === Number(user?.id)
+    user?.id && Number(storedProfile.userId) === Number(user.id)
       ? storedProfile.profile
-      : user?.id
-        ? readCachedProfile(user.id)
-        : null;
+      : null;
 
   const setProfile = useCallback(
     (nextProfile) => {
       setStoredProfile({ userId: user?.id, profile: nextProfile });
-      if (user?.id && Number(nextProfile?.id) === Number(user.id)) {
-        localStorage.setItem(cacheKey(user.id), JSON.stringify(nextProfile));
-      }
     },
     [user],
   );

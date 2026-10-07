@@ -1,24 +1,10 @@
-import jwt from "jsonwebtoken";
 import { StatusCodes } from "http-status-codes";
 import { registerService, loginService } from "../service/auth.service.js";
 import {
   AUTH_COOKIE_NAME,
   authCookieOptions,
+  setAuthCookie,
 } from "../../../utility/authCookie.js";
-
-/**
- * Stores the JWT in an httpOnly cookie that expires together with the token.
- *
- * @param {import('express').Response} res
- * @param {string} token
- */
-function setAuthCookie(res, token) {
-  const { exp } = jwt.decode(token);
-  res.cookie(AUTH_COOKIE_NAME, token, {
-    ...authCookieOptions,
-    maxAge: exp * 1000 - Date.now(),
-  });
-}
 
 /**
  * Handles user registration requests.
@@ -51,8 +37,8 @@ const registerController = async (req, res, next) => {
 
 /**
  * Handles user login requests.
- * Sets the token as an httpOnly cookie. The token is still returned in the
- * JSON during the switch; remove it once the frontend no longer reads it.
+ * The token goes only into the httpOnly cookie, never into the JSON body,
+ * so JavaScript in the browser can't read it.
  *
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -72,7 +58,6 @@ const loginController = async (req, res, next) => {
       message: "Login successful.",
       data: {
         user: authResult.user,
-        token: authResult.token, // TEMPORARY: remove in the final step
       },
     });
   } catch (error) {
@@ -95,7 +80,7 @@ const logoutController = (req, res) => {
 };
 
 /**
- * Returns the logged-in user, based on the auth cookie (or header).
+ * Returns the logged-in user, based on the auth cookie.
  *
  * @param {import('express').Request} req
  * @param {import('express').Response} res

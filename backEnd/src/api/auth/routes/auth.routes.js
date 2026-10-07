@@ -3,6 +3,7 @@ const authRouter = express.Router();
 import {
   registerController,
   loginController,
+  logoutController,
 } from "../controller/auth.controller.js";
 import {
   registerValidation,
@@ -15,24 +16,19 @@ import { authRateLimit } from "../../../middleware/auth-rate-limit.js";
  * @desc Register a new user
  * @access Public
  */
-authRouter.post("/register", authRateLimit, registerValidation, registerController);
+authRouter.post(
+  "/register",
+  authRateLimit,
+  registerValidation,
+  registerController,
+);
 
 /**
  * @route POST /api/auth/login
- * @desc Authenticate user and get token
+ * @desc Authenticate user and set the auth cookie
  * @access Public
  */
 authRouter.post("/login", authRateLimit, loginValidation, loginController);
-export { authRouter };
-
-
-import {
-  registerController,
-  loginController,
-  logoutController,
-} from "../controller/auth.controller.js";
-
-// ...existing register and login routes...
 
 /**
  * @route POST /api/auth/logout
@@ -40,3 +36,5 @@ import {
  * @access Public
  */
 authRouter.post("/logout", logoutController);
+
+export { authRouter };

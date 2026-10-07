@@ -4,6 +4,7 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { db } from "./schema/db.config.js";
 import { mainRouter } from "./src/mainRoutes.js";
 import { errorHandler, notFound } from "./src/middleware/error-handler.js";
@@ -12,14 +13,15 @@ import { warmQuestionTagEmbeddings } from "./src/api/question/service/question-t
 
 const app = express();
 
-// When deployed (Render, Railway, Vercel, Nginx...), requests reach this app
-// through a proxy. This makes req.ip the visitor's real IP instead of the
-// proxy's, so the login rate limit counts each visitor separately.
-app.set("trust proxy", 1);
+// Requests reach this app through two proxies: Vercel (the /api rewrite)
+// and Render. Trusting both makes req.ip the visitor's real IP instead of
+// a proxy's, so the login rate limit counts each visitor separately.
+app.set("trust proxy", 2);
 
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(cors());
 // Only profile photos are public. Users' PDFs (uploads/rag) are NOT served
 // here; they are only reachable through GET /api/rag/documents/:id/file,

@@ -94,4 +94,17 @@ const logoutController = (req, res) => {
   });
 };
 
-export { registerController, loginController, logoutController };
+/**
+ * Returns the logged-in user, based on the auth cookie (or header).
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+const meController = (req, res) => {
+  res.status(StatusCodes.OK).json({
+    success: true,
+    data: req.user,
+  });
+};
+
+export { registerController, loginController, logoutController, meController };

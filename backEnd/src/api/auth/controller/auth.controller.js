@@ -1,24 +1,10 @@
-import jwt from "jsonwebtoken";
 import { StatusCodes } from "http-status-codes";
 import { registerService, loginService } from "../service/auth.service.js";
 import {
   AUTH_COOKIE_NAME,
   authCookieOptions,
+  setAuthCookie,
 } from "../../../utility/authCookie.js";
-
-/**
- * Stores the JWT in an httpOnly cookie that expires together with the token.
- *
- * @param {import('express').Response} res
- * @param {string} token
- */
-function setAuthCookie(res, token) {
-  const { exp } = jwt.decode(token);
-  res.cookie(AUTH_COOKIE_NAME, token, {
-    ...authCookieOptions,
-    maxAge: exp * 1000 - Date.now(),
-  });
-}
 
 /**
  * Handles user registration requests.

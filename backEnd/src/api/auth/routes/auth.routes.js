@@ -24,3 +24,19 @@ authRouter.post("/register", authRateLimit, registerValidation, registerControll
  */
 authRouter.post("/login", authRateLimit, loginValidation, loginController);
 export { authRouter };
+
+
+import {
+  registerController,
+  loginController,
+  logoutController,
+} from "../controller/auth.controller.js";
+
+// ...existing register and login routes...
+
+/**
+ * @route POST /api/auth/logout
+ * @desc Clear the auth cookie
+ * @access Public
+ */
+authRouter.post("/logout", logoutController);

@@ -47,6 +47,7 @@ const registerController = async (req, res, next) => {
  */
 const loginController = async (req, res, next) => {
   try {
+    console.log("[debug] login from", req.ip); // TEMPORARY: remove after checking
     const { email, password } = req.body;
 
     const authResult = await loginService({ email, password });

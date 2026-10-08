@@ -47,7 +47,12 @@ const registerController = async (req, res, next) => {
  */
 const loginController = async (req, res, next) => {
   try {
-    console.log("[debug] login from", req.ip); // TEMPORARY: remove after checking
+    console.log("[debug] login", {
+      ip: req.ip,
+      forwardedFor: req.headers["x-forwarded-for"],
+      vercelForwardedFor: req.headers["x-vercel-forwarded-for"],
+      realIp: req.headers["x-real-ip"],
+    });
     const { email, password } = req.body;
 
     const authResult = await loginService({ email, password });

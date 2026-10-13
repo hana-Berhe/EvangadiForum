@@ -230,3 +230,9 @@
   font-size: 0.72rem;
   color: var(--text-muted, #64748b);
 }
+
+.loadMoreRow {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+}

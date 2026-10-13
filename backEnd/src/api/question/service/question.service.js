@@ -16,10 +16,16 @@ import {
   BadRequestError,
   NotFoundError,
 } from "../../../utility/errors/errors.js";
+import {
+  buildCursorCondition,
+  decodeQuestionCursor,
+  encodeQuestionCursor,
+  normalizePageSize,
+} from "./question-pagination.js";
 
 const generateQuestionHash = () => crypto.randomBytes(8).toString("hex");
 // ---- T-10a ---added---
-const buildQuestionFilters = (filters) => {
+const buildQuestionFilters = (filters, cursorPosition = null) => {
   const conditions = [];
   const params = [];
 
@@ -39,6 +45,12 @@ const buildQuestionFilters = (filters) => {
     params.push(filters.tag);
   }
 
+  if (cursorPosition) {
+    const cursor = buildCursorCondition(cursorPosition);
+    conditions.push(cursor.condition);
+    params.push(...cursor.params);
+  }
+
   if (conditions.length === 0) {
     return { whereClause: "", params };
   }
@@ -48,12 +60,46 @@ const buildQuestionFilters = (filters) => {
     params,
   };
 };
-const getQuestionsService = async (filters) => {
-  const normalizedLimit = 100; // Fixed max 100 records
-  const sortColumn = "q.created_at";
-  const normalizedSortOrder = "DESC";
 
+/**
+ * Totals for the whole feed that matches the filters, not just one page.
+ * The dashboard cards use these, so they stay right with "load more".
+ */
+const getQuestionStats = async (filters) => {
   const { whereClause, params } = buildQuestionFilters(filters);
+  const statsSql = `
+    SELECT
+      COUNT(*) AS questions,
+      COALESCE(SUM(ac.answer_count), 0) AS replies,
+      COALESCE(SUM(ac.answer_count IS NULL), 0) AS unanswered,
+      COALESCE(SUM(q.user_id = ?), 0) AS yours
+    FROM questions q
+    LEFT JOIN (
+      SELECT question_id, COUNT(*) AS answer_count
+      FROM answers
+      GROUP BY question_id
+    ) ac ON ac.question_id = q.question_id
+    ${whereClause}
+  `;
+  const [row] = await safeExecute(statsSql, [filters.userId ?? 0, ...params]);
+  return {
+    questions: Number(row.questions),
+    replies: Number(row.replies),
+    unanswered: Number(row.unanswered),
+    yours: Number(row.yours),
+  };
+};
+
+const getQuestionsService = async (filters) => {
+  // normalizePageSize returns a whole number from 1 to 100, so it is safe to
+  // write into LIMIT directly (LIMIT ? is unreliable with mysql2 prepared
+  // statements).
+  const pageSize = normalizePageSize(filters.limit);
+  const cursorPosition = filters.cursor
+    ? decodeQuestionCursor(filters.cursor)
+    : null;
+
+  const { whereClause, params } = buildQuestionFilters(filters, cursorPosition);
 
   const listSql = `
     SELECT
@@ -74,14 +120,21 @@ const getQuestionsService = async (filters) => {
     LEFT JOIN answers a ON a.question_id = q.question_id
     ${whereClause}
     GROUP BY q.question_id, u.user_id
-    ORDER BY ${sortColumn} ${normalizedSortOrder}
-    LIMIT ${normalizedLimit}
+    ORDER BY q.created_at DESC, q.question_id DESC
+    LIMIT ${pageSize + 1}
   `;
 
+  // One extra row tells us whether another page exists.
   const rows = await safeExecute(listSql, params);
+  const hasMore = rows.length > pageSize;
+  const pageRows = hasMore ? rows.slice(0, pageSize) : rows;
+  const lastRow = pageRows[pageRows.length - 1];
+
+  // Totals are only needed once, with the first page.
+  const stats = cursorPosition ? null : await getQuestionStats(filters);
 
   return {
-    data: rows.map((question) => ({
+    data: pageRows.map((question) => ({
       id: question.id,
       questionHash: question.questionHash,
       title: question.title,
@@ -98,10 +151,15 @@ const getQuestionsService = async (filters) => {
       },
     })),
     meta: {
-      limit: normalizedLimit,
-      total: rows.length,
+      limit: pageSize,
+      hasMore,
+      nextCursor: hasMore
+        ? encodeQuestionCursor({ createdAt: lastRow.createdAt, id: lastRow.id })
+        : null,
+      total: stats ? stats.questions : null,
+      stats,
       sortBy: "newest",
-      sortOrder: normalizedSortOrder,
+      sortOrder: "DESC",
     },
   };
 };

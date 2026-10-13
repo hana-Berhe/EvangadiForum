@@ -48,6 +48,8 @@ const getQuestionsController = async (req, res, next) => {
       mine: req.query.mine,
       tag: req.query.tag,
       userId: req.user.id, // Pass the authenticated user's ID
+      limit: req.query.limit,
+      cursor: req.query.cursor,
     };
 
     const result = await getQuestionsService(filters);

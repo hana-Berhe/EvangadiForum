@@ -25,6 +25,18 @@ const getQuestionsValidation = [
     .bail()
     .isIn(QUESTION_TAG_NAMES)
     .withMessage("Tag must be one of the supported question tags."),
+  query("limit")
+    .optional()
+    .isInt({ min: 1, max: 100 })
+    .withMessage("Limit must be a whole number from 1 to 100")
+    .toInt(),
+  query("cursor")
+    .optional()
+    .isString()
+    .withMessage("Cursor must be a string")
+    .bail()
+    .isLength({ min: 1, max: 200 })
+    .withMessage("Cursor is not valid"),
   validationErrorHandler,
 ];
 

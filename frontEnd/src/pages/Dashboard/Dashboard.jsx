@@ -18,6 +18,8 @@ import ui from "../../styles/pageStates.module.css";
 
 const SEMANTIC_MIN_LENGTH = 5;
 const SEARCH_DEBOUNCE_MS = 400;
+// Questions per "Load more" step in the feed and in keyword search.
+const PAGE_SIZE = 20;
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -31,10 +33,27 @@ export default function Dashboard() {
   const [activeSearch, setActiveSearch] = useState(null);
   const [note, setNote] = useState("");
 
+  // "Load more": where the next page starts (null = no more pages), and the
+  // filters of the list on screen, so the next page uses the same ones.
+  const [nextCursor, setNextCursor] = useState(null);
+  const [feedParams, setFeedParams] = useState({});
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [loadMoreError, setLoadMoreError] = useState("");
+  // Totals for the whole forum, sent by the API with the first feed page.
+  const [forumStats, setForumStats] = useState(null);
+
 
   const requestIdRef = useRef(0);
 
   const lastSearchKeyRef = useRef("");
+
+  // Shows the first page of a list and remembers how to fetch the next one.
+  const showFirstPage = useCallback((response, params) => {
+    setQuestions(response.data);
+    setNextCursor(response.meta?.nextCursor ?? null);
+    setFeedParams(params);
+    setLoadMoreError("");
+  }, []);
 
   const loadAllQuestions = useCallback(async () => {
     const requestId = ++requestIdRef.current;
@@ -44,11 +63,12 @@ export default function Dashboard() {
     setError("");
 
     try {
-      const response = await getAllQuestions();
+      const response = await getAllQuestions({ limit: PAGE_SIZE });
 
       if (requestId !== requestIdRef.current) return;
 
-      setQuestions(response.data);
+      showFirstPage(response, {});
+      if (response.meta?.stats) setForumStats(response.meta.stats);
       setActiveSearch(null);
     } catch (err) {
       if (requestId === requestIdRef.current) {
@@ -57,7 +77,7 @@ export default function Dashboard() {
     } finally {
       if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, []);
+  }, [showFirstPage]);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,10 +88,11 @@ export default function Dashboard() {
       const isStale = () => cancelled || requestId !== requestIdRef.current;
 
       try {
-        const response = await getAllQuestions();
+        const response = await getAllQuestions({ limit: PAGE_SIZE });
 
         if (!isStale()) {
-          setQuestions(response.data);
+          showFirstPage(response, {});
+          if (response.meta?.stats) setForumStats(response.meta.stats);
         }
       } catch (err) {
         if (!isStale()) {
@@ -89,7 +110,7 @@ export default function Dashboard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [showFirstPage]);
 
   async function executeSearch(rawValue, searchMode) {
     const value = rawValue.trim();
@@ -121,21 +142,28 @@ export default function Dashboard() {
 
     try {
       let response;
+      let params = null;
 
       if (searchMode === "semantic") {
+        // Semantic search returns the closest matches, so it has no pages.
         response = await semanticSearch({
           query: value,
           k: 10,
         });
       } else {
-        response = await getAllQuestions({
-          search: value,
-        });
+        params = { search: value };
+        response = await getAllQuestions({ ...params, limit: PAGE_SIZE });
       }
 
       if (requestId !== requestIdRef.current) return;
 
-      setQuestions(response.data);
+      if (params) {
+        showFirstPage(response, params);
+      } else {
+        setQuestions(response.data);
+        setNextCursor(null);
+        setLoadMoreError("");
+      }
 
       setActiveSearch({
         term: value,
@@ -187,12 +215,53 @@ export default function Dashboard() {
     loadAllQuestions();
   }
 
+  async function loadMore() {
+    if (!nextCursor || loadingMore) return;
+
+    // If a new search starts meanwhile, this page belongs to the old list.
+    const requestId = requestIdRef.current;
+
+    setLoadingMore(true);
+    setLoadMoreError("");
+
+    try {
+      const response = await getAllQuestions({
+        ...feedParams,
+        limit: PAGE_SIZE,
+        cursor: nextCursor,
+      });
+
+      if (requestId !== requestIdRef.current) return;
+
+      setQuestions((current) => {
+        // Skip any question already on screen, just in case.
+        const shown = new Set(current.map((q) => q.questionHash));
+        return [
+          ...current,
+          ...response.data.filter((q) => !shown.has(q.questionHash)),
+        ];
+      });
+      setNextCursor(response.meta?.nextCursor ?? null);
+    } catch (err) {
+      if (requestId === requestIdRef.current) {
+        setLoadMoreError(
+          getErrorMessage(err, "Could not load more questions."),
+        );
+      }
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
   function switchMode(mode) {
     setSearchMode(mode);
     setNote("");
   }
 
   const stats = useMemo(() => {
+    if (forumStats) return forumStats;
+
+    // Fallback for an older API that does not send totals.
     const totalReplies = questions.reduce(
       (total, question) => total + Number(question.answerCount),
       0,
@@ -212,7 +281,7 @@ export default function Dashboard() {
       unanswered,
       yours,
     };
-  }, [questions, user.id]);
+  }, [forumStats, questions, user.id]);
 
   return (
     <div className={styles.dashboardPage}>
@@ -263,8 +332,7 @@ export default function Dashboard() {
         <div className={styles.welcomeDivider} />
 
         <p className={styles.tinyNote}>
-          Figures below describe the newest threads in this feed (up to 100 from
-          the API).
+          Figures below describe the whole forum.
         </p>
 
         <div className={`${styles.statsGrid} ${styles.compact}`}>
@@ -395,6 +463,23 @@ export default function Dashboard() {
             />
           ))}
         </div>
+
+        {!loading && !error && loadMoreError && (
+          <ErrorMessage message={loadMoreError} />
+        )}
+
+        {!loading && !error && nextCursor && (
+          <div className={styles.loadMoreRow}>
+            <button
+              type="button"
+              className={btn.secondaryButton}
+              onClick={loadMore}
+              disabled={loadingMore}
+            >
+              {loadingMore ? "Loading..." : "Load more"}
+            </button>
+          </div>
+        )}
       </section>
     </div>
   );

@@ -10,7 +10,10 @@ import {
   registerValidation,
   loginValidation,
 } from "../validations/auth.validation.js";
-import { authRateLimit } from "../../../middleware/auth-rate-limit.js";
+import {
+  loginRateLimit,
+  registerRateLimit,
+} from "../../../middleware/auth-rate-limit.js";
 import { authenticateUser } from "../../../middleware/authentication.js";
 
 /**
@@ -20,7 +23,7 @@ import { authenticateUser } from "../../../middleware/authentication.js";
  */
 authRouter.post(
   "/register",
-  authRateLimit,
+  registerRateLimit,
   registerValidation,
   registerController,
 );
@@ -30,7 +33,7 @@ authRouter.post(
  * @desc Authenticate user and set the auth cookie
  * @access Public
  */
-authRouter.post("/login", authRateLimit, loginValidation, loginController);
+authRouter.post("/login", loginRateLimit, loginValidation, loginController);
 
 /**
  * @route POST /api/auth/logout

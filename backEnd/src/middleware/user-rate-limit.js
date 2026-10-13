@@ -3,7 +3,8 @@
 // discussion rooms use it (one user must not flood a room).
 //
 // It is a counter in memory: no package and no database table. It is reset
-// when the server restarts, and that is fine for this job.
+// when the server restarts, and that is fine for this job. It remembers at
+// most `maxTrackedUsers` users, so the Map cannot grow forever.
 // Use it AFTER authenticateUser, because it needs req.user.id.
 
 import { TooManyRequestsError } from "../utility/errors/errors.js";
@@ -15,14 +16,16 @@ import { TooManyRequestsError } from "../utility/errors/errors.js";
  * @param {number} options.max - Requests allowed per user in one window.
  * @param {number} [options.windowMs=60000] - Window length in milliseconds.
  * @param {string} [options.what="requests"] - The word used in the message.
+ * @param {number} [options.maxTrackedUsers=10000] - Most users remembered at
+ *   once. When full, the user who started a window longest ago is forgotten.
  * @returns {(req, res, next) => void}
  */
 export const createUserRateLimit = ({
   max,
   windowMs = 60 * 1000,
   what = "requests",
+  maxTrackedUsers = 10000,
 }) => {
-
   const requestCounts = new Map();
 
   return (req, res, next) => {
@@ -31,6 +34,12 @@ export const createUserRateLimit = ({
     const userId = req.user.id;
     let entry = requestCounts.get(userId);
     if (!entry || entry.resetAt <= now) {
+      // Delete first, so a reset user moves to the end of the Map (newest).
+      requestCounts.delete(userId);
+      if (requestCounts.size >= maxTrackedUsers) {
+        // Forget the oldest user to make room.
+        requestCounts.delete(requestCounts.keys().next().value);
+      }
       entry = { count: 0, resetAt: now + windowMs };
       requestCounts.set(userId, entry);
     }
